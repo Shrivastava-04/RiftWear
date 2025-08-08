@@ -1,0 +1,135 @@
+/* client/src/index.css */
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Tailwind CSS v3 Directives */
+@tailwind base;      /* This is correct for v3 */
+@tailwind components;
+@tailwind utilities;
+
+/* Your custom CSS variables and base layers */
+@layer base {
+  :root {
+    /* Arrasté Brand Colors */
+    --background: 252 14% 9%; /* #17161c */
+    --foreground: 36 100% 87%; /* #ffd7b3 */
+
+    --card: 252 14% 9%;
+    --card-foreground: 36 100% 87%;
+
+    --popover: 232 19% 19%; /* #2f3241 */
+    --popover-foreground: 36 100% 87%;
+
+    --primary: 232 19% 19%; /* #2f3241 */
+    --primary-foreground: 36 100% 87%;
+
+    --secondary: 232 19% 19%; /* #2f3241 */
+    --secondary-foreground: 36 100% 87%;
+
+    --muted: 232 19% 19%;
+    --muted-foreground: 36 30% 70%;
+
+    --accent: 34 73% 58%; /* #e89846 */
+    --accent-foreground: 252 14% 9%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 36 100% 87%;
+
+    --border: 232 19% 25%;
+    --input: 232 19% 25%;
+    --ring: 34 73% 58%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--primary)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(34 73% 45%));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--primary)));
+
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(var(--accent) / 0.2);
+    --shadow-card: 0 10px 30px -10px hsl(var(--background) / 0.8);
+    --shadow-button: 0 4px 20px hsl(var(--accent) / 0.3);
+
+    /* Animations (CSS variables for transitions) */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  * {
+    @apply border-border transition-all duration-300;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--accent));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent) / 0.8);
+  }
+}
+
+/* Your existing @layer components */
+@layer components {
+  /* Hero text animations - these now use Tailwind's `animation` utility names,
+     which are defined in tailwind.config.js. Note: for `fade-in-up-delay`
+     you still need the full `animation` property to specify the delay. */
+  .animate-fade-in-up {
+    animation: fade-in-up;
+  }
+
+  .animate-fade-in-up-delay {
+    animation: fade-in-up 0.8s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  .animate-glow {
+    animation: glow;
+  }
+
+  .animate-float {
+    animation: float;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--accent)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glass effect */
+  .glass {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Product card hover effects */
+  .product-card {
+    transform: translateY(0);
+    transition: var(--transition-smooth);
+  }
+
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-glow);
+  }
+}
