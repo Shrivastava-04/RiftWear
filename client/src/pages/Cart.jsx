@@ -161,82 +161,6 @@ const Cart = () => {
     }
   };
 
-  // const handleMakePayment = async () => {
-  //   // Load the Razorpay script
-  //   const res = await loadScript(
-  //     "https://checkout.razorpay.com/v1/checkout.js"
-  //   );
-
-  //   if (!res) {
-  //     alert("Razorpay SDK failed to load. Are you online?");
-  //     return;
-  //   }
-
-  //   try {
-  //     // Call your backend to create a Razorpay order
-  //     const orderResponse = await axios.post(
-  //       `${API_BASE_URL}/payment/razorpay/create-order`,
-  //       {
-  //         amount: totalAmount,
-  //         cartItems: cartItems, // Pass cart details to backend for order creation
-  //         userId: userId,
-  //       }
-  //     );
-
-  //     const { id, currency, amount } = orderResponse.data;
-
-  //     const options = {
-  //       key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Use your Razorpay Key ID from env variables
-  //       amount: amount,
-  //       currency: currency,
-  //       name: "Your Store Name",
-  //       description: "Payment for your order",
-  //       order_id: id,
-  //       handler: async (response) => {
-  //         // This function will be called on successful payment
-  //         alert("Payment Successful!");
-
-  //         // Here you would call another backend API to save the final order
-  //         try {
-  //           const finalOrderResponse = await axios.post(
-  //             `${API_BASE_URL}/order/create`,
-  //             {
-  //               userId: userId,
-  //               cartItems: cartItems,
-  //               razorpayPaymentId: response.razorpay_payment_id,
-  //               razorpayOrderId: response.razorpay_order_id,
-  //               totalAmount: totalAmount,
-  //             }
-  //           );
-  //           // Clear the cart on success
-  //           setCartItems([]);
-  //           navigate(
-  //             `/order-confirmation/${finalOrderResponse.data.order._id}`
-  //           );
-  //         } catch (error) {
-  //           console.error("Error saving final order:", error);
-  //           alert(
-  //             "Payment successful, but failed to save order. Please contact support."
-  //           );
-  //         }
-  //       },
-  //       prefill: {
-  //         name: user.name,
-  //         email: user.email,
-  //         contact: user.phoneNumber,
-  //       },
-  //       theme: {
-  //         color: "#3399cc",
-  //       },
-  //     };
-
-  //     const paymentObject = new window.Razorpay(options);
-  //     paymentObject.open();
-  //   } catch (error) {
-  //     console.error("Error during payment process:", error);
-  //     alert("Payment failed. Please try again.");
-  //   }
-  // };
   const handleMakePayment = async () => {
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
@@ -263,7 +187,7 @@ const Cart = () => {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: amount,
         currency: currency,
-        name: "Your Store Name",
+        name: "Rift Wear",
         description: "Payment for your order",
         order_id: id,
         handler: async (response) => {

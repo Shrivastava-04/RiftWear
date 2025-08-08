@@ -4,6 +4,9 @@ import { v4 as uuidv4 } from "uuid"; // For generating unique order numbers
 import Product from "../models/product.model.js"; // Import your Product model
 import Order from "../models/orders.model.js"; // Import your Order model
 import User from "../models/user.model.js"; // Import your User model
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const razorpayInstance = new Razorpay({
   key_id: process.env.Razorpay_key_API,

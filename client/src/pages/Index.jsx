@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import axios from "axios";
+import comingSoon from "../assets/coming soon image.png";
 
 const Index = () => {
   const [heroBlur, setHeroBlur] = useState(0);
@@ -32,48 +33,48 @@ const Index = () => {
     const loadProducts = async () => {
       const res = await axios.get(`${API_BASE_URL}/product/getallproduct`);
       // console.log(res.data);
-      setFeaturedProducts(res.data);
+      const firstTwoProducts = res.data.slice(0, 2);
+      setFeaturedProducts(firstTwoProducts);
     };
     loadProducts();
   }, []);
 
   // Mock featured products (as per your original code)
-  const featuredProductsa = [
-    {
-      id: "1",
-      name: "Urban Essential Hoodie",
-      price: 89,
-      originalPrice: 120,
-      image: hoodieImage,
-      category: "Hoodies",
-      isNew: true,
-      onSale: true,
-    },
-    {
-      id: "2",
-      name: "Street Culture Tee",
-      price: 45,
-      image: tshirtImage,
-      category: "T-Shirts",
-      isNew: true,
-    },
-    {
-      id: "3",
-      name: "Midnight Black Hoodie",
-      price: 95,
-      image: hoodieImage,
-      category: "Hoodies",
-    },
-    {
-      id: "4",
-      name: "Graphic Statement Tee",
-      price: 39,
-      originalPrice: 55,
-      image: tshirtImage,
-      category: "T-Shirts",
-      onSale: true,
-    },
-  ];
+
+  const product1 = {
+    _id: "689683cdc7875dcf1764057",
+    name: "Tshirt",
+    price: 488,
+    originalPrice: 686,
+    images: [
+      "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1754663484/nhn9gpda.",
+      "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1754663483/asqjsvZC",
+    ],
+    category: "T-Shirt",
+    isNew: true,
+    onSale: true,
+  };
+  const product2 = {
+    _id: "689683cdc7875dcf1764057",
+    name: "Tshirt",
+    price: 488,
+    originalPrice: 686,
+    images: [
+      "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1754663484/nhn9gpda.",
+      "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1754663483/asqjsvZC",
+    ],
+    category: "T-Shirt",
+    isNew: true,
+    onSale: true,
+  };
+
+  const departmentsData = Array.from({ length: 18 }, (_, i) => ({
+    _id: `dept-${i + 1}`,
+    name: `Department ${i + 1}`,
+    description: `Find apparel designed for Department ${i + 1}.`,
+    image: `https://placehold.co/400x250/0F9D58/FFFFFF?text=Dept+${i + 1}`,
+    exploreLink: `/explore?department=Department+${i + 1}`,
+  }));
 
   useEffect(() => {
     // Determine the height of the hero section for calculations
@@ -260,23 +261,20 @@ const Index = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-fade-in-up">
               {featuredProducts.map((product) => (
                 // Assuming ProductCard now handles the 'product' prop correctly as discussed previously
-                <ProductCard key={product._id} product={product} />
+                <ProductCard
+                  key={product._id}
+                  arrival={"arrived"}
+                  product={product}
+                />
               ))}
-            </div>
-
-            <div className="text-center">
-              <Button variant="outline" size="lg" asChild>
-                <Link to="/explore">
-                  View All Products
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              <ProductCard arrival={"comingSoon"} product={product1} />
+              <ProductCard arrival={"comingSoon"} product={product2} />
             </div>
           </div>
         </section>
         <section
-          ref={featuredProductsRef}
-          className="pt-5 pb-20" // Keep py-20 for vertical padding
+          ref={departmentsData}
+          className="py-20" // Keep py-20 for vertical padding
           style={{
             // Apply the gradient. Its opacity is controlled by sectionBackgroundOpacity.
             background: `linear-gradient(to bottom, var(--background), hsl(var(--primary) / 0.2))`,
@@ -289,102 +287,43 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-4 animate-fade-in-up">
-                Featured Products
+                Shop by Department
               </h2>
               <p className="text-foreground/70 max-w-2xl mx-auto animate-fade-in-up">
-                Discover our most popular pieces, carefully selected to elevate
-                your streetwear game
+                Find apparel designed specifically for your field of study.
               </p>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-fade-in-up">
-              {featuredProducts.map((product) => (
-                // Assuming ProductCard now handles the 'product' prop correctly as discussed previously
-                <ProductCard key={product._id} product={product} />
+          </div>
+          {/* Full-width scroll container - no horizontal padding */}
+          <div className="flex overflow-x-scroll pb-4 space-x-6 scrollbar-hide">
+            <div className="px-4 flex space-x-6">
+              {departmentsData.map((department) => (
+                <Card
+                  key={department._id}
+                  className="flex-shrink-0 w-64 bg-card/50 border-border/50 overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
+                >
+                  <img
+                    src={comingSoon}
+                    alt={department.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <CardContent className="p-4 space-y-2">
+                    <CardTitle className="text-xl">{department.name}</CardTitle>
+                    <p className="text-sm text-foreground/70">
+                      {department.description}
+                    </p>
+                    <Button asChild className="w-full mt-4" variant="cta">
+                      <Link to={department.exploreLink}>
+                        Shop Now
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
               ))}
-            </div>
-
-            <div className="text-center">
-              <Button variant="outline" size="lg" asChild>
-                <Link to="/explore">
-                  View All Products
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
             </div>
           </div>
         </section>
-
-        {/* Explore Categories (This section will naturally scroll up after Featured Products) */}
-        {/* <section className="py-20"> */}
-        {/* {" "} */}
-        {/* You can apply a fixed background here if desired */}
-        {/* <div className="container mx-auto px-4"> */}
-        {/* <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
-                Explore Collections
-              </h2>
-              <p className="text-foreground/70 max-w-2xl mx-auto">
-                Find your perfect style in our curated collections
-              </p>
-            </div> */}
-
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              <Card className="group overflow-hidden border-border/50 bg-gradient-card">
-                <div className="relative aspect-square overflow-hidden">
-                  <img
-                    src={hoodieImage}
-                    alt="Hoodies Collection"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-
-                  <CardContent className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                    <h3 className="text-2xl font-bold text-foreground mb-2">
-                      Explore Hoodies
-                    </h3>
-                    <p className="text-foreground/70 mb-4">
-                      Premium comfort meets street style
-                    </p>
-                    <Button variant="cta" asChild>
-                      <Link to="/explore?category=hoodies">
-                        Shop Hoodies
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </div>
-              </Card>
-
-              <Card className="group overflow-hidden border-border/50 bg-gradient-card">
-                <div className="relative aspect-square overflow-hidden">
-                  <img
-                    src={tshirtImage}
-                    alt="T-Shirts Collection"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-
-                  <CardContent className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                    <h3 className="text-2xl font-bold text-foreground mb-2">
-                      Explore T-Shirts
-                    </h3>
-                    <p className="text-foreground/70 mb-4">
-                      Express yourself with bold graphics
-                    </p>
-                    <Button variant="cta" asChild>
-                      <Link to="/explore?category=tshirts">
-                        Shop T-Shirts
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </div>
-              </Card>
-            </div> */}
-        {/* </div> */}
-        {/* </section> */}
-
         {/* Newsletter Section - This is fine here */}
         <section className="py-20 bg-primary">
           <div className="container mx-auto px-4 text-center">
@@ -409,7 +348,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
         {/* Contact Section */}
         <section className="bg-primary">
           <div className="grid grid-row-1 lg:grid-row-2 gap-12 max-w-6xl mx-auto">
@@ -601,3 +539,5 @@ const Index = () => {
 };
 
 export default Index;
+
+// {/* NEW: Departments Section with Horizontal Scroll */}

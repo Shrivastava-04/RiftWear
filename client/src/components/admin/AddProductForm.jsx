@@ -240,6 +240,7 @@ const AddProductForm = () => {
     setIsLoading(true);
 
     if (!validateForm()) {
+      console.log(validateForm);
       setIsLoading(false);
       toast({
         title: "Validation Error",

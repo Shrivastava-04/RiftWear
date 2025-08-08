@@ -125,7 +125,7 @@ const Login = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     // --- THIS IS THE CORRECT LOGIC FOR A DIRECT ID TOKEN ---
     const idToken = credentialResponse.credential;
-    console.log("ID Token to be sent:", idToken);
+    // console.log("ID Token to be sent:", idToken);
     if (!idToken) {
       console.error("ID Token is missing from Google response.");
       return;
@@ -145,6 +145,7 @@ const Login = () => {
         "Login failed:",
         error.response?.data?.message || error.message
       );
+      console.log(error);
     }
   };
 
