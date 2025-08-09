@@ -43,8 +43,8 @@ const Header = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to={handleLogo()} className="flex items-center space-x-2">
-            <img src={logo} alt="Rift Wear" className="h-8 w-8" />
-            <span className="text-xl font-bold gradient-text">Rift Wear</span>
+            <img src={logo} alt="Rift" className="h-8 w-8" />
+            <span className="text-xl font-bold gradient-text">Rift</span>
           </Link>
 
           {/* Desktop Navigation */}

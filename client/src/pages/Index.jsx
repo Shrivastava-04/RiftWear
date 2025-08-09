@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import axios from "axios";
-import comingSoon from "../assets/coming soon image.png";
+import comingSoon from "../assets/coming soon image 2.png";
 
 const Index = () => {
   const [heroBlur, setHeroBlur] = useState(0);

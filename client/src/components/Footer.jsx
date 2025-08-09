@@ -12,8 +12,8 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <img src={logo} alt="Rift Wear" className="h-8 w-8" />
-              <span className="text-xl font-bold gradient-text">Rift Wear</span>
+              <img src={logo} alt="Rift" className="h-8 w-8" />
+              <span className="text-xl font-bold gradient-text">Rift</span>
             </div>
             <p className="text-sm text-foreground/70 max-w-xs">
               Premium streetwear for the next generation. Unleash your style
@@ -138,7 +138,7 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border/40">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-foreground/60">
-              © 2024 Rift Wear. All rights reserved.
+              © 2024 Rift. All rights reserved.
             </p>
             <nav className="flex space-x-6">
               <Link
