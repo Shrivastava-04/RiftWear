@@ -396,9 +396,13 @@ const Product = () => {
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Add to Cart
                     </Button>
-                    <Button variant="cta" size="lg" onClick={handleBuyNow}>
+                    {/* <Button
+                      variant="cta"
+                      size="lg"
+                      onClick={() => navigate("/cart")}
+                    >
                       Buy Now
-                    </Button>
+                    </Button> */}
                   </>
                 )}
                 {isProductInTheCart && (

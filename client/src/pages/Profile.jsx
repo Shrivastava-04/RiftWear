@@ -2,90 +2,191 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 // Import icons for UI
-import { User as UserIcon, Mail, Phone, Edit, LogOut } from "lucide-react";
+import {
+  User as UserIcon,
+  Mail,
+  Phone,
+  Edit,
+  LogOut,
+  MapPin,
+} from "lucide-react"; // Added MapPin icon
 // Import Shadcn UI components
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// Import Shadcn Dialog components
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 // Using useAuth ONLY for its logout function here, as requested
 import { useAuth } from "@/context/AuthCotext.jsx";
-import Header from "@/components/Header"; // Ensure Header is imported
-import Footer from "@/components/Footer"; // Ensure Footer is imported
-// import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const Profile = () => {
-  // --- LOCAL STATE (as per your current preference) ---
-  const [user, setUser] = useState(null); // Local state for user data
-  const [loading, setLoading] = useState(true); // Local loading state
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false); // Local authentication status
-  const navigate = useNavigate(); // Use useNavigate hook for navigation
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for modal visibility
+  const { toast } = useToast();
+  const [editFormData, setEditFormData] = useState({
+    // State for form inputs
+    phoneNumber: "",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "",
+    },
+  });
+  const navigate = useNavigate();
 
-  // Get userId from localStorage (as per your current preference)
   const userId = (localStorage.getItem("userId") || "").replaceAll(/"/g, "");
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL; // Get API base URL
+  const { logout: authContextLogout } = useAuth();
 
-  // Get logout function from AuthContext to clear server-side session
-  const { logout: authContextLogout } = useAuth(); // Renamed to avoid conflict with local handleLogout
+  // --- FETCH USER PROFILE LOGIC ---
+  const fetchUserProfile = async () => {
+    if (!userId) {
+      console.warn(
+        "Profile Page: No userId found in localStorage. Assuming not logged in."
+      );
+      setLoading(false);
+      setIsUserAuthenticated(false);
+      return;
+    }
 
-  // --- FETCH USER PROFILE LOGIC (as per your current preference) ---
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      // If userId is missing, assume not authenticated
-      if (!userId) {
-        console.warn(
-          "Profile Page: No userId found in localStorage. Assuming not logged in."
-        );
-        setLoading(false);
-        setIsUserAuthenticated(false);
-        // Consider navigating to login immediately here if no userId
-        // navigate('/login');
-        return;
-      }
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/user/userById`, {
+        params: { id: userId },
+      });
 
-      try {
-        setLoading(true); // Set loading to true while fetching
-        // This makes the GET request to your backend to fetch user details by ID
-        const response = await axios.get(`${API_BASE_URL}/user/userById`, {
-          params: { id: userId }, // Sending userId as a query parameter
+      if (response.data && response.data.user) {
+        setUser(response.data.user);
+        setIsUserAuthenticated(true);
+        // Set initial form data when user data is fetched
+        setEditFormData({
+          phoneNumber: response.data.user.phoneNumber || "",
+          address: {
+            street: response.data.user.address?.street || "",
+            city: response.data.user.address?.city || "",
+            state: response.data.user.address?.state || "",
+            postalCode: response.data.user.address?.postalCode || "",
+            country: response.data.user.address?.country || "",
+          },
         });
-
-        // Check for response data and user object within it
-        if (response.data && response.data.user) {
-          setUser(response.data.user);
-          setIsUserAuthenticated(true);
-        } else {
-          // If API returns 200 but no user data (e.g., user deleted from DB)
-          console.warn(
-            "Profile Page: User data not found in API response, even with 200 OK."
-          );
-          setUser(null);
-          setIsUserAuthenticated(false);
-          // Also clear localStorage userId if it's invalid/user not found
-          localStorage.removeItem("userId");
-        }
-      } catch (error) {
-        console.error(
-          "Profile Page: Error fetching user profile:",
-          error.response?.status,
-          error.response?.data?.message || error.message
+      } else {
+        console.warn(
+          "Profile Page: User data not found in API response, even with 200 OK."
         );
         setUser(null);
         setIsUserAuthenticated(false);
-        // Clear userId in localStorage on API fetch error (e.g., 404, 500)
         localStorage.removeItem("userId");
-        // Optionally show a toast message here for the error
-      } finally {
-        setLoading(false); // Always set loading to false
       }
-    };
+    } catch (error) {
+      console.error(
+        "Profile Page: Error fetching user profile:",
+        error.response?.status,
+        error.response?.data?.message || error.message
+      );
+      setUser(null);
+      setIsUserAuthenticated(false);
+      localStorage.removeItem("userId");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchUserProfile(); // Call the function to fetch user profile
-  }, [API_BASE_URL, userId, navigate]); // Dependencies for useEffect (include navigate if used in callback)
+  useEffect(() => {
+    fetchUserProfile();
+  }, [API_BASE_URL, userId, navigate]);
 
-  // --- RENDERING LOGIC (UI / Styling as requested) ---
+  // --- MODAL AND FORM HANDLERS ---
+  const handleEditClick = () => {
+    // Open the modal
+    setIsEditModalOpen(true);
+  };
 
-  // Show loading state while fetching user data
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    // Check if the input field is part of the address object
+    if (name.startsWith("address.")) {
+      const addressField = name.split(".")[1];
+      setEditFormData((prevData) => ({
+        ...prevData,
+        address: {
+          ...prevData.address,
+          [addressField]: value,
+        },
+      }));
+    } else {
+      // Otherwise, it's a top-level field like phoneNumber
+      setEditFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/user/updateUser`,
+        {
+          userId,
+          phoneNumber: editFormData.phoneNumber,
+          address: editFormData.address,
+        },
+        {
+          withCredentials: true, // Important for sending cookies (JWT token)
+        }
+      );
+
+      if (response.data.message) {
+        // alert(response.data.message); // Use alert for now, consider a toast/message box
+        toast({
+          title: "Profile Updated",
+          description: "Your profile is updated successfully",
+          variant: "success",
+        });
+        setIsEditModalOpen(false); // Close modal on success
+        fetchUserProfile(); // Re-fetch user data to update UI
+      }
+    } catch (error) {
+      console.error(
+        "Error updating profile:",
+        error.response?.data?.message || error.message
+      );
+      alert(
+        "Failed to update profile: " +
+          (error.response?.data?.message || "Please try again.")
+      );
+    }
+  };
+
+  // --- Logout Handler ---
+  const handleLogout = async () => {
+    await authContextLogout();
+    localStorage.removeItem("userId");
+    setUser(null);
+    setIsUserAuthenticated(false);
+    navigate("/");
+  };
+
+  // --- RENDERING LOGIC ---
   if (loading) {
     return (
       <>
@@ -98,7 +199,6 @@ const Profile = () => {
     );
   }
 
-  // If not authenticated, display login required message
   if (!isUserAuthenticated) {
     return (
       <>
@@ -122,18 +222,6 @@ const Profile = () => {
     );
   }
 
-  // --- Logout Handler ---
-  const handleLogout = async () => {
-    // IMPORTANT: Call AuthContext's logout to clear the HTTP-only cookie on the backend
-    await authContextLogout();
-    // Then clear local storage and redirect (consistent with your current logic)
-    localStorage.removeItem("userId"); // Clear userId from localStorage (as this page relies on it)
-    setUser(null); // Reset local user state for immediate UI update
-    setIsUserAuthenticated(false); // Update local auth status
-    navigate("/"); // Redirect to home page
-  };
-
-  // Render profile content if user data is available and authenticated
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
@@ -143,7 +231,7 @@ const Profile = () => {
           My Profile
         </h1>
 
-        {user ? ( // Ensure user object exists before trying to access its properties
+        {user ? (
           <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* User Details Card */}
             <Card className="bg-card/50 border-border/50 shadow-lg">
@@ -151,13 +239,121 @@ const Profile = () => {
                 <CardTitle className="text-2xl font-bold gradient-text">
                   Personal Information
                 </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-foreground/70 hover:text-accent"
+                <Dialog
+                  open={isEditModalOpen}
+                  onOpenChange={setIsEditModalOpen}
                 >
-                  <Edit className="h-5 w-5" />
-                </Button>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-foreground/70 hover:text-accent"
+                      onClick={handleEditClick}
+                    >
+                      <Edit className="h-5 w-5" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Edit Profile</DialogTitle>
+                      <DialogDescription>
+                        Make changes to your phone number and address here.
+                        Click save when you're done.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form
+                      onSubmit={handleSaveProfile}
+                      className="grid gap-4 py-4"
+                    >
+                      {/* Phone Number Input */}
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="phoneNumber" className="text-right">
+                          Phone
+                        </Label>
+                        <Input
+                          id="phoneNumber"
+                          name="phoneNumber"
+                          value={editFormData.phoneNumber}
+                          onChange={handleFormChange}
+                          className="col-span-3"
+                          placeholder="e.g., +1234567890"
+                        />
+                      </div>
+                      <h3 className="text-lg font-semibold mt-4 mb-2">
+                        Address
+                      </h3>
+                      {/* Address Fields */}
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="street" className="text-right">
+                          Street
+                        </Label>
+                        <Input
+                          id="street"
+                          name="address.street"
+                          value={editFormData.address.street}
+                          onChange={handleFormChange}
+                          className="col-span-3"
+                          placeholder="e.g., 123 Main St"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="city" className="text-right">
+                          City
+                        </Label>
+                        <Input
+                          id="city"
+                          name="address.city"
+                          value={editFormData.address.city}
+                          onChange={handleFormChange}
+                          className="col-span-3"
+                          placeholder="e.g., New York"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="state" className="text-right">
+                          State
+                        </Label>
+                        <Input
+                          id="state"
+                          name="address.state"
+                          value={editFormData.address.state}
+                          onChange={handleFormChange}
+                          className="col-span-3"
+                          placeholder="e.g., NY"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="postalCode" className="text-right">
+                          Postal Code
+                        </Label>
+                        <Input
+                          id="postalCode"
+                          name="address.postalCode"
+                          value={editFormData.address.postalCode}
+                          onChange={handleFormChange}
+                          className="col-span-3"
+                          placeholder="e.g., 10001"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="country" className="text-right">
+                          Country
+                        </Label>
+                        <Input
+                          id="country"
+                          name="address.country"
+                          value={editFormData.address.country}
+                          onChange={handleFormChange}
+                          className="col-span-3"
+                          placeholder="e.g., USA"
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button type="submit">Save changes</Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </CardHeader>
               <CardContent className="space-y-4 pt-4">
                 <div className="flex items-center space-x-3">
@@ -174,7 +370,7 @@ const Profile = () => {
                     <p className="font-semibold">{user.email}</p>
                   </div>
                 </div>
-                {user.phoneNumber && ( // Only display if phoneNumber exists
+                {user.phoneNumber && (
                   <div className="flex items-center space-x-3">
                     <Phone className="h-5 w-5 text-accent" />
                     <div>
@@ -185,21 +381,32 @@ const Profile = () => {
                     </div>
                   </div>
                 )}
+                {user.address && ( // Display address only if it exists
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="h-5 w-5 text-accent" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Address</p>
+                      <p className="font-semibold">
+                        {user.address.street}
+                        {user.address.street && user.address.city && ", "}
+                        {user.address.city}
+                        {user.address.city && user.address.state && ", "}
+                        {user.address.state}
+                        {user.address.state && user.address.postalCode && " "}
+                        {user.address.postalCode}
+                        {user.address.country &&
+                        (user.address.city || user.address.state)
+                          ? `, ${user.address.country}`
+                          : user.address.country}
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {user.role === "admin" && (
                   <Button>
                     <Link to="/admin">Admin Panel</Link>
                   </Button>
                 )}
-                {/* Add other user details here (e.g., date joined from timestamps) */}
-                {/* {user.createdAt && (
-                  <div className="flex items-center space-x-3">
-                    <Clock className="h-5 w-5 text-accent" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Member Since</p>
-                      <p className="font-semibold">{new Date(user.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                )} */}
               </CardContent>
             </Card>
 
@@ -217,9 +424,9 @@ const Profile = () => {
                 <Button asChild variant="outline" className="w-full">
                   <Link to="/order">Order History</Link>
                 </Button>
-                <Button variant="outline" className="w-full">
+                {/* <Button variant="outline" className="w-full">
                   Addresses
-                </Button>
+                </Button> */}
                 {/* Logout Button */}
                 <Button
                   variant="destructive"
@@ -233,8 +440,6 @@ const Profile = () => {
             </Card>
           </div>
         ) : (
-          // This fallback should ideally be caught by !isUserAuthenticated,
-          // but good for defensive programming if user is null for some other reason.
           <div className="text-center py-12">
             <p className="text-foreground/60 mb-4">
               User data could not be displayed.

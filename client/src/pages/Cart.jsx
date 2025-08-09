@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 
 // This is a helper function to load the Razorpay script
@@ -36,6 +37,7 @@ const Cart = () => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const [itemLoading, setItemLoading] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const userId = (localStorage.getItem("userId") || "").replaceAll(/"/g, "");
@@ -94,8 +96,9 @@ const Cart = () => {
   }, [API_BASE_URL, userId, navigate]);
 
   const totalAmount = useMemo(() => {
+    // Add defensive check to ensure item.productId exists before accessing properties
     return (cartItems ?? []).reduce(
-      (total, item) => total + item.productId.price * item.quantity,
+      (total, item) => total + (item.productId?.price * item.quantity || 0),
       0
     );
   }, [cartItems]);
@@ -162,6 +165,33 @@ const Cart = () => {
   };
 
   const handleMakePayment = async () => {
+    console.log(user.address);
+    if (
+      user &&
+      (!user.address ||
+        user.address.street === "" ||
+        user.address.city === "" ||
+        user.address.postalCode === "" ||
+        user.address.state === "" ||
+        user.address.country === "")
+    ) {
+      toast({
+        title: "Please Enter your address",
+        description: "Please update your profile and Enter the address",
+        variant: "destructive",
+      });
+      navigate("/profile");
+      return;
+    }
+    if (user && !user.phoneNumber) {
+      toast({
+        title: "Please Enter Phone Number",
+        description: "Please update your profile and Enter your Phone Number",
+        variant: "destructive",
+      });
+      navigate("/profile");
+      return;
+    }
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
@@ -191,9 +221,6 @@ const Cart = () => {
         description: "Payment for your order",
         order_id: id,
         handler: async (response) => {
-          // This function will be called on successful payment
-          // alert("Payment Successful!"); // Removed alert as per instructions
-
           try {
             const finalOrderResponse = await axios.post(
               `${API_BASE_URL}/orders/create`,
@@ -205,14 +232,12 @@ const Cart = () => {
                 totalAmount: totalAmount,
               }
             );
-            // Clear the cart on success
             setCartItems([]);
             navigate(
               `/order-confirmation/${finalOrderResponse.data.order._id}`
             );
           } catch (error) {
             console.error("Error saving final order:", error);
-            // Navigate to order failure page if saving order fails after successful payment
             navigate("/order-failure");
           }
         },
@@ -229,14 +254,12 @@ const Cart = () => {
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
 
-      // Handle payment modal close/failure (optional, but good practice)
       paymentObject.on("payment.failed", function (response) {
         console.error("Razorpay Payment Failed:", response.error);
         navigate("/order-failure");
       });
     } catch (error) {
       console.error("Error during payment process:", error);
-      // Navigate to order failure page for initial order creation errors
       navigate("/order-failure");
     }
   };

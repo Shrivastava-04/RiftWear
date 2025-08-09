@@ -16,10 +16,32 @@ const userSchema = new mongoose.Schema(
       required: false,
     },
     phoneNumber: {
-      // <--- MODIFIED THIS BLOCK
       type: String,
-      sparse: true, // <--- IMPORTANT: Allows multiple documents with null/undefined phoneNumber
-      required: false, // <--- IMPORTANT: Makes phoneNumber optional
+      sparse: true,
+      required: false,
+    },
+    // The address is now a single object with its own properties
+    address: {
+      street: {
+        type: String,
+        required: false,
+      },
+      city: {
+        type: String,
+        required: false,
+      },
+      state: {
+        type: String,
+        required: false,
+      },
+      postalCode: {
+        type: String,
+        required: false,
+      },
+      country: {
+        type: String,
+        required: false,
+      },
     },
     role: {
       type: String,
@@ -56,12 +78,11 @@ const userSchema = new mongoose.Schema(
     googleId: {
       type: String,
       unique: true,
-      sparse: true, // Allows multiple null values
+      sparse: true,
     },
   },
   { timestamps: true }
-); // Added timestamps for good practice
+);
 
-// Consistent naming: Model name should start with uppercase
 const User = mongoose.model("User", userSchema);
 export default User;

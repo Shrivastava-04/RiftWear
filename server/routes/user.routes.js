@@ -15,6 +15,7 @@ import {
   protect,
   signup,
   updateCartDetails,
+  updateUser,
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
@@ -28,5 +29,6 @@ router.post("/deleteFromCart", deleteFromCart);
 router.get("/getCartDetails", getCartDetails);
 router.put("/updateCartDetails", updateCartDetails);
 router.get("/order", getOrdersByUserId); // NEW ROUTE
+router.put("/updateUser", updateUser);
 
 export default router;

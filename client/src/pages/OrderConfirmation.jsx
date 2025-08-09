@@ -26,7 +26,7 @@ const OrderConfirmation = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get(`${API_BASE_URL}/orders/${orderId}`);
+        const response = await axios.get(`${API_BASE_URL}/order/${orderId}`);
         setOrder(response.data.order);
         console.log(response.data.order);
       } catch (err) {

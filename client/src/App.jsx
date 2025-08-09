@@ -17,6 +17,10 @@ import OrderConfirmation from "./pages/OrderConfirmation"; // Adjust path as nee
 import OrderFailure from "./pages/OrderFailure"; // Adjust path as needed
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
+import ShippingPolicy from "./pages/Shipping";
+import CancellationRefundPolicy from "./pages/Return";
+import TermsConditions from "./pages/TermsAndCondition";
+import PrivacyPolicy from "./pages/Privacy-Policy";
 
 const queryClient = new QueryClient();
 
@@ -43,8 +47,15 @@ const App = () => (
           />
           <Route path="/order-failure" element={<OrderFailure />} />
           {/* ... other routes */}
-          {/* <Route path="/user/profile" element={<Profile />} /> */}
+          <Route path="/user/profile" element={<Profile />} />
           <Route path="/order" element={<Orders />} /> {/* ADD THIS ROUTE */}
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route
+            path="/cancellation-refund-policy"
+            element={<CancellationRefundPolicy />}
+          />
+          <Route path="/terms-and-conditions" element={<TermsConditions />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

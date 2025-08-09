@@ -87,28 +87,28 @@ const Footer = () => {
                 Contact Us
               </Link>
               <Link
-                to="/shipping"
+                to="/shipping-policy"
                 className="text-sm text-foreground/70 hover:text-accent transition-colors"
               >
                 Shipping Info
               </Link>
               <Link
-                to="/returns"
+                to="/cancellation-refund-policy"
                 className="text-sm text-foreground/70 hover:text-accent transition-colors"
               >
                 Returns & Exchanges
               </Link>
               <Link
-                to="/size-guide"
+                to="/terms-and-conditions"
                 className="text-sm text-foreground/70 hover:text-accent transition-colors"
               >
-                Size Guide
+                Terms and Conditions
               </Link>
               <Link
-                to="/faq"
+                to="/privacy-policy"
                 className="text-sm text-foreground/70 hover:text-accent transition-colors"
               >
-                FAQ
+                Privacy Policy
               </Link>
             </nav>
           </div>

@@ -164,9 +164,9 @@ const Contact = () => {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Email Us</h3>
                     <p className="text-foreground/70 mb-1">
-                      support@arraste.com
+                      riftwear.help@gmail.com
                     </p>
-                    <p className="text-foreground/70">orders@arraste.com</p>
+                    {/* <p className="text-foreground/70">orders@arraste.com</p> */}
                   </div>
                 </div>
               </CardContent>
@@ -180,14 +180,14 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Call Us</h3>
-                    <p className="text-foreground/70 mb-1">+1 (555) 123-4567</p>
-                    <p className="text-foreground/70">Mon-Fri, 9AM-6PM EST</p>
+                    <p className="text-foreground/70 mb-1">+91 78987 82596</p>
+                    <p className="text-foreground/70">Mon-Fri, 9AM-6PM IST</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 border-border/50">
+            {/* <Card className="bg-card/50 border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
                   <div className="bg-accent/20 p-3 rounded-lg">
@@ -202,9 +202,9 @@ const Contact = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
-            <Card className="bg-card/50 border-border/50">
+            {/* <Card className="bg-card/50 border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
                   <div className="bg-accent/20 p-3 rounded-lg">
@@ -220,7 +220,7 @@ const Contact = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
 

@@ -37,6 +37,7 @@ const Index = () => {
       setFeaturedProducts(firstTwoProducts);
     };
     loadProducts();
+    console.log("hello world");
   }, []);
 
   // Mock featured products (as per your original code)

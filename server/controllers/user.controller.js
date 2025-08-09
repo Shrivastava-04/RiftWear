@@ -221,6 +221,7 @@ export const getUserProfileUsingId = async (req, res) => {
         phoneNumber: user.phoneNumber,
         role: user.role,
         cartItem: user.cartItem,
+        address: user.address,
       },
     });
   } catch (error) {
@@ -578,5 +579,48 @@ export const getOrdersByUserId = async (req, res) => {
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updateUser = async (req, res) => {
+  try {
+    const { userId, phoneNumber, address } = req.body;
+
+    if (!userId) {
+      console.log("object");
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).josn({ message: "Invalid user Id" });
+    }
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        phoneNumber: phoneNumber,
+        address: address,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!updateUser) {
+      return res.status(404).json({ message: "Unable to update user" });
+    }
+    console.log(updatedUser);
+
+    res.status(200).json({
+      message: "User updated successfull",
+      user: {
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phoneNumber: updatedUser.phoneNumber,
+        address: updatedUser.address,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+    console.log(error);
   }
 };
