@@ -202,6 +202,7 @@ const Cart = () => {
     }
 
     try {
+      console.log(cartItems);
       const orderResponse = await axios.post(
         `${API_BASE_URL}/payment/razorpay/create-order`,
         {

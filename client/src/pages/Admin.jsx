@@ -7,6 +7,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar"; // The sidebar compo
 import UserManagement from "@/components/admin/UserManagement";
 import ProductManagement from "@/components/admin/ProductManagement";
 import AddProductForm from "@/components/admin/AddProductForm";
+import DepartmentManagement from "@/components/admin/DepartmentManagement"; // Import the new DepartmentManagement component
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -153,6 +154,7 @@ const AdminDashboard = () => {
         )}
         {activeTab === "addProduct" && <AddProductForm />}
         {activeTab === "orderHistory" && <AdminOrderHistory />}
+        {activeTab === "departments" && <DepartmentManagement />}
       </main>
     </div>
   );

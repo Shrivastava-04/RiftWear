@@ -23,12 +23,18 @@ const OrderConfirmation = () => {
         setLoading(false);
         return;
       }
+      // console.log(orderId); // Log the orderId to check if it's being passed correctly
 
       try {
         setLoading(true);
-        const response = await axios.get(`${API_BASE_URL}/order/${orderId}`);
+        const response = await axios.get(
+          `${API_BASE_URL}/orders/current-order-details`,
+          {
+            params: { id: orderId },
+          }
+        );
         setOrder(response.data.order);
-        console.log(response.data.order);
+        // console.log(response.data.order);
       } catch (err) {
         console.error("Error fetching order details:", err);
         setError(
@@ -185,7 +191,7 @@ const OrderConfirmation = () => {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="flex-1">
-                <Link to="/user/orders">
+                <Link to="/order">
                   <Package className="h-4 w-4 mr-2" /> View My Orders
                 </Link>
               </Button>

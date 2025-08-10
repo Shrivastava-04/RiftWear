@@ -36,7 +36,7 @@ const Product = () => {
   const [error, setError] = useState(null);
 
   const [selectedSize, setSelectedSize] = useState("");
-  const [selectedVariety, setSelectedVariety] = useState("");
+  const [selectedVariety, setSelectedVariety] = useState("Regular");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);

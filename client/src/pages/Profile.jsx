@@ -370,38 +370,34 @@ const Profile = () => {
                     <p className="font-semibold">{user.email}</p>
                   </div>
                 </div>
-                {user.phoneNumber && (
-                  <div className="flex items-center space-x-3">
-                    <Phone className="h-5 w-5 text-accent" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Phone Number
-                      </p>
-                      <p className="font-semibold">{user.phoneNumber}</p>
-                    </div>
+                <div className="flex items-center space-x-3">
+                  <Phone className="h-5 w-5 text-accent" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Phone Number
+                    </p>
+                    <p className="font-semibold">{user.phoneNumber}</p>
                   </div>
-                )}
-                {user.address && ( // Display address only if it exists
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-5 w-5 text-accent" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Address</p>
-                      <p className="font-semibold">
-                        {user.address.street}
-                        {user.address.street && user.address.city && ", "}
-                        {user.address.city}
-                        {user.address.city && user.address.state && ", "}
-                        {user.address.state}
-                        {user.address.state && user.address.postalCode && " "}
-                        {user.address.postalCode}
-                        {user.address.country &&
-                        (user.address.city || user.address.state)
-                          ? `, ${user.address.country}`
-                          : user.address.country}
-                      </p>
-                    </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <MapPin className="h-5 w-5 text-accent" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Address</p>
+                    <p className="font-semibold">
+                      {user.address.street}
+                      {user.address.street && user.address.city && ", "}
+                      {user.address.city}
+                      {user.address.city && user.address.state && ", "}
+                      {user.address.state}
+                      {user.address.state && user.address.postalCode && " "}
+                      {user.address.postalCode}
+                      {user.address.country &&
+                      (user.address.city || user.address.state)
+                        ? `, ${user.address.country}`
+                        : user.address.country}
+                    </p>
                   </div>
-                )}
+                </div>
                 {user.role === "admin" && (
                   <Button>
                     <Link to="/admin">Admin Panel</Link>

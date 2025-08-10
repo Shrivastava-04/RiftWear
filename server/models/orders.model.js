@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema(
           type: String,
           require: true,
         },
-        type: {
+        variety: {
           type: String,
           require: true,
         },

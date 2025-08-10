@@ -321,11 +321,111 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
+// export const exportOrders = async (req, res) => {
+//   try {
+//     const { startDate, endDate } = req.query;
+//     let query = {};
+//     if (startDate) {
+//       query.createdAt = { ...query.createdAt, $gte: new Date(startDate) };
+//     }
+
+//     // If endDate is provided, add it to the query
+//     if (endDate) {
+//       // For endDate, set it to the end of the day to include all orders on that day
+//       const endOfDay = new Date(endDate);
+//       endOfDay.setHours(23, 59, 59, 999);
+//       query.createdAt = { ...query.createdAt, $lte: endOfDay };
+//     }
+//     const orders = await Order.find({})
+//       .sort({ createdAt: -1 })
+//       .populate("detailsOfCustomer", "name email phoneNumber address")
+//       .populate("detailsOfProduct.productId", "name ");
+
+//     const workbook = new ExcelJS.Workbook();
+//     const worksheet = workbook.addWorksheet("Orders");
+
+//     // Define columns
+//     worksheet.columns = [
+//       { header: "Order #", key: "orderNumber", width: 20 },
+//       { header: "Customer Name", key: "customerName", width: 30 },
+//       { header: "Customer Email", key: "customerEmail", width: 40 },
+//       { header: "Customer Phone", key: "customerPhone", width: 20 },
+//       { header: "Customer Address", key: "customerAddress", width: 50 },
+//       { header: "Product Name", key: "productName", width: 40 },
+//       { header: "Size", key: "size", width: 10 },
+//       { header: "Color", key: "color", width: 15 },
+//       { header: "Variety", key: "type", width: 15 },
+//       { header: "Quantity", key: "quantity", width: 15 },
+//       { header: "Amount", key: "amount", width: 15 },
+//       { header: "Date", key: "date", width: 20 },
+//       { header: "razorpayId", key: "razorpayId", width: 30 },
+//     ];
+
+//     // Add data rows
+//     orders.forEach((order) => {
+//       order.detailsOfProduct.forEach((item) => {
+//         worksheet.addRow({
+//           orderNumber: order.orderNumber,
+//           customerName: order.detailsOfCustomer?.name || "N/A",
+//           customerEmail: order.detailsOfCustomer?.email || "N/A",
+//           customerPhone: order.detailsOfCustomer?.phoneNumber || "N/A",
+//           customerAddress: order.detailsOfCustomer?.address || "N/A",
+//           productName: item.productId?.name || "Unknown Product",
+//           size: item.size,
+//           color: item.color,
+//           variety: item.variety,
+//           quantity: item.quantity,
+//           amount: order.amount,
+//           date: new Date(order.createdAt).toLocaleDateString("en-GB", {
+//             year: "numeric",
+//             month: "2-digit",
+//             day: "2-digit",
+//           }),
+//           razorpayId: order.razorpayId,
+//         });
+//       });
+//     });
+//     console.log(orders);
+
+//     // Set headers to trigger file download
+//     res.setHeader(
+//       "Content-Type",
+//       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+//     );
+//     res.setHeader(
+//       "Content-Disposition",
+//       "attachment; filename=" + "orders.xlsx"
+//     );
+
+//     await workbook.xlsx.write(res);
+//     res.end();
+//   } catch (error) {
+//     console.error("Error exporting orders:", error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
 export const exportOrders = async (req, res) => {
   try {
-    const orders = await Order.find({})
+    const { startDate, endDate } = req.query; // Get startDate and endDate from query parameters
+
+    let query = {}; // Initialize an empty query object
+
+    // If startDate is provided, add it to the query
+    if (startDate) {
+      query.createdAt = { ...query.createdAt, $gte: new Date(startDate) };
+    }
+
+    // If endDate is provided, add it to the query
+    if (endDate) {
+      // For endDate, set it to the end of the day to include all orders on that day
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.createdAt = { ...query.createdAt, $lte: endOfDay };
+    }
+
+    const orders = await Order.find(query) // Apply the date range query
       .sort({ createdAt: -1 })
-      .populate("detailsOfCustomer", "name email")
+      .populate("detailsOfCustomer", "name email phoneNumber address") // Populate address
       .populate("detailsOfProduct.productId", "name");
 
     const workbook = new ExcelJS.Workbook();
@@ -336,29 +436,57 @@ export const exportOrders = async (req, res) => {
       { header: "Order #", key: "orderNumber", width: 20 },
       { header: "Customer Name", key: "customerName", width: 30 },
       { header: "Customer Email", key: "customerEmail", width: 40 },
+      { header: "Customer Phone", key: "customerPhone", width: 20 },
+      { header: "Customer Address", key: "customerAddress", width: 50 }, // For concatenated address
       { header: "Product Name", key: "productName", width: 40 },
       { header: "Size", key: "size", width: 10 },
       { header: "Color", key: "color", width: 15 },
-      { header: "Variety", key: "variety", width: 15 },
+      { header: "Variety", key: "type", width: 15 },
       { header: "Quantity", key: "quantity", width: 15 },
+      { header: "Amount", key: "amount", width: 15 },
+      { header: "Date", key: "date", width: 20 },
+      { header: "razorpayId", key: "razorpayId", width: 30 },
     ];
 
     // Add data rows
     orders.forEach((order) => {
+      // Concatenate address fields
+      const customerAddress = order.detailsOfCustomer?.address
+        ? [
+            order.detailsOfCustomer.address.street,
+            order.detailsOfCustomer.address.city,
+            order.detailsOfCustomer.address.state,
+            order.detailsOfCustomer.address.postalCode,
+            order.detailsOfCustomer.address.country,
+          ]
+            .filter(Boolean) // Remove null or undefined parts
+            .join(", ")
+        : "N/A";
+
       order.detailsOfProduct.forEach((item) => {
         worksheet.addRow({
           orderNumber: order.orderNumber,
           customerName: order.detailsOfCustomer?.name || "N/A",
           customerEmail: order.detailsOfCustomer?.email || "N/A",
+          customerPhone: order.detailsOfCustomer?.phoneNumber || "N/A",
+          customerAddress: customerAddress, // Use the concatenated address
           productName: item.productId?.name || "Unknown Product",
           size: item.size,
           color: item.color,
           variety: item.variety,
           quantity: item.quantity,
+          amount: order.amount,
+          date: new Date(order.createdAt)
+            .toLocaleDateString("en-GB", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            })
+            .replace(/\//g, "-"), // Format date as DD-MM-YYYY
+          razorpayId: order.razorpayId,
         });
       });
     });
-    console.log(orders);
 
     // Set headers to trigger file download
     res.setHeader(

@@ -5,6 +5,6 @@ import { createOrder, getOrderById } from "../controllers/order.controller.js";
 const router = express.Router();
 
 router.post("/create", createOrder);
-router.get("/:id", getOrderById); // New route to get order by ID
+router.get("/current-order-details", getOrderById); // New route to get order by ID
 
 export default router;

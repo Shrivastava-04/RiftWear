@@ -8,6 +8,7 @@ dotenv.config();
 
 // Initialize the Google OAuth client
 const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
+const frontendUrl = process.env.FRONTEND_URL;
 
 export const googleAuth = async (req, res) => {
   try {
@@ -49,27 +50,39 @@ export const googleAuth = async (req, res) => {
     );
 
     // 4. Send email conditionally based on whether it's a new user
-    if (isNewUser) {
-      const subject = "Welcome to Our Website!";
-      const htmlContent = `<h1>Hello ${name},</h1><p>Thank you for signing up!</p>`;
-
-      try {
-        await sendEmail(email, subject, htmlContent);
-      } catch (emailError) {
-        console.error("Failed to send welcome email:", emailError);
-      }
+    const subject = "Welcome to Rift.";
+    const htmlContent = `
+      <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
+        <p>Hi ${name},</p>
+        <p>Welcome to Rift. We're thrilled to have you join our community.</p>
+        <p>Your account has been successfully created. You can now explore our collections, save your favorite items to your wishlist, and enjoy a faster, smoother checkout experience on all future orders.</p>
+        <p>You can get started by exploring our latest collection.</p>
+        <p><a href="${frontendUrl}" style="color: #e89846; text-decoration: none;">Explore Our Latest Collection</a></p>
+        <p>Connect with Rift on Instagram to stay updated on new releases, behind-the-scenes, and exclusive offers.</p>
+        <p><a href="[YOUR_INSTAGRAM_LINK_HERE]" style="color: #e89846; text-decoration: none;">Follow us on Instagram</a></p>
+        <p>Best regards,</p>
+        <p><strong>Team Rift.</strong></p>
+        <p style="font-size: 0.9em; color: #777;">
+          <a href="${frontendUrl}/contact" style="color: #777; text-decoration: none;">Contact Us</a> | <a href="${frontendUrl}/unsubscribe" style="color: #777; text-decoration: none;">Unsubscribe</a>
+        </p>
+      </div>
+    `;
+    try {
+      await sendEmail(email, subject, htmlContent);
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError);
     }
 
-    if (!isNewUser) {
-      const subject = "Welcome back to Our Website!";
-      const htmlContent = `<h1>Hello ${name},</h1><p>You have been logged in. Welcome Back</p>`;
+    // if (!isNewUser) {
+    //   const subject = "Welcome back to Our Website!";
+    //   const htmlContent = `<h1>Hello ${name},</h1><p>You have been logged in. Welcome Back</p>`;
 
-      try {
-        await sendEmail(email, subject, htmlContent);
-      } catch (emailError) {
-        console.error("Failed to send welcome email:", emailError);
-      }
-    }
+    //   try {
+    //     await sendEmail(email, subject, htmlContent);
+    //   } catch (emailError) {
+    //     console.error("Failed to send welcome email:", emailError);
+    //   }
+    // }
 
     // 5. Send the JWT and user data back to the frontend
     res.status(200).json({

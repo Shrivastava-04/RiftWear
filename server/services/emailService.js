@@ -15,7 +15,7 @@ const apiInstance = new Brevo.TransactionalEmailsApi();
 export const sendEmail = async (to, subject, htmlContent) => {
   const sendSmtpEmail = {
     sender: {
-      name: "Rift Wear",
+      name: "Rift",
       email: process.env.BREVO_EMAIL_SENDER,
     },
     to: [{ email: to }],

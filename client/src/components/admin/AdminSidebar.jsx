@@ -27,6 +27,7 @@ const AdminSidebar = ({
     { name: "Products", icon: Package, tab: "products" },
     { name: "Add Product", icon: PlusCircle, tab: "addProduct" },
     { name: "Order History", icon: ListOrdered, tab: "orderHistory" },
+    { name: "Departments", icon: ListOrdered, tab: "departments" }, // New Departments tab
   ];
 
   return (
