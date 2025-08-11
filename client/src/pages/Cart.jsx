@@ -200,6 +200,7 @@ const Cart = () => {
       alert("Razorpay SDK failed to load. Are you online?");
       return;
     }
+    console.log(res);
 
     try {
       console.log(cartItems);

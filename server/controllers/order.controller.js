@@ -137,6 +137,7 @@ export const createOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
+    console.log("razorpay order saved: from createOrder function", savedOrder);
 
     // 2. Clear the user's cart
     const user = await User.findByIdAndUpdate(

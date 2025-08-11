@@ -41,6 +41,10 @@ export const createRazorpayOrder = async (req, res) => {
       currency: razorpayOrder.currency,
       amount: razorpayOrder.amount,
     });
+    console.log(
+      "razorpay order created successfully: and response sent from createRazorpayOrder",
+      razorpayOrder
+    );
   } catch (error) {
     console.error("Error creating Razorpay order:", error);
     res.status(500).json({ message: "Internal Server Error" });
