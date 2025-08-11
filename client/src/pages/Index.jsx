@@ -785,7 +785,7 @@ const Index = () => {
                   forDepartment={false} // This tells ProductCard to render as a standard size
                 />
               ))}
-              <ProductCard
+              {/* <ProductCard
                 arrival={"comingSoon"}
                 product={product1} // Using mock product for coming soon
                 forDepartment={false}
@@ -794,13 +794,13 @@ const Index = () => {
                 arrival={"comingSoon"}
                 product={product2} // Using mock product for coming soon
                 forDepartment={false}
-              />
+              /> */}
             </div>
           </div>
         </section>
 
         {/* Shop by Department Section */}
-        <section
+        {/* <section
           className="py-20"
           style={{
             background: `linear-gradient(to bottom, var(--background), hsl(var(--primary) / 0.2))`,
@@ -818,7 +818,7 @@ const Index = () => {
             </div>
           </div>
           {/* Full-width scroll container - no horizontal padding */}
-          <div className="flex overflow-x-scroll pb-4 space-x-6 scrollbar-hide px-4">
+        {/* <div className="flex overflow-x-scroll pb-4 space-x-6 scrollbar-hide px-4">
             {departmentsData.map((department) => (
               // Use the new DepartmentProductCard here
               <DepartmentProductCard
@@ -831,7 +831,7 @@ const Index = () => {
               />
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* Newsletter Section */}
         <section className="py-20 bg-primary">
