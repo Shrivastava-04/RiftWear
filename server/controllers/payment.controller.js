@@ -34,6 +34,7 @@ export const createRazorpayOrder = async (req, res) => {
     // You can optionally save a pending order in your database here
     // or wait for a successful payment webhook to save the final order.
     // For simplicity, we will save the order on the frontend's success callback.
+    console.log("Razorpay Order Created:", razorpayOrder);
 
     res.status(200).json({
       id: razorpayOrder.id,
