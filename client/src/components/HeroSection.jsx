@@ -24,7 +24,10 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
 
       {/* Content - place above the blur layer */}
       <div className="relative z-10 container mx-auto px-4 text-center">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div
+          className="max-w-4xl mx-auto space-y-8"
+          style={{ filter: `blur(${blurAmount}px)` }}
+        >
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black gradient-text animate-fade-in-up">
               UNLEASH
@@ -54,7 +57,7 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
           <div className="absolute top-20 left-10 w-20 h-20 bg-accent/20 rounded-full blur-xl animate-float" />
           <div
             className="absolute bottom-20 right-10 w-32 h-32 bg-accent/10 rounded-full blur-2xl animate-float"
-            style={{ animationDelay: "1s" }}
+            // style={{ animationDelay: "1s" }}
           />
         </div>
       </div>

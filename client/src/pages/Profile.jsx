@@ -414,9 +414,9 @@ const Profile = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-4">
-                <Button variant="outline" className="w-full">
+                {/* <Button variant="outline" className="w-full">
                   Change Password
-                </Button>
+                </Button> */}
                 <Button asChild variant="outline" className="w-full">
                   <Link to="/order">Order History</Link>
                 </Button>

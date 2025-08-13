@@ -226,9 +226,9 @@ const Product = () => {
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary" className="text-xs">
+                {/* <Badge variant="secondary" className="text-xs">
                   {product.category}
-                </Badge>
+                </Badge> */}
                 {product.isNew && (
                   <Badge className="bg-accent text-accent-foreground text-xs">
                     {" "}
@@ -256,7 +256,7 @@ const Product = () => {
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-1">
+                {/* <div className="flex items-center gap-1">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
                       <Star
@@ -268,11 +268,11 @@ const Product = () => {
                         }`}
                       />
                     ))}
-                  </div>
-                  <span className="text-sm text-muted-foreground">
+                  </div> */}
+                {/* <span className="text-sm text-muted-foreground">
                     ({product.reviews} reviews)
-                  </span>
-                </div>
+                  </span> */}
+                {/* </div> */}
               </div>
               <p className="text-foreground/70 leading-relaxed">
                 {product.description}
@@ -416,7 +416,7 @@ const Product = () => {
                   </Button>
                 )}
               </div>
-              <div className="flex justify-center gap-4">
+              {/* <div className="flex justify-center gap-4">
                 <Button variant="ghost" size="icon">
                   {" "}
                   <Heart className="h-4 w-4" />{" "}
@@ -425,7 +425,7 @@ const Product = () => {
                   {" "}
                   <Share className="h-4 w-4" />{" "}
                 </Button>
-              </div>
+              </div> */}
             </div>
             <Card className="bg-card/50 border-border/50">
               <CardContent className="p-4">
@@ -434,9 +434,9 @@ const Product = () => {
                     <Truck className="h-5 w-5 text-accent" />
                     <div>
                       <p className="font-medium text-sm">Free Shipping</p>
-                      <p className="text-xs text-muted-foreground">
+                      {/* <p className="text-xs text-muted-foreground">
                         On orders over $75
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                   <div className="flex flex-col items-center space-y-2">
@@ -444,7 +444,7 @@ const Product = () => {
                     <div>
                       <p className="font-medium text-sm">Easy Returns</p>
                       <p className="text-xs text-muted-foreground">
-                        30-day return policy
+                        30-day return policy <br /> "On manufacturing defects"
                       </p>
                     </div>
                   </div>
@@ -464,10 +464,10 @@ const Product = () => {
         </div>
         <div className="mb-16">
           <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="specs">Specifications</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              {/* <TabsTrigger value="reviews">Reviews</TabsTrigger> */}
             </TabsList>
             <TabsContent value="details" className="mt-6">
               <Card className="bg-card/50 border-border/50">
@@ -509,22 +509,22 @@ const Product = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-            <TabsContent value="reviews" className="mt-6">
-              <Card className="bg-card/50 border-border/50">
-                <CardContent className="p-6">
-                  <div className="text-center py-8">
-                    <h3 className="font-semibold text-lg mb-2">
+            {/* <TabsContent value="reviews" className="mt-6"> */}
+            {/* <Card className="bg-card/50 border-border/50"> */}
+            {/* <CardContent className="p-6"> */}
+            {/* <div className="text-center py-8"> */}
+            {/* <h3 className="font-semibold text-lg mb-2">
                       Customer Reviews
                     </h3>
                     <p className="text-foreground/70 mb-4">
                       {product.rating} out of 5 stars ({product.reviews}{" "}
                       reviews)
-                    </p>
-                    <Button variant="outline">Write a Review</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                    </p> */}
+            {/* <Button variant="outline">Write a Review</Button> */}
+            {/* </div> */}
+            {/* </CardContent> */}
+            {/* </Card> */}
+            {/* </TabsContent> */}
           </Tabs>
         </div>
       </div>
@@ -536,12 +536,12 @@ const Product = () => {
           onOpenChange={setIsSizeChartModalOpen}
         >
           <DialogContent className="sm:max-w-[80vw] max-h-[90vh] overflow-y-auto bg-card border-border">
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="absolute top-2 right-2 text-foreground/70 hover:text-accent"
               onClick={() => setIsSizeChartModalOpen(false)}
-            ></Button>
+            ></Button> */}
             <div className="flex flex-col items-center justify-center p-4">
               <h3 className="text-2xl font-bold mb-4">
                 Size Chart for {product.name}

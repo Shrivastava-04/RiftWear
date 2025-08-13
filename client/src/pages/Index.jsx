@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Facebook,
+  Instagram,
+  SeparatorVerticalIcon,
+  Share,
+  Twitter,
+  Youtube,
+} from "lucide-react";
+import emailjs from "@emailjs/browser";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
@@ -10,11 +19,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import hoodieImage from "@/assets/hoodie-1.jpg";
 import tshirtImage from "@/assets/tshirt-1.jpg";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 import comingSoon from "../assets/coming soon image 2.png";
 
 const Index = () => {
@@ -28,13 +38,18 @@ const Index = () => {
   const topOfPageRef = useRef(null);
   const location = useLocation();
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+  const { toast } = useToast();
 
   // Load Products for Featured Section
   useEffect(() => {
     const loadProducts = async () => {
       try {
         const res = await axios.get(`${API_BASE_URL}/product/getallproduct`);
-        const firstTwoProducts = res.data.slice(0, 2); // Get first two for featured
+        const firstTwoProducts = res.data
+          .filter((item) => {
+            return !item.forDepartment;
+          })
+          .slice(0, 2); // Get first two for featured
         setFeaturedProducts(firstTwoProducts);
       } catch (error) {
         console.error("Error loading featured products:", error);
@@ -80,6 +95,7 @@ const Index = () => {
           `${API_BASE_URL}/departments/get-department`
         );
         setDepartmentsData(response.data);
+        // console.log(response.);
         console.log("Departments fetched successfully:", response.data);
       } catch (error) {
         console.error("Error fetching departments:", error);
@@ -167,33 +183,107 @@ const Index = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    subject: "",
     message: "",
+    subject: "",
   });
-  const { toast } = useToast();
+
+  const [errors, setErrors] = useState({});
+
+  const [isSending, setIsSending] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const validate = () => {
+    const errors = {};
+    if (!formData.name) {
+      errors.name = "Name is required";
+    }
+    if (!formData.email) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid";
+    }
+    if (!formData.message) {
+      errors.message = "Message is required";
+    }
+    return errors;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const validateData = validate();
+    if (Object.keys(validateData).length > 0) {
+      setErrors(validateData);
+    } else {
+      setErrors({});
+      setIsSending(true);
 
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 24 hours.",
-    });
-
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+      emailjs
+        .send(
+          "service_zhcibqb",
+          "template_0gppc5h",
+          formData,
+          "CPvYRDJLV592kASVa"
+        )
+        .then((response) => {
+          console.log("SUCCESS!", response.status, response.text);
+          // toast.success("Message sent successfully");
+          toast({
+            title: "Message Sent!",
+            description:
+              "Your message has been sent successfully. We'll get back to you as soon as possible.",
+            variant: "success",
+          });
+          setFormData({ name: "", email: "", message: "", subject: "" });
+        })
+        .catch((error) => {
+          // console.log("FAILED...", error);
+          toast({
+            title: "Message Failed",
+            description: "Failed to send message. Please try again later.",
+            variant: "destructive",
+          });
+          // toast.error("Failed to send message. Please try again later");
+        })
+        .finally(() => {
+          setIsSending(false);
+        });
+    }
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // const [formData, setFormData] = useState({
+  //   name: "",
+  //   email: "",
+  //   subject: "",
+  //   message: "",
+  // });
+  // const { toast } = useToast();
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+
+  //   toast({
+  //     title: "Message Sent!",
+  //     description: "We'll get back to you within 24 hours.",
+  //   });
+
+  //   setFormData({
+  //     name: "",
+  //     email: "",
+  //     subject: "",
+  //     message: "",
+  //   });
+  // };
+
+  // const handleChange = (e) => {
+  //   setFormData({
+  //     ...formData,
+  //     [e.target.name]: e.target.value,
+  //   });
+  // };
 
   return (
     <>
@@ -245,7 +335,7 @@ const Index = () => {
         </section>
 
         {/* Shop by Department Section */}
-        {/* <section
+        <section
           className="py-20"
           style={{
             background: `linear-gradient(to bottom, var(--background), hsl(var(--primary) / 0.2))`,
@@ -263,7 +353,7 @@ const Index = () => {
             </div>
           </div>
           {/* Full-width scroll container - no horizontal padding */}
-        {/* <div className="flex overflow-x-scroll pb-4 space-x-6 scrollbar-hide px-4">
+          <div className="flex overflow-x-scroll pb-4 space-x-6 scrollbar-hide px-4">
             {departmentsData.map((department) => (
               // Use the new DepartmentProductCard here
               <DepartmentProductCard
@@ -276,10 +366,10 @@ const Index = () => {
               />
             ))}
           </div>
-        </section> */}
+        </section>
 
         {/* Newsletter Section */}
-        <section className="py-20 bg-primary">
+        {/* <section className="py-20 bg-primary">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-2xl mx-auto space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold gradient-text">
@@ -301,7 +391,7 @@ const Index = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Contact Section */}
         <section className="bg-primary">
@@ -394,9 +484,12 @@ const Index = () => {
                       type="submit"
                       variant="cta"
                       size="lg"
-                      className="w-full"
+                      className={`w-full ${
+                        isSending ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                      disabled={isSending}
                     >
-                      Send Message
+                      {isSending ? "Sending..." : "Send Message"}
                     </Button>
                   </form>
                 </CardContent>
@@ -409,8 +502,163 @@ const Index = () => {
               id="about"
               className="py-20 bg-primary"
             >
-              <div className="space-y-8">
-                <Card className="bg-card/50 border-border/50">
+              {/* Container for Contact Cards, giving them the same max-width as the FAQ section */}
+              <div className="max-w-4xl mx-auto px-4">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+                  {/* Email Card */}
+                  <Card className="bg-card/50 border-border/50 flex-1 w-full">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-accent/20 p-3 rounded-lg">
+                          <Mail className="h-6 w-6 text-accent" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            Email Us
+                          </h3>
+                          <p
+                            // href="mailto:riftwear.help@gmail.com"
+                            className="text-foreground/70 mb-1"
+                          >
+                            riftwear.help@gmail.com
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  {/* Social Media Card */}
+                  <Card className="bg-card/50 border-border/50 flex-1 w-full">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-accent/20 p-3 rounded-lg">
+                          <Share className="h-6 w-6 text-accent" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            Social Media
+                          </h3>
+                          <div className="flex space-x-4">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:text-accent"
+                            >
+                              <a
+                                href="https://www.instagram.com/rift_wear/"
+                                target="_blank"
+                                rel="noopner noreferrer"
+                              >
+                                <Instagram className="h-4 w-4" />
+                              </a>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:text-accent"
+                              asChild // Add asChild to render the Button component as its child (the <a> tag)
+                            >
+                              <a
+                                href="https://x.com/rift_wear"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Twitter className="h-4 w-4" />
+                              </a>
+                            </Button>
+                            {/* <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:text-accent"
+                            >
+                              <Twitter className="h-4 w-4" />
+                            </Button> */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:text-accent"
+                            >
+                              <Facebook className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:text-accent"
+                            >
+                              <Youtube className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+              {/* FAQ Section */}
+              <div className="mt-20 max-w-4xl mx-auto px-4">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold gradient-text mb-4">
+                    Frequently Asked Questions
+                  </h2>
+                  <p className="text-foreground/70">
+                    Quick answers to common questions
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* FAQ Cards */}
+                  <Card className="bg-card/50 border-border/50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-2">
+                        What's your return policy?
+                      </h3>
+                      <p className="text-foreground/70 text-sm">
+                        We offer 30-day returns on all unworn items with
+                        original tags. Free return shipping included.
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-card/50 border-border/50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-2">
+                        How long does shipping take?
+                      </h3>
+                      <p className="text-foreground/70 text-sm">
+                        Standard shipping takes 3-5 business days. Express
+                        shipping available for 1-2 day delivery.
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-card/50 border-border/50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-2">
+                        Do you offer size exchanges?
+                      </h3>
+                      <p className="text-foreground/70 text-sm">
+                        Yes! Free size exchanges within 30 days. Check our size
+                        guide or contact us for help.
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-card/50 border-border/50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-2">
+                        When do you restock sold-out items?
+                      </h3>
+                      <p className="text-foreground/70 text-sm">
+                        Restocks vary by item. Sign up for notifications on
+                        product pages to be alerted when items return.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </section>
+            {/* <section
+              ref={aboutSectionRef}
+              id="about"
+              className="py-20 bg-primary"
+            > */}
+            {/* <div className="space-y-8 flex items-center justify-around min-w-full">
+                <Card className="bg-card/50 border-border/50 ">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
                       <div className="bg-accent/20 p-3 rounded-lg">
@@ -425,8 +673,52 @@ const Index = () => {
                     </div>
                   </CardContent>
                 </Card>
-
                 <Card className="bg-card/50 border-border/50">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="bg-accent/20 p-3 rounded-lg">
+                        <Share className="h-6 w-6 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">
+                          Social Media
+                        </h3>
+                        <div className="flex space-x-4">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:text-accent"
+                          >
+                            <Instagram className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:text-accent"
+                          >
+                            <Twitter className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:text-accent"
+                          >
+                            <Facebook className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:text-accent"
+                          >
+                            <Youtube className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* <Card className="bg-card/50 border-border/50">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
                       <div className="bg-accent/20 p-3 rounded-lg">
@@ -443,9 +735,131 @@ const Index = () => {
                       </div>
                     </div>
                   </CardContent>
+                </Card> */}
+            {/* </div>  */}
+            {/* <div class="flex items-center justify-between min-w-full gap-4 md:gap-8">
+                <Card className="bg-card/50 border-border/50 flex-1">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="bg-accent/20 p-3 rounded-lg">
+                        <Mail className="h-6 w-6 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">Email Us</h3>
+                        <p className="text-foreground/70 mb-1">
+                          riftwear.help@gmail.com
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
                 </Card>
-              </div>
-            </section>
+                <Card className="bg-card/50 border-border/50 flex-1">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="bg-accent/20 p-3 rounded-lg">
+                        <Share className="h-6 w-6 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">
+                          Social Media
+                        </h3>
+                        <div className="flex space-x-4">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:text-accent"
+                          >
+                            <Instagram className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:text-accent"
+                          >
+                            <Twitter className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:text-accent"
+                          >
+                            <Facebook className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="hover:text-accent"
+                          >
+                            <Youtube className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div> */}
+            {/* FAQ Section */}
+            {/* <div className="mt-20">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold gradient-text mb-4">
+                    Frequently Asked Questions
+                  </h2>
+                  <p className="text-foreground/70">
+                    Quick answers to common questions
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                  <Card className="bg-card/50 border-border/50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-2">
+                        What's your return policy?
+                      </h3>
+                      <p className="text-foreground/70 text-sm">
+                        We offer 30-day returns on all unworn items with
+                        original tags. Free return shipping included.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-card/50 border-border/50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-2">
+                        How long does shipping take?
+                      </h3>
+                      <p className="text-foreground/70 text-sm">
+                        Standard shipping takes 3-5 business days. Express
+                        shipping available for 1-2 day delivery.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-card/50 border-border/50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-2">
+                        Do you offer size exchanges?
+                      </h3>
+                      <p className="text-foreground/70 text-sm">
+                        Yes! Free size exchanges within 30 days. Check our size
+                        guide or contact us for help.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-card/50 border-border/50">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-2">
+                        When do you restock sold-out items?
+                      </h3>
+                      <p className="text-foreground/70 text-sm">
+                        Restocks vary by item. Sign up for notifications on
+                        product pages to be alerted when items return.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div> */}
+            {/* </section> */}
           </div>
         </section>
         <Footer />

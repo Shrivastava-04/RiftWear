@@ -18,8 +18,8 @@ const Header = () => {
     // { name: "T-Shirts", href: "/explore?category=tshirts" },
     // { name: "Hoodies", href: "/explore?category=hoodies" },
     // { name: "Sale", href: "/explore?category=sale" },
-    { name: "Contact", href: "/#contact" },
-    { name: "About Us", href: "/#about" },
+    // { name: "Contact", href: "/#contact" },
+    // { name: "About Us", href: "/#about" },
   ];
   const handleLogo = () => {
     if (window.location.pathname === "/") {
@@ -63,7 +63,7 @@ const Header = () => {
           {/* Right Actions */}
           <div className="flex items-center space-x-4">
             {/* Search */}
-            <div className="hidden md:flex items-center">
+            {/* <div className="hidden md:flex items-center">
               {isSearchOpen ? (
                 <div className="flex items-center space-x-2">
                   <Input
@@ -88,17 +88,17 @@ const Header = () => {
                   <Search className="h-4 w-4" />
                 </Button>
               )}
-            </div>
+            </div> */}
 
             {/* Mobile Search */}
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="md:hidden"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
             >
               <Search className="h-4 w-4" />
-            </Button>
+            </Button> */}
 
             {/* Cart */}
             <Button
@@ -118,7 +118,7 @@ const Header = () => {
             </Button>
 
             {/* Mobile Menu Toggle */}
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="md:hidden"
@@ -129,22 +129,22 @@ const Header = () => {
               ) : (
                 <Menu className="h-4 w-4" />
               )}
-            </Button>
+            </Button> */}
           </div>
         </div>
 
         {/* Mobile Search Bar */}
-        {isSearchOpen && (
+        {/* {isSearchOpen && (
           <div className="md:hidden py-4 border-t border-border/40">
             <Input
               placeholder="Search products..."
               className="w-full bg-secondary/50"
             />
           </div>
-        )}
+        )} */}
 
         {/* Mobile Navigation Menu */}
-        {isMenuOpen && (
+        {/* {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border/40">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
@@ -175,7 +175,7 @@ const Header = () => {
               </div>
             </nav>
           </div>
-        )}
+        )} */}
       </div>
     </header>
   );

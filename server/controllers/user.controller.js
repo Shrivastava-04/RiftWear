@@ -588,7 +588,7 @@ export const getOrdersByUserId = async (req, res) => {
     if (!orders || orders.length === 0) {
       return res
         .status(404)
-        .json({ message: "No orders found for this user." });
+        .json({ message: "No orders found for this user.", orderLength: 0 });
     }
 
     res.status(200).json({ orders });

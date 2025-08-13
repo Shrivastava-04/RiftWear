@@ -62,7 +62,7 @@ const Contact = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {/* Contact Form */}
-          <Card className="bg-card/50 border-border/50">
+          {/* <Card className="bg-card/50 border-border/50">
             <CardHeader>
               <CardTitle className="text-2xl gradient-text">
                 Send us a message
@@ -151,7 +151,7 @@ const Contact = () => {
                 </Button>
               </form>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Contact Information */}
           <div className="space-y-8">

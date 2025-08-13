@@ -8,9 +8,9 @@ const Footer = () => {
   return (
     <footer className="bg-primary border-t border-border/40">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="space-y-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"> */}
+        {/* Company Info */}
+        {/* <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <img src={logo} alt="Rift" className="h-8 w-8" />
               <span className="text-xl font-bold gradient-text">Rift</span>
@@ -33,10 +33,10 @@ const Footer = () => {
                 <Youtube className="h-4 w-4" />
               </Button>
             </div>
-          </div>
+          </div> */}
 
-          {/* Quick Links */}
-          <div className="space-y-4">
+        {/* Quick Links */}
+        {/* <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground">
               Quick Links
             </h3>
@@ -72,10 +72,10 @@ const Footer = () => {
                 Sale
               </Link>
             </nav>
-          </div>
+          </div> */}
 
-          {/* Customer Service */}
-          <div className="space-y-4">
+        {/* Customer Service */}
+        {/* <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground">
               Customer Service
             </h3>
@@ -111,10 +111,10 @@ const Footer = () => {
                 Privacy Policy
               </Link>
             </nav>
-          </div>
+          </div> */}
 
-          {/* Newsletter */}
-          <div className="space-y-4">
+        {/* Newsletter */}
+        {/* <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground">
               Stay Updated
             </h3>
@@ -131,37 +131,43 @@ const Footer = () => {
                 Subscribe
               </Button>
             </div>
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
 
         {/* Bottom Section */}
-        <div className="mt-12 pt-8 border-t border-border/40">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-foreground/60">
-              © 2024 Rift. All rights reserved.
-            </p>
-            <nav className="flex space-x-6">
-              <Link
-                to="/privacy"
-                className="text-sm text-foreground/60 hover:text-accent transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                to="/terms"
-                className="text-sm text-foreground/60 hover:text-accent transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                to="/cookies"
-                className="text-sm text-foreground/60 hover:text-accent transition-colors"
-              >
-                Cookie Policy
-              </Link>
-            </nav>
-          </div>
+        {/* <div className="mt-12 pt-8 border-t border-border/40"> */}
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <p className="text-sm text-foreground/60">
+            © 2025 Rift. All rights reserved.
+          </p>
+          <nav className="flex space-x-6">
+            <Link
+              to="/shipping-policy"
+              className="text-sm text-foreground/70 hover:text-accent transition-colors"
+            >
+              Shipping Info
+            </Link>
+            <Link
+              to="/cancellation-refund-policy"
+              className="text-sm text-foreground/70 hover:text-accent transition-colors"
+            >
+              Returns & Exchanges
+            </Link>
+            <Link
+              to="/terms-and-conditions"
+              className="text-sm text-foreground/70 hover:text-accent transition-colors"
+            >
+              Terms and Conditions
+            </Link>
+            <Link
+              to="/privacy-policy"
+              className="text-sm text-foreground/70 hover:text-accent transition-colors"
+            >
+              Privacy Policy
+            </Link>
+          </nav>
         </div>
+        {/* </div> */}
       </div>
     </footer>
   );
