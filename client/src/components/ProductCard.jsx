@@ -92,7 +92,7 @@ const ProductCard = ({ product, arrival, forDepartment, department }) => {
             </div>
 
             {/* Quick Actions */}
-            <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {/* <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <Button
                 variant="ghost"
                 size="icon"
@@ -107,7 +107,7 @@ const ProductCard = ({ product, arrival, forDepartment, department }) => {
               >
                 <Eye className="h-4 w-4" />
               </Button>
-            </div>
+            </div> */}
 
             {/* Add to Cart - Slides up on hover */}
             {/* <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
