@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
-import FinalBg from "@/assets/FinalBg.mp4";
+import FinalBg from "../assets/FinalBG.mp4";
 import React from "react";
 
 const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
