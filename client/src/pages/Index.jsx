@@ -320,7 +320,7 @@ const Index = () => {
                   forDepartment={false} // This tells ProductCard to render as a standard size
                 />
               ))}
-              {/* <ProductCard
+              <ProductCard
                 arrival={"comingSoon"}
                 product={product1} // Using mock product for coming soon
                 forDepartment={false}
@@ -329,7 +329,7 @@ const Index = () => {
                 arrival={"comingSoon"}
                 product={product2} // Using mock product for coming soon
                 forDepartment={false}
-              /> */}
+              />
             </div>
           </div>
         </section>
