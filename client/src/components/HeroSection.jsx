@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
+import FinalBg from "@/assets/FinalBg.mp4";
 import React from "react";
 
 const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
@@ -12,12 +13,30 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img
+        {/* <img
           src={heroImage}
           alt="Arrasté Hero"
           className="w-full h-full object-cover transition-all duration-300" // Smoother transition
           style={{ filter: `blur(${blurAmount}px)` }} // Apply dynamic blur
-        />
+        /> */}
+        <video
+          autoPlay // Automatically start playing the video
+          loop // Loop the video continuously
+          muted // Mute the video (essential for autoplay in most browsers)
+          playsInline // Allow video to play inline on mobile devices
+          preload="auto" // Hint to the browser to preload the entire video
+          className="w-full h-full object-cover transition-all duration-300" // Smoother transition, covers the area
+          style={{ filter: `blur(${blurAmount}px)` }} // Apply dynamic blur
+        >
+          <source src={FinalBg} type="video/mp4" />
+          {/* Add more source tags for different formats for better browser compatibility */}
+          {/* <source src={heroVideoWebm} type="video/webm" /> */}
+          Your browser does not support the video tag.
+        </video>
+        {/* <video>
+          <source src={FinalBg} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video> */}
         {/* The background gradient will also fade with the section opacity */}
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/50" />
       </div>

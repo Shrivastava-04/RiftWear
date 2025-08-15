@@ -512,7 +512,7 @@ const Index = () => {
                         <div className="bg-accent/20 p-3 rounded-lg">
                           <Mail className="h-6 w-6 text-accent" />
                         </div>
-                        <div>
+                        <div className="py-1">
                           <h3 className="font-semibold text-lg mb-2">
                             Email Us
                           </h3>
@@ -537,34 +537,33 @@ const Index = () => {
                           <h3 className="font-semibold text-lg mb-2">
                             Social Media
                           </h3>
-                          <div className="flex space-x-4">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="hover:text-accent"
+                          <div className="flex space-x-4 py-2">
+                            <a
+                              href="https://www.instagram.com/rift_wear/"
+                              target="_blank"
+                              rel="noopner noreferrer"
                             >
-                              <a
-                                href="https://www.instagram.com/rift_wear/"
-                                target="_blank"
-                                rel="noopner noreferrer"
-                              >
-                                <Instagram className="h-4 w-4" />
-                              </a>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="hover:text-accent"
-                              asChild // Add asChild to render the Button component as its child (the <a> tag)
+                              {/* <Button
+                                variant="ghost"
+                                size="icon"
+                                className="hover:text-accent"
+                              > */}
+                              <Instagram className="h-5 w-5" />
+                              {/* </Button> */}
+                            </a>
+                            <a
+                              href="https://x.com/rift_wear"
+                              target="_blank"
+                              rel="noopener noreferrer"
                             >
-                              <a
-                                href="https://x.com/rift_wear"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Twitter className="h-4 w-4" />
-                              </a>
-                            </Button>
+                              {/* <Button
+                                variant="ghost"
+                                size="icon"
+                                className="hover:text-accent"
+                              > */}
+                              <Twitter className="h-5 w-5" />
+                              {/* </Button> */}
+                            </a>
                             {/* <Button
                               variant="ghost"
                               size="icon"
@@ -572,7 +571,7 @@ const Index = () => {
                             >
                               <Twitter className="h-4 w-4" />
                             </Button> */}
-                            <Button
+                            {/* <Button
                               variant="ghost"
                               size="icon"
                               className="hover:text-accent"
@@ -585,7 +584,7 @@ const Index = () => {
                               className="hover:text-accent"
                             >
                               <Youtube className="h-4 w-4" />
-                            </Button>
+                            </Button> */}
                           </div>
                         </div>
                       </div>
