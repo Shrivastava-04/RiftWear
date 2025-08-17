@@ -47,7 +47,7 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
           className="max-w-4xl mx-auto space-y-8"
           style={{ filter: `blur(${blurAmount}px)` }}
         >
-          <div className="space-y-4">
+          <div className="space-y-1 md:space-y-4">
             <h1 className="text-2xl md:text-4xl lg:text-6xl font-black gradient-text animate-fade-in-up">
               FOR THE HALLWAYS
             </h1>

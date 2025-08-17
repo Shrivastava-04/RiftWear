@@ -398,7 +398,7 @@ const Index = () => {
             <section
               ref={contactSectionRef}
               id="contact"
-              className="py-20 bg-primary"
+              className="md:py-20 bg-primary"
             >
               <Card className="bg-card/50 border-border/50">
                 <CardHeader>
@@ -499,7 +499,7 @@ const Index = () => {
             <section
               ref={aboutSectionRef}
               id="about"
-              className="py-20 bg-primary"
+              className="md:py-20 bg-primary"
             >
               {/* Container for Contact Cards, giving them the same max-width as the FAQ section */}
               <div className="max-w-4xl mx-auto px-4">
@@ -596,7 +596,7 @@ const Index = () => {
                 </div>
               </div>
               {/* FAQ Section */}
-              <div className="mt-20 max-w-4xl mx-auto px-4">
+              <div className="mt-10 md:mt-20 max-w-4xl mx-auto px-4">
                 <div className="text-center mb-12">
                   <h2 className="text-3xl font-bold gradient-text mb-4">
                     Frequently Asked Questions

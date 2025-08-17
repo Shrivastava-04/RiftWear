@@ -908,12 +908,12 @@ const AddProductForm = () => {
     onSale: false,
     rating: 0,
     reviews: 0,
-    features: [""],
+    features: ["Pure Fabric", "Stylish Design"],
     specifications: {
-      Material: "",
-      Weight: "",
-      Fit: "",
-      Care: "",
+      Material: "100% Cotton",
+      Weight: "180 GSM",
+      Fit: "Round Neck, Regular Fit",
+      Care: "Machine Washed",
     },
     forHomePage: false, // New field for home page display
   });

@@ -97,7 +97,7 @@ const productSchema = new mongoose.Schema(
     features: [
       {
         type: String,
-        required: true,
+        default: "Pure Fabric",
       },
     ],
     specifications: {
