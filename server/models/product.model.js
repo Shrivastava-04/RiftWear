@@ -101,10 +101,11 @@ const productSchema = new mongoose.Schema(
       },
     ],
     specifications: {
-      Material: { type: String, required: true, default: "100% Cotton" },
-      Weight: { type: String, required: true, default: "180 GSM" },
-      Fit: { type: String, required: true, default: "Round Neck, Regular Fit" },
-      Care: { type: String, required: true, default: "Machine washed" },
+      // **Remove `required: true` from here to allow defaults to be used**
+      Material: { type: String, default: "100% Cotton" },
+      Weight: { type: String, default: "180 GSM" },
+      Fit: { type: String, default: "Round Neck, Regular Fit" },
+      Care: { type: String, default: "Machine washed" },
     },
     forDepartment: {
       type: Boolean,

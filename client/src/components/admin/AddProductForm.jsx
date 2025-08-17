@@ -6,13 +6,7 @@
 // import { Textarea } from "@/components/ui/textarea";
 // import { Checkbox } from "@/components/ui/checkbox";
 // import { useToast } from "@/hooks/use-toast";
-// import {
-//   Plus,
-//   X,
-//   UploadCloud,
-//   Image as ImageIcon,
-//   Loader2,
-// } from "lucide-react";
+// import { Plus, X, Image as ImageIcon, Loader2 } from "lucide-react";
 
 // const AddProductForm = () => {
 //   const [formData, setFormData] = useState({
@@ -343,6 +337,7 @@
 //         reviews: 0,
 //         features: [""],
 //         specifications: { Material: "", Weight: "", Fit: "", Care: "" },
+//         forHomePage: false, // Reset the new field
 //       });
 //       setSelectedFiles([]);
 //       setSelectedFileForSizeChart([]);
@@ -601,26 +596,44 @@
 //               Status & Ratings
 //             </h3>
 //             <div>
-//               <Checkbox
-//                 id="isNew"
-//                 name="isNew"
-//                 checked={formData.isNew}
-//                 onCheckedChange={(checked) =>
-//                   setFormData({ ...formData, isNew: checked })
-//                 }
-//               />
-//               <label htmlFor="isNew">New Arrival</label>
+//               <div className="flex items-center space-x-2">
+//                 <Checkbox
+//                   id="isNew"
+//                   name="isNew"
+//                   checked={formData.isNew}
+//                   onCheckedChange={(checked) =>
+//                     setFormData({ ...formData, isNew: checked })
+//                   }
+//                 />
+//                 <label htmlFor="isNew">New Arrival</label>
+//               </div>
 //             </div>
 //             <div>
-//               <Checkbox
-//                 id="onSale"
-//                 name="onSale"
-//                 checked={formData.onSale}
-//                 onCheckedChange={(checked) =>
-//                   setFormData({ ...formData, onSale: checked })
-//                 }
-//               />
-//               <label htmlFor="onSale">On Sale</label>
+//               <div className="flex items-center space-x-2">
+//                 <Checkbox
+//                   id="onSale"
+//                   name="onSale"
+//                   checked={formData.onSale}
+//                   onCheckedChange={(checked) =>
+//                     setFormData({ ...formData, onSale: checked })
+//                   }
+//                 />
+//                 <label htmlFor="onSale">On Sale</label>
+//               </div>
+//             </div>
+//             {/* NEW FIELD: forHomePage */}
+//             <div>
+//               <div className="flex items-center space-x-2">
+//                 <Checkbox
+//                   id="forHomePage"
+//                   name="forHomePage"
+//                   checked={formData.forHomePage}
+//                   onCheckedChange={(checked) =>
+//                     setFormData({ ...formData, forHomePage: checked })
+//                   }
+//                 />
+//                 <label htmlFor="forHomePage">Display on Home Page</label>
+//               </div>
 //             </div>
 //             <div>
 //               <label htmlFor="rating">Rating</label>
@@ -1039,6 +1052,55 @@ const AddProductForm = () => {
     );
   };
 
+  // const validateForm = () => {
+  //   let newErrors = {};
+  //   if (!formData.name.trim()) newErrors.name = "Name is required.";
+  //   if (!formData.price || formData.price <= 0)
+  //     newErrors.price = "Price must be a positive number.";
+  //   if (!formData.originalPrice || formData.originalPrice <= 0)
+  //     newErrors.originalPrice = "Original price must be a positive number.";
+  //   if (!formData.description.trim())
+  //     newErrors.description = "Description is required.";
+  //   if (!formData.category.trim()) newErrors.category = "Category is required.";
+
+  //   if (selectedFiles.length === 0 && uploadedImageUrls.length === 0) {
+  //     newErrors.images = "At least one product image is required.";
+  //   }
+
+  //   // Removed the following validation checks because the fields now have default values in the backend schema
+  //   /*
+  //   if (selectedFileForSizeChart.length === 0 && uploadedImageUrlForSizeChart.length === 0) {
+  //     newErrors.sizeChart = "A size chart image is required.";
+  //   }
+  //   if (!formData.specifications.Material.trim()) newErrors.Material = "Material is required.";
+  //   if (!formData.specifications.Weight.trim()) newErrors.Weight = "Weight is required.";
+  //   if (!formData.specifications.Fit.trim()) newErrors.Fit = "Fit is required.";
+  //   if (!formData.specifications.Care.trim()) newErrors.Care = "Care instructions are required.";
+  //   */
+
+  //   if (!Object.values(formData.sizes).some(Boolean)) {
+  //     newErrors.sizes = "At least one size must be selected.";
+  //   }
+  //   if (!Object.values(formData.varietyOfProduct).some(Boolean)) {
+  //     newErrors.varietyOfProduct = "At least one variety must be selected.";
+  //   }
+  //   if (!Object.values(formData.colors).some(Boolean)) {
+  //     newErrors.colors = "At least one color must be selected.";
+  //   }
+  //   if (
+  //     formData.features.length === 0 ||
+  //     formData.features.every((f) => !f.trim())
+  //   ) {
+  //     newErrors.features = "At least one feature is required.";
+  //   }
+
+  //   if (formData.forDepartment && !formData.departmentName.trim()) {
+  //     newErrors.departmentName = "Department name is required.";
+  //   }
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
   const validateForm = () => {
     let newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required.";
@@ -1054,13 +1116,22 @@ const AddProductForm = () => {
       newErrors.images = "At least one product image is required.";
     }
 
-    // --- UPDATED VALIDATION FOR SIZE CHART ---
+    // Removed the following validation checks because the fields now have default values in the backend schema
+    /*
     if (
       selectedFileForSizeChart.length === 0 &&
       uploadedImageUrlForSizeChart.length === 0
     ) {
       newErrors.sizeChart = "A size chart image is required.";
     }
+    if (!formData.specifications.Material.trim())
+      newErrors.Material = "Material is required.";
+    if (!formData.specifications.Weight.trim())
+      newErrors.Weight = "Weight is required.";
+    if (!formData.specifications.Fit.trim()) newErrors.Fit = "Fit is required.";
+    if (!formData.specifications.Care.trim())
+      newErrors.Care = "Care instructions are required.";
+    */
 
     if (!Object.values(formData.sizes).some(Boolean)) {
       newErrors.sizes = "At least one size must be selected.";
@@ -1071,20 +1142,12 @@ const AddProductForm = () => {
     if (!Object.values(formData.colors).some(Boolean)) {
       newErrors.colors = "At least one color must be selected.";
     }
-    if (
-      formData.features.length === 0 ||
-      formData.features.every((f) => !f.trim())
-    ) {
-      newErrors.features = "At least one feature is required.";
-    }
-
-    if (!formData.specifications.Material.trim())
-      newErrors.Material = "Material is required.";
-    if (!formData.specifications.Weight.trim())
-      newErrors.Weight = "Weight is required.";
-    if (!formData.specifications.Fit.trim()) newErrors.Fit = "Fit is required.";
-    if (!formData.specifications.Care.trim())
-      newErrors.Care = "Care instructions are required.";
+    // if (
+    //   formData.features.length === 0 ||
+    //   formData.features.every((f) => !f.trim())
+    // ) {
+    //   newErrors.features = "At least one feature is required.";
+    // }
 
     if (formData.forDepartment && !formData.departmentName.trim()) {
       newErrors.departmentName = "Department name is required.";
@@ -1093,7 +1156,6 @@ const AddProductForm = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -1143,6 +1205,8 @@ const AddProductForm = () => {
         return;
       }
 
+      // Removed validation for size chart URL to align with backend changes
+      /*
       if (
         finalSizeChartUrl.length === 0 &&
         selectedFileForSizeChart.length > 0
@@ -1155,6 +1219,7 @@ const AddProductForm = () => {
         setIsLoading(false);
         return;
       }
+      */
 
       setUploadedImageUrls(finalImageUrls);
       setUploadedImageUrlForSizeChart(finalSizeChartUrl);
@@ -1564,10 +1629,10 @@ const AddProductForm = () => {
           </div>
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground/80">
-              Specifications *
+              Specifications
             </h3>
             <div>
-              <label htmlFor="specMaterial">Material *</label>
+              <label htmlFor="specMaterial">Material</label>
               <Input
                 type="text"
                 id="specMaterial"
@@ -1582,7 +1647,7 @@ const AddProductForm = () => {
               {errors.Material && <p>{errors.Material}</p>}
             </div>
             <div>
-              <label htmlFor="specWeight">Weight *</label>
+              <label htmlFor="specWeight">Weight</label>
               <Input
                 type="text"
                 id="specWeight"
@@ -1597,7 +1662,7 @@ const AddProductForm = () => {
               {errors.Weight && <p>{errors.Weight}</p>}
             </div>
             <div>
-              <label htmlFor="specFit">Fit *</label>
+              <label htmlFor="specFit">Fit</label>
               <Input
                 type="text"
                 id="specFit"
@@ -1612,7 +1677,7 @@ const AddProductForm = () => {
               {errors.Fit && <p>{errors.Fit}</p>}
             </div>
             <div>
-              <label htmlFor="specCare">Care Instructions *</label>
+              <label htmlFor="specCare">Care Instructions</label>
               <Input
                 type="text"
                 id="specCare"

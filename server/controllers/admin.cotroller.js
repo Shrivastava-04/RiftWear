@@ -95,26 +95,26 @@ export const addProduct = async (req, res) => {
       validationErrors.push("At least one color must be selected.");
     }
     // Features array
-    if (
-      !features ||
-      !Array.isArray(features) ||
-      features.length === 0 ||
-      features.some((f) => !f.trim())
-    ) {
-      validationErrors.push("At least one feature is required.");
-    }
+    // if (
+    //   !features ||
+    //   !Array.isArray(features) ||
+    //   features.length === 0 ||
+    //   features.some((f) => !f.trim())
+    // ) {
+    //   validationErrors.push("At least one feature is required.");
+    // }
     // Specifications object
-    if (
-      !specifications ||
-      !specifications.Material ||
-      !specifications.Weight ||
-      !specifications.Fit ||
-      !specifications.Care
-    ) {
-      validationErrors.push(
-        "All specifications (Material, Weight, Fit, Care) are required."
-      );
-    }
+    // if (
+    //   !specifications ||
+    //   !specifications.Material ||
+    //   !specifications.Weight ||
+    //   !specifications.Fit ||
+    //   !specifications.Care
+    // ) {
+    //   validationErrors.push(
+    //     "All specifications (Material, Weight, Fit, Care) are required."
+    //   );
+    // }
     // Conditional validation for department
     if (forDepartment && !departmentName.trim()) {
       validationErrors.push(
@@ -122,9 +122,9 @@ export const addProduct = async (req, res) => {
       );
     }
     // Size Chart array
-    if (sizeChart && !Array.isArray(sizeChart)) {
-      validationErrors.push("Size chart must be an array of URLs.");
-    }
+    // if (sizeChart && !Array.isArray(sizeChart)) {
+    //   validationErrors.push("Size chart must be an array of URLs.");
+    // }
 
     if (validationErrors.length > 0) {
       return res.status(400).json({ message: validationErrors.join(" ") });
