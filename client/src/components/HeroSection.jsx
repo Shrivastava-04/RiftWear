@@ -48,18 +48,18 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
           style={{ filter: `blur(${blurAmount}px)` }}
         >
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black gradient-text animate-fade-in-up">
-              UNLEASH
+            <h1 className="text-2xl md:text-4xl lg:text-6xl font-black gradient-text animate-fade-in-up">
+              FOR THE HALLWAYS
             </h1>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black gradient-text animate-fade-in-up-delay">
-              YOUR STYLE
+            <h1 className="text-2xl md:text-4xl lg:text-6xl font-black gradient-text animate-fade-in-up-delay">
+              TO THE HANGOUTS
             </h1>
           </div>
 
-          <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto animate-fade-in-up-delay">
-            Discover premium streetwear that defines your individuality. Express
-            yourself with our exclusive collection designed for the bold and
-            fearless.
+          <p className="text-sm md:text-lg text-foreground/80 max-w-3xl mx-auto animate-fade-in-up-delay">
+            Every college has its stories, its landmarks, its legends. <br />{" "}
+            This isn't just merch; it's a piece of your story, <br /> made for
+            the crew you call family.
           </p>
 
           {/* <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up-delay">

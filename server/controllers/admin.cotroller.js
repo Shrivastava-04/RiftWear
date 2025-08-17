@@ -66,6 +66,7 @@ export const addProduct = async (req, res) => {
       forDepartment,
       departmentName,
       sizeChart,
+      forHomePage,
     } = req.body;
 
     // --- REWRITTEN VALIDATION LOGIC ---
@@ -148,6 +149,7 @@ export const addProduct = async (req, res) => {
       forDepartment,
       departmentName: forDepartment ? departmentName : "", // Save departmentName only if forDepartment is true
       sizeChart,
+      forHomePage, // Assuming new products are featured on the homepage by default
     });
 
     await newProduct.save();

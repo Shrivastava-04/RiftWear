@@ -47,9 +47,9 @@ const Index = () => {
         const res = await axios.get(`${API_BASE_URL}/product/getallproduct`);
         const firstTwoProducts = res.data
           .filter((item) => {
-            return !item.forDepartment;
+            return !item.forDepartment && item.forHomePage; // Filter out products not for home page
           })
-          .slice(0, 2); // Get first two for featured
+          .slice(0, 4); // Get first two for featured
         setFeaturedProducts(firstTwoProducts);
       } catch (error) {
         console.error("Error loading featured products:", error);
@@ -306,8 +306,7 @@ const Index = () => {
                 Featured Products
               </h2>
               <p className="text-foreground/70 max-w-2xl mx-auto animate-fade-in-up">
-                Discover our most popular pieces, carefully selected to elevate
-                your streetwear game
+                Discover our most popular pieces.
               </p>
             </div>
 
@@ -320,7 +319,7 @@ const Index = () => {
                   forDepartment={false} // This tells ProductCard to render as a standard size
                 />
               ))}
-              <ProductCard
+              {/* <ProductCard
                 arrival={"comingSoon"}
                 product={product1} // Using mock product for coming soon
                 forDepartment={false}
@@ -329,7 +328,7 @@ const Index = () => {
                 arrival={"comingSoon"}
                 product={product2} // Using mock product for coming soon
                 forDepartment={false}
-              />
+              /> */}
             </div>
           </div>
         </section>
@@ -537,11 +536,12 @@ const Index = () => {
                           <h3 className="font-semibold text-lg mb-2">
                             Social Media
                           </h3>
-                          <div className="flex space-x-4 py-2">
+                          <div className="flex space-x-8 py-2">
                             <a
                               href="https://www.instagram.com/rift_wear/"
                               target="_blank"
                               rel="noopner noreferrer"
+                              className="flex items-center space-x-2"
                             >
                               {/* <Button
                                 variant="ghost"
@@ -549,12 +549,14 @@ const Index = () => {
                                 className="hover:text-accent"
                               > */}
                               <Instagram className="h-5 w-5" />
+                              <p>rift_wear</p>
                               {/* </Button> */}
                             </a>
                             <a
                               href="https://x.com/rift_wear"
                               target="_blank"
                               rel="noopener noreferrer"
+                              className="flex items-center space-x-2"
                             >
                               {/* <Button
                                 variant="ghost"
@@ -562,6 +564,7 @@ const Index = () => {
                                 className="hover:text-accent"
                               > */}
                               <Twitter className="h-5 w-5" />
+                              <p>rift_wear</p>
                               {/* </Button> */}
                             </a>
                             {/* <Button
@@ -621,8 +624,7 @@ const Index = () => {
                         How long does shipping take?
                       </h3>
                       <p className="text-foreground/70 text-sm">
-                        Standard shipping takes 3-5 business days. Express
-                        shipping available for 1-2 day delivery.
+                        Standard shipping takes 10-12 business days.
                       </p>
                     </CardContent>
                   </Card>
