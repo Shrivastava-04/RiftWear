@@ -97,15 +97,15 @@ const productSchema = new mongoose.Schema(
     features: [
       {
         type: String,
-        default: "Pure Fabric",
+        required: true,
       },
     ],
     specifications: {
       // **Remove `required: true` from here to allow defaults to be used**
-      Material: { type: String, default: "100% Cotton" },
-      Weight: { type: String, default: "180 GSM" },
-      Fit: { type: String, default: "Round Neck, Regular Fit" },
-      Care: { type: String, default: "Machine washed" },
+      Material: { type: String, required: true },
+      Weight: { type: String, required: true },
+      Fit: { type: String, required: true },
+      Care: { type: String, required: true },
     },
     forDepartment: {
       type: Boolean,
@@ -118,8 +118,7 @@ const productSchema = new mongoose.Schema(
     sizeChart: [
       {
         type: String,
-        default:
-          "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1755197627/sigrfjjydtlpmbmdexo8.png",
+        required: true,
       },
     ],
     forHomePage: {

@@ -127,6 +127,7 @@ export const addProduct = async (req, res) => {
     // }
 
     if (validationErrors.length > 0) {
+      console.log(validationErrors);
       return res.status(400).json({ message: validationErrors.join(" ") });
     }
 
