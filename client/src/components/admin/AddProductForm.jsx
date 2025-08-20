@@ -9,6 +9,18 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, X, Image as ImageIcon, Loader2 } from "lucide-react";
 
 const AddProductForm = () => {
+  // Define default values
+  const defaultFeatures = ["Pure Fabric", "Stylish Design"];
+  const defaultSpecs = {
+    Material: "100% Cotton",
+    Weight: "180 GSM",
+    Fit: "Round Neck, Regular Fit",
+    Care: "Machine Washed",
+  };
+  const defaultSizeChartUrl = [
+    "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1755700423/i7af6otb7qaksvobk4up.png",
+  ];
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -25,44 +37,31 @@ const AddProductForm = () => {
     colors: { Black: false, White: false },
     forDepartment: false,
     departmentName: "",
-    sizeChart: [
-      "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1755197834/dm2c0vwy9juwjrl8to5r.png",
-    ],
+    sizeChart: [],
     category: "",
     isNew: true,
     onSale: false,
     rating: 0,
     reviews: 0,
-    features: ["Pure Fabric", "Stylish Design"],
-    specifications: {
-      Material: "100% Cotton",
-      Weight: "180 GSM",
-      Fit: "Round Neck, Regular Fit",
-      Care: "Machine Washed",
-    },
-    forHomePage: false, // New field for home page display
+    features: [...defaultFeatures], // Initialize with default values
+    specifications: { ...defaultSpecs }, // Initialize with default values
+    forHomePage: false,
   });
+
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedFileForSizeChart, setSelectedFileForSizeChart] = useState([]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [uploadedImageUrlForSizeChart, setUploadedImageUrlForSizeChart] =
-    useState([
-      "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1755197834/dm2c0vwy9juwjrl8to5r.png",
-    ]); // Default size chart image URL
-
-  // Combine image upload states for cleaner logic
+    useState([]);
   const [isUploading, setIsUploading] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const { toast } = useToast();
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
   const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const CLOUDINARY_UPLOAD_PRESET = import.meta.env
     .VITE_CLOUDINARY_UPLOAD_PRESET;
 
-  // --- Handlers for regular form fields ---
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
@@ -102,9 +101,6 @@ const AddProductForm = () => {
   const handleRemoveFeature = (index) => {
     setFormData((prevData) => {
       const newFeatures = prevData.features.filter((_, i) => i !== index);
-      if (newFeatures.length === 0) {
-        return { ...prevData, features: [""] };
-      }
       return { ...prevData, features: newFeatures };
     });
   };
@@ -119,7 +115,6 @@ const AddProductForm = () => {
     }));
   };
 
-  // --- NEW: A reusable function to upload a single file ---
   const uploadSingleImage = async (file) => {
     if (!file) return null;
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
@@ -150,7 +145,6 @@ const AddProductForm = () => {
     }
   };
 
-  // --- NEW: Handlers for product images ---
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setSelectedFiles(files);
@@ -164,71 +158,17 @@ const AddProductForm = () => {
     );
   };
 
-  // --- NEW: Handlers for size chart image ---
   const handleFileChangeForSizeChart = (e) => {
     const files = Array.from(e.target.files);
     setSelectedFileForSizeChart(files);
-    setUploadedImageUrlForSizeChart([
-      "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1755197834/dm2c0vwy9juwjrl8to5r.png",
-    ]);
+    setUploadedImageUrlForSizeChart([]);
     setErrors((prevErrors) => ({ ...prevErrors, sizeChart: "" }));
   };
 
-  const handleRemoveSelectedFileforSizeChart = (indexToRemove) => {
-    setSelectedFileForSizeChart((prevFile) =>
-      prevFile.filter((_, index) => index !== indexToRemove)
-    );
+  const handleRemoveSelectedFileforSizeChart = () => {
+    setSelectedFileForSizeChart([]);
   };
 
-  // const validateForm = () => {
-  //   let newErrors = {};
-  //   if (!formData.name.trim()) newErrors.name = "Name is required.";
-  //   if (!formData.price || formData.price <= 0)
-  //     newErrors.price = "Price must be a positive number.";
-  //   if (!formData.originalPrice || formData.originalPrice <= 0)
-  //     newErrors.originalPrice = "Original price must be a positive number.";
-  //   if (!formData.description.trim())
-  //     newErrors.description = "Description is required.";
-  //   if (!formData.category.trim()) newErrors.category = "Category is required.";
-
-  //   if (selectedFiles.length === 0 && uploadedImageUrls.length === 0) {
-  //     newErrors.images = "At least one product image is required.";
-  //   }
-
-  //   // Removed the following validation checks because the fields now have default values in the backend schema
-  //   /*
-  //   if (selectedFileForSizeChart.length === 0 && uploadedImageUrlForSizeChart.length === 0) {
-  //     newErrors.sizeChart = "A size chart image is required.";
-  //   }
-  //   if (!formData.specifications.Material.trim()) newErrors.Material = "Material is required.";
-  //   if (!formData.specifications.Weight.trim()) newErrors.Weight = "Weight is required.";
-  //   if (!formData.specifications.Fit.trim()) newErrors.Fit = "Fit is required.";
-  //   if (!formData.specifications.Care.trim()) newErrors.Care = "Care instructions are required.";
-  //   */
-
-  //   if (!Object.values(formData.sizes).some(Boolean)) {
-  //     newErrors.sizes = "At least one size must be selected.";
-  //   }
-  //   if (!Object.values(formData.varietyOfProduct).some(Boolean)) {
-  //     newErrors.varietyOfProduct = "At least one variety must be selected.";
-  //   }
-  //   if (!Object.values(formData.colors).some(Boolean)) {
-  //     newErrors.colors = "At least one color must be selected.";
-  //   }
-  //   if (
-  //     formData.features.length === 0 ||
-  //     formData.features.every((f) => !f.trim())
-  //   ) {
-  //     newErrors.features = "At least one feature is required.";
-  //   }
-
-  //   if (formData.forDepartment && !formData.departmentName.trim()) {
-  //     newErrors.departmentName = "Department name is required.";
-  //   }
-
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0;
-  // };
   const validateForm = () => {
     let newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required.";
@@ -242,23 +182,6 @@ const AddProductForm = () => {
     if (selectedFiles.length === 0 && uploadedImageUrls.length === 0) {
       newErrors.images = "At least one product image is required.";
     }
-    // Removed the following validation checks because the fields now have default values in the backend schema
-    /*
-    if (
-      selectedFileForSizeChart.length === 0 &&
-      uploadedImageUrlForSizeChart.length === 0
-    ) {
-      newErrors.sizeChart = "A size chart image is required.";
-    }
-    if (!formData.specifications.Material.trim())
-      newErrors.Material = "Material is required.";
-    if (!formData.specifications.Weight.trim())
-      newErrors.Weight = "Weight is required.";
-    if (!formData.specifications.Fit.trim()) newErrors.Fit = "Fit is required.";
-    if (!formData.specifications.Care.trim())
-      newErrors.Care = "Care instructions are required.";
-    */
-
     if (!Object.values(formData.sizes).some(Boolean))
       newErrors.sizes = "At least one size must be selected.";
     if (!Object.values(formData.varietyOfProduct).some(Boolean))
@@ -266,13 +189,6 @@ const AddProductForm = () => {
     if (!Object.values(formData.colors).some(Boolean)) {
       newErrors.colors = "At least one color must be selected.";
     }
-    // if (
-    //   formData.features.length === 0 ||
-    //   formData.features.every((f) => !f.trim())
-    // ) {
-    //   newErrors.features = "At least one feature is required.";
-    // }
-
     if (formData.forDepartment && !formData.departmentName.trim()) {
       newErrors.departmentName = "Department name is required.";
     }
@@ -281,13 +197,11 @@ const AddProductForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // --- Form submission handler ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     if (!validateForm()) {
-      console.log(validateForm);
       setIsLoading(false);
       toast({
         title: "Validation Error",
@@ -301,27 +215,16 @@ const AddProductForm = () => {
     let finalImageUrls = uploadedImageUrls;
     let finalSizeChartUrl = uploadedImageUrlForSizeChart;
 
-    if (selectedFiles.length > 0 || selectedFileForSizeChart.length > 0) {
+    // Handle product images upload
+    if (selectedFiles.length > 0) {
       setIsUploading(true);
-
       const imageUploadPromises = selectedFiles.map((file) =>
         uploadSingleImage(file)
       );
-      const sizeChartUploadPromises = selectedFileForSizeChart.map((file) =>
-        uploadSingleImage(file)
-      );
-
-      const [imageResults, sizeChartResults] = await Promise.all([
-        Promise.all(imageUploadPromises),
-        Promise.all(sizeChartUploadPromises),
-      ]);
-
+      const imageResults = await Promise.all(imageUploadPromises);
       setIsUploading(false);
-
       finalImageUrls = imageResults.filter((url) => url !== null);
-      finalSizeChartUrl = sizeChartResults.filter((url) => url !== null);
-
-      if (finalImageUrls.length === 0 && selectedFiles.length > 0) {
+      if (finalImageUrls.length === 0) {
         toast({
           title: "Image Upload Failed",
           description: "Product images could not be uploaded.",
@@ -330,33 +233,40 @@ const AddProductForm = () => {
         setIsLoading(false);
         return;
       }
+    }
 
-      // Removed validation for size chart URL to align with backend changes
-      /*
-      if (
-        finalSizeChartUrl.length === 0 &&
-        selectedFileForSizeChart.length > 0
-      ) {
-        toast({
-          title: "Image Upload Failed",
-          description: "Size chart image could not be uploaded.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-      */
-
-      setUploadedImageUrls(finalImageUrls);
-      setUploadedImageUrlForSizeChart(finalSizeChartUrl);
+    // Handle size chart image upload
+    if (selectedFileForSizeChart.length > 0) {
+      setIsUploading(true);
+      const sizeChartUploadPromises = selectedFileForSizeChart.map((file) =>
+        uploadSingleImage(file)
+      );
+      const sizeChartResults = await Promise.all(sizeChartUploadPromises);
+      setIsUploading(false);
+      finalSizeChartUrl = sizeChartResults.filter((url) => url !== null);
+    } else {
+      // If no new image is selected, use the default URL
+      finalSizeChartUrl = [...defaultSizeChartUrl];
     }
 
     try {
+      // Determine which features to send
+      const hasCustomFeatures = formData.features.some(
+        (f) => f.trim() !== "" && !defaultFeatures.includes(f)
+      );
+      const featuresToSend = hasCustomFeatures
+        ? formData.features.filter((f) => f.trim() !== "")
+        : [...defaultFeatures];
+
+      // Determine which specifications to send
+      const specificationsToSend = { ...formData.specifications };
+
       const dataToSend = {
         ...formData,
         images: finalImageUrls,
-        sizeChart: formData.sizeChart, // change this to finalSizeChartUrl for uploading custom size chart images and also change the default value in the formData state
-        features: formData.features.filter((f) => f.trim()),
+        sizeChart: finalSizeChartUrl,
+        features: featuresToSend,
+        specifications: specificationsToSend,
       };
 
       const response = await axios.post(
@@ -385,29 +295,20 @@ const AddProductForm = () => {
         colors: { Black: false, White: false },
         forDepartment: false,
         departmentName: "",
-        sizeChart: [
-          "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1755197834/dm2c0vwy9juwjrl8to5r.png",
-        ],
+        sizeChart: [],
         category: "",
         isNew: true,
         onSale: false,
         rating: 0,
         reviews: 0,
-        features: ["Pure Fabric", "Stylish Design"],
-        specifications: {
-          Material: "100% Cotton",
-          Weight: "180 GSM",
-          Fit: "Round Neck, Regular Fit",
-          Care: "Machine Washed",
-        },
-        forHomePage: false, // Reset the new field
+        features: [...defaultFeatures],
+        specifications: { ...defaultSpecs },
+        forHomePage: false,
       });
       setSelectedFiles([]);
       setSelectedFileForSizeChart([]);
       setUploadedImageUrls([]);
-      setUploadedImageUrlForSizeChart([
-        "https://res.cloudinary.com/dfvxh7p8p/image/upload/v1755197834/dm2c0vwy9juwjrl8to5r.png",
-      ]);
+      setUploadedImageUrlForSizeChart([]);
     } catch (err) {
       console.error("Error adding product:", err);
       toast({
@@ -445,7 +346,9 @@ const AddProductForm = () => {
                 className="bg-secondary/50"
                 placeholder="Product Name"
               />
-              {errors.name && <p>{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
             </div>
             <div>
               <label htmlFor="category">Category *</label>
@@ -458,7 +361,9 @@ const AddProductForm = () => {
                 className="bg-secondary/50"
                 placeholder="e.g., Hoodies, T-Shirts"
               />
-              {errors.category && <p>{errors.category}</p>}
+              {errors.category && (
+                <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+              )}
             </div>
             <div>
               <label htmlFor="description">Description *</label>
@@ -471,9 +376,14 @@ const AddProductForm = () => {
                 placeholder="Detailed product description"
                 rows={4}
               />
-              {errors.description && <p>{errors.description}</p>}
+              {errors.description && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.description}
+                </p>
+              )}
             </div>
           </div>
+          {/* --- */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground/80">
               Pricing
@@ -491,7 +401,9 @@ const AddProductForm = () => {
                 min="0"
                 step="0.01"
               />
-              {errors.price && <p>{errors.price}</p>}
+              {errors.price && (
+                <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+              )}
             </div>
             <div>
               <label htmlFor="originalPrice">Original Price *</label>
@@ -506,9 +418,14 @@ const AddProductForm = () => {
                 min="0"
                 step="0.01"
               />
-              {errors.originalPrice && <p>{errors.originalPrice}</p>}
+              {errors.originalPrice && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.originalPrice}
+                </p>
+              )}
             </div>
           </div>
+          {/* --- */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground/80">
               Product Images *
@@ -524,16 +441,16 @@ const AddProductForm = () => {
                 className="bg-secondary/50 file:text-foreground"
                 disabled={isUploading}
               />
-              {errors.images && <p>{errors.images}</p>}
+              {errors.images && (
+                <p className="text-red-500 text-sm mt-1">{errors.images}</p>
+              )}
             </div>
-
             {isUploading && selectedFiles.length > 0 && (
               <div className="flex items-center text-accent">
                 <Loader2 className="h-5 w-5 animate-spin mr-2" />
                 <span>Uploading images...</span>
               </div>
             )}
-
             {selectedFiles.length > 0 && (
               <div>
                 <p>Selected Images (Local Preview):</p>
@@ -589,6 +506,7 @@ const AddProductForm = () => {
               </div>
             )}
           </div>
+          {/* --- */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground/80">
               Visuals & Variants
@@ -611,7 +529,9 @@ const AddProductForm = () => {
                   </div>
                 ))}
               </div>
-              {errors.sizes && <p>{errors.sizes}</p>}
+              {errors.sizes && (
+                <p className="text-red-500 text-sm mt-1">{errors.sizes}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">
@@ -635,7 +555,11 @@ const AddProductForm = () => {
                   </div>
                 ))}
               </div>
-              {errors.varietyOfProduct && <p>{errors.varietyOfProduct}</p>}
+              {errors.varietyOfProduct && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.varietyOfProduct}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Colors *</label>
@@ -653,9 +577,12 @@ const AddProductForm = () => {
                   </div>
                 ))}
               </div>
-              {errors.colors && <p>{errors.colors}</p>}
+              {errors.colors && (
+                <p className="text-red-500 text-sm mt-1">{errors.colors}</p>
+              )}
             </div>
           </div>
+          {/* --- */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground/80">
               Status & Ratings
@@ -686,7 +613,6 @@ const AddProductForm = () => {
                 <label htmlFor="onSale">On Sale</label>
               </div>
             </div>
-            {/* NEW FIELD: forHomePage */}
             <div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -712,7 +638,9 @@ const AddProductForm = () => {
                 max="5"
                 step="0.1"
               />
-              {errors.rating && <p>{errors.rating}</p>}
+              {errors.rating && (
+                <p className="text-red-500 text-sm mt-1">{errors.rating}</p>
+              )}
             </div>
             <div>
               <label htmlFor="reviews">Number of Reviews</label>
@@ -725,13 +653,19 @@ const AddProductForm = () => {
                 min="0"
                 step="1"
               />
-              {errors.reviews && <p>{errors.reviews}</p>}
+              {errors.reviews && (
+                <p className="text-red-500 text-sm mt-1">{errors.reviews}</p>
+              )}
             </div>
           </div>
+          {/* --- */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground/80">
-              Features *
+              Features
             </h3>
+            <p className="text-sm text-muted-foreground">
+              Default values will be used if left empty.
+            </p>
             {formData.features.map((feature, index) => (
               <div key={index} className="flex items-center space-x-2 mb-2">
                 <Input
@@ -741,16 +675,14 @@ const AddProductForm = () => {
                   className="flex-1 bg-secondary/50"
                   placeholder={`Feature ${index + 1}`}
                 />
-                {formData.features.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveFeature(index)}
-                  >
-                    <X />
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleRemoveFeature(index)}
+                >
+                  <X />
+                </Button>
               </div>
             ))}
             <Button
@@ -761,12 +693,18 @@ const AddProductForm = () => {
             >
               <Plus /> Add Feature
             </Button>
-            {errors.features && <p>{errors.features}</p>}
+            {errors.features && (
+              <p className="text-red-500 text-sm mt-1">{errors.features}</p>
+            )}
           </div>
+          {/* --- */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground/80">
               Specifications
             </h3>
+            <p className="text-sm text-muted-foreground">
+              Default values will be used if left empty.
+            </p>
             <div>
               <label htmlFor="specMaterial">Material</label>
               <Input
@@ -780,7 +718,9 @@ const AddProductForm = () => {
                 className="bg-secondary/50"
                 placeholder="e.g., 100% Cotton"
               />
-              {errors.Material && <p>{errors.Material}</p>}
+              {errors.Material && (
+                <p className="text-red-500 text-sm mt-1">{errors.Material}</p>
+              )}
             </div>
             <div>
               <label htmlFor="specWeight">Weight</label>
@@ -795,7 +735,9 @@ const AddProductForm = () => {
                 className="bg-secondary/50"
                 placeholder="e.g., 300 GSM"
               />
-              {errors.Weight && <p>{errors.Weight}</p>}
+              {errors.Weight && (
+                <p className="text-red-500 text-sm mt-1">{errors.Weight}</p>
+              )}
             </div>
             <div>
               <label htmlFor="specFit">Fit</label>
@@ -810,7 +752,9 @@ const AddProductForm = () => {
                 className="bg-secondary/50"
                 placeholder="e.g., Oversized, Regular"
               />
-              {errors.Fit && <p>{errors.Fit}</p>}
+              {errors.Fit && (
+                <p className="text-red-500 text-sm mt-1">{errors.Fit}</p>
+              )}
             </div>
             <div>
               <label htmlFor="specCare">Care Instructions</label>
@@ -825,9 +769,12 @@ const AddProductForm = () => {
                 className="bg-secondary/50"
                 placeholder="e.g., Machine wash cold"
               />
-              {errors.Care && <p>{errors.Care}</p>}
+              {errors.Care && (
+                <p className="text-red-500 text-sm mt-1">{errors.Care}</p>
+              )}
             </div>
           </div>
+          {/* --- */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground/80">
               Department & Size Chart
@@ -856,7 +803,11 @@ const AddProductForm = () => {
                     className="bg-secondary/50"
                     placeholder="e.g., Men's Clothing"
                   />
-                  {errors.departmentName && <p>{errors.departmentName}</p>}
+                  {errors.departmentName && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.departmentName}
+                    </p>
+                  )}
                 </div>
               </>
             )}
@@ -867,23 +818,36 @@ const AddProductForm = () => {
               >
                 Size Chart Image
               </label>
-              {/* <Input
+              <p className="text-sm text-muted-foreground">
+                <a
+                  href={defaultSizeChartUrl[0]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  Default size chart
+                </a>{" "}
+                will be used if you don't upload a new one.
+              </p>
+              <Input
                 type="file"
                 id="sizeChartUpload"
                 accept="image/*"
                 onChange={handleFileChangeForSizeChart}
                 className="bg-secondary/50 file:text-foreground file:bg-primary file:rounded-md file:border-0 file:px-3 file:py-1.5"
                 disabled={isUploading}
-              /> */}
-              {errors.sizeChart && <p>{errors.sizeChart}</p>}
+              />
+              {errors.sizeChart && (
+                <p className="text-red-500 text-sm mt-1">{errors.sizeChart}</p>
+              )}
             </div>
             {isUploading && selectedFileForSizeChart.length > 0 && (
               <div className="flex items-center text-accent">
                 <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                <span>Uploading images...</span>
+                <span>Uploading size chart...</span>
               </div>
             )}
-            {selectedFileForSizeChart.length > 0 && (
+            {selectedFileForSizeChart.length > 0 ? (
               <div className="mt-2 relative w-32 h-32 rounded-md overflow-hidden border border-border/50">
                 <img
                   src={URL.createObjectURL(selectedFileForSizeChart[0])}
@@ -895,10 +859,24 @@ const AddProductForm = () => {
                   variant="ghost"
                   size="icon"
                   className="absolute top-1 right-1 h-6 w-6 rounded-full bg-background/70 text-foreground/80 hover:bg-background"
-                  onClick={() => handleRemoveSelectedFileforSizeChart(0)}
+                  onClick={handleRemoveSelectedFileforSizeChart}
                 >
                   <X className="h-4 w-4" />
                 </Button>
+              </div>
+            ) : (
+              <div className="mt-2 relative w-32 h-32 rounded-md overflow-hidden border border-border/50">
+                <a
+                  href={defaultSizeChartUrl[0]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src={defaultSizeChartUrl[0]}
+                    alt="Default Size Chart"
+                    className="w-full h-full object-cover"
+                  />
+                </a>
               </div>
             )}
             {uploadedImageUrlForSizeChart.length > 0 && (
@@ -917,6 +895,7 @@ const AddProductForm = () => {
               </div>
             )}
           </div>
+          {/* --- */}
           <Button
             type="submit"
             variant="cta"
