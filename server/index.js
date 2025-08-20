@@ -9,6 +9,7 @@ import authRoute from "./routes/auth.routes.js";
 import paymentRoute from "./routes/payment.routes.js"; // Correct import name
 import orderRoute from "./routes/order.routes.js";
 import departmentRoute from "./routes/department.route.js"; // Importing the department route
+import dropRoute from "./routes/drop.routes.js"; // Importing the drop route
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -47,6 +48,7 @@ app.use("/auth", authRoute);
 app.use("/payment", paymentRoute); // Corrected typo here from "/paymet" to "/payment"
 app.use("/orders", orderRoute);
 app.use("/departments", departmentRoute);
+app.use("/drops", dropRoute);
 
 app.get("/", (req, res) => {
   res.send("Hell its working!");

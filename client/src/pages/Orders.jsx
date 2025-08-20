@@ -34,14 +34,19 @@
 //         const response = await axios.get(`${API_BASE_URL}/user/order`, {
 //           params: { userId },
 //         });
-//         if (response.data.orderLength === 0) {
-//           setError("No orders found for this user.");
-//           setLoading(false);
-//           return;
+
+//         // The key change is here: check if the 'orders' array is empty.
+//         // The backend returns a 200 status code even when no orders are found,
+//         // so we must handle this case in the 'try' block.
+//         if (!response.data.orders || response.data.orders.length === 0) {
+//           setOrders([]); // Set orders to an empty array
+//         } else {
+//           setOrders(response.data.orders);
 //         }
-//         setOrders(response.data.orders);
 //       } catch (err) {
 //         console.error("Error fetching orders:", err);
+//         // The backend's `orderLength: 0` response is not an error,
+//         // so we will only hit this block for actual server errors (e.g., 500).
 //         setError("Failed to fetch orders. Please try again later.");
 //       } finally {
 //         setLoading(false);
@@ -49,6 +54,10 @@
 //     };
 //     fetchOrders();
 //   }, [userId, API_BASE_URL, navigate]);
+
+//   // Rest of your component remains the same, but the 'if (error)' block
+//   // will now only be triggered for genuine errors. The `if (orders.length === 0)`
+//   // block will handle the case of no orders found.
 
 //   if (loading) {
 //     return (
@@ -63,6 +72,24 @@
 //     );
 //   }
 
+//   if (orders.length === 0) {
+//     return (
+//       <>
+//         <Header />
+//         <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground text-center p-4">
+//           <Package className="h-16 w-16 text-muted-foreground mb-4" />
+//           <p className="text-xl font-semibold mb-2">No Orders Found</p>
+//           <p className="text-foreground/70 mb-6">
+//             It looks like you haven't placed any orders yet.
+//           </p>
+//           <Button asChild variant="cta" size="lg">
+//             <Link to="/">Start Shopping</Link>
+//           </Button>
+//         </div>
+//         <Footer />
+//       </>
+//     );
+//   }
 //   if (error) {
 //     return (
 //       <>
@@ -83,25 +110,6 @@
 //               </Button>
 //             </CardContent>
 //           </Card>
-//         </div>
-//         <Footer />
-//       </>
-//     );
-//   }
-
-//   if (orders.length === 0) {
-//     return (
-//       <>
-//         <Header />
-//         <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground text-center p-4">
-//           <Package className="h-16 w-16 text-muted-foreground mb-4" />
-//           <p className="text-xl font-semibold mb-2">No Orders Found</p>
-//           <p className="text-foreground/70 mb-6">
-//             It looks like you haven't placed any orders yet.
-//           </p>
-//           <Button asChild variant="cta" size="lg">
-//             <Link to="/">Start Shopping</Link>
-//           </Button>
 //         </div>
 //         <Footer />
 //       </>
@@ -219,18 +227,13 @@ const Orders = () => {
           params: { userId },
         });
 
-        // The key change is here: check if the 'orders' array is empty.
-        // The backend returns a 200 status code even when no orders are found,
-        // so we must handle this case in the 'try' block.
         if (!response.data.orders || response.data.orders.length === 0) {
-          setOrders([]); // Set orders to an empty array
+          setOrders([]);
         } else {
           setOrders(response.data.orders);
         }
       } catch (err) {
         console.error("Error fetching orders:", err);
-        // The backend's `orderLength: 0` response is not an error,
-        // so we will only hit this block for actual server errors (e.g., 500).
         setError("Failed to fetch orders. Please try again later.");
       } finally {
         setLoading(false);
@@ -238,10 +241,6 @@ const Orders = () => {
     };
     fetchOrders();
   }, [userId, API_BASE_URL, navigate]);
-
-  // Rest of your component remains the same, but the 'if (error)' block
-  // will now only be triggered for genuine errors. The `if (orders.length === 0)`
-  // block will handle the case of no orders found.
 
   if (loading) {
     return (
@@ -337,11 +336,15 @@ const Orders = () => {
               </CardHeader>
               <CardContent className="p-4 space-y-4">
                 {order.detailsOfProduct.map((item, index) => (
-                  <div key={index} className="flex items-start space-x-4">
+                  <div
+                    key={index}
+                    className="flex items-start space-x-4 border-b border-border/50 pb-3 last:border-b-0 last:pb-0"
+                  >
                     <img
                       src={
-                        item.productId?.images?.[0] ||
-                        "https://placehold.co/80x80/cccccc/333333?text=No+Image"
+                        item.color?.images?.[0] || // Prioritize color-specific image
+                        item.productId?.images?.[0] || // Fallback to main product image
+                        "https://placehold.co/80x80/cccccc/333333?text=No+Image" // Final fallback
                       }
                       alt={item.productId?.name || "Product"}
                       className="w-20 h-20 object-cover rounded-md border border-border/50"
@@ -352,6 +355,11 @@ const Orders = () => {
                       </p>
                       <p className="text-sm text-foreground/70">
                         Qty: {item.quantity} | Size: {item.size}
+                        {item.variety && ` | Variety: ${item.variety}`}
+                        {item.color?.name && ` | Color: ${item.color.name}`}
+                      </p>
+                      <p className="text-sm text-accent">
+                        ₹{(item.productId?.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   </div>

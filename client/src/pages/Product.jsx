@@ -23,6 +23,12 @@
 // import { useToast } from "@/hooks/use-toast";
 // import axios from "axios";
 // import { Dialog, DialogContent } from "@/components/ui/dialog";
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   TooltipProvider,
+//   TooltipTrigger,
+// } from "@/components/ui/tooltip";
 
 // const Product = () => {
 //   const navigate = useNavigate();
@@ -281,26 +287,45 @@
 //             <div>
 //               <h3 className="font-semibold mb-3">Type</h3>
 //               <div className="flex flex-wrap gap-2">
-//                 {Object.keys(product.varietyOfProduct).map((variety) => (
-//                   <Button
-//                     key={variety}
-//                     variant="outline"
-//                     className={`aspect-square border rounded-md text-sm font-medium transition-all ${
-//                       product.varietyOfProduct[variety]
-//                         ? selectedVariety === variety
+//                 {Object.keys(product.varietyOfProduct).map((variety) => {
+//                   const isAvailable = product.varietyOfProduct[variety];
+//                   const isSelected = selectedVariety === variety;
+
+//                   if (!isAvailable) {
+//                     return (
+//                       <div
+//                         key={variety}
+//                         className="relative group cursor-not-allowed"
+//                       >
+//                         <Button
+//                           variant="outline"
+//                           className="aspect-square border rounded-md text-sm font-medium transition-all opacity-50 cursor-not-allowed"
+//                           disabled={true}
+//                         >
+//                           {variety}
+//                         </Button>
+//                         <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
+//                           This type is not currently available.
+//                         </span>
+//                       </div>
+//                     );
+//                   }
+
+//                   return (
+//                     <Button
+//                       key={variety}
+//                       variant="outline"
+//                       className={`aspect-square border rounded-md text-sm font-medium transition-all ${
+//                         isSelected
 //                           ? "border-accent bg-accent text-accent-foreground"
 //                           : "border-border hover:border-accent/50 hover:bg-accent/10"
-//                         : "opacity-50 cursor-not-allowed"
-//                     }`}
-//                     onClick={() =>
-//                       product.varietyOfProduct[variety] &&
-//                       setSelectedVariety(variety)
-//                     }
-//                     disabled={!product.varietyOfProduct[variety]}
-//                   >
-//                     {variety}
-//                   </Button>
-//                 ))}
+//                       }`}
+//                       onClick={() => setSelectedVariety(variety)}
+//                     >
+//                       {variety}
+//                     </Button>
+//                   );
+//                 })}
 //               </div>
 //             </div>
 //             <div>
@@ -317,50 +342,86 @@
 //                 )}
 //               </div>
 //               <div className="flex flex-wrap gap-2">
-//                 {Object.keys(product.sizes).map((size) => (
-//                   <Button
-//                     key={size}
-//                     variant="outline"
-//                     className={`aspect-square border rounded-md text-sm font-medium transition-all ${
-//                       product.sizes[size]
-//                         ? selectedSize === size
+//                 {Object.keys(product.sizes).map((size) => {
+//                   const isAvailable = product.sizes[size];
+//                   const isSelected = selectedSize === size;
+
+//                   if (!isAvailable) {
+//                     return (
+//                       <div
+//                         key={size}
+//                         className="relative group cursor-not-allowed"
+//                       >
+//                         <Button
+//                           variant="outline"
+//                           className="aspect-square border rounded-md text-sm font-medium transition-all opacity-50 cursor-not-allowed"
+//                           disabled={true}
+//                         >
+//                           {size}
+//                         </Button>
+//                         <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
+//                           This size is not currently available.
+//                         </span>
+//                       </div>
+//                     );
+//                   }
+
+//                   return (
+//                     <Button
+//                       key={size}
+//                       variant="outline"
+//                       className={`aspect-square border rounded-md text-sm font-medium transition-all ${
+//                         isSelected
 //                           ? "border-accent bg-accent text-accent-foreground"
 //                           : "border-border hover:border-accent/50 hover:bg-accent/10"
-//                         : "opacity-50 cursor-not-allowed"
-//                     }`}
-//                     onClick={() => product.sizes[size] && setSelectedSize(size)}
-//                     disabled={!product.sizes[size]}
-//                   >
-//                     {size}
-//                   </Button>
-//                 ))}
+//                       }`}
+//                       onClick={() => setSelectedSize(size)}
+//                     >
+//                       {size}
+//                     </Button>
+//                   );
+//                 })}
 //               </div>
 //             </div>
 //             <div>
 //               <h3 className="font-semibold mb-3">Color: {selectedColor}</h3>
 //               <div className="flex flex-wrap gap-3">
-//                 {Object.keys(product.colors).map((color) => (
-//                   <button
-//                     key={color}
-//                     onClick={() =>
-//                       product.colors[color] && setSelectedColor(color)
-//                     }
-//                     disabled={!product.colors[color]}
-//                     className={`w-8 h-8 rounded-full border-2 transition-all ${
-//                       product.colors[color]
-//                         ? selectedColor === color
+//                 {Object.keys(product.colors).map((color) => {
+//                   const isAvailable = product.colors[color];
+//                   const isSelected = selectedColor === color;
+
+//                   if (!isAvailable) {
+//                     return (
+//                       <div key={color} className="relative group">
+//                         <button
+//                           disabled={true}
+//                           className="w-8 h-8 rounded-full border-2 transition-all opacity-50 cursor-not-allowed"
+//                           style={{ backgroundColor: colorMap[color] || color }}
+//                           title={color}
+//                         />
+//                         <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
+//                           This color is not currently available.
+//                         </span>
+//                       </div>
+//                     );
+//                   }
+
+//                   return (
+//                     <button
+//                       key={color}
+//                       onClick={() => setSelectedColor(color)}
+//                       className={`w-8 h-8 rounded-full border-2 transition-all ${
+//                         isSelected
 //                           ? "border-accent scale-110"
 //                           : "border-border hover:border-accent/50"
-//                         : "opacity-50 cursor-not-allowed"
-//                     }`}
-//                     // Use a color map or hardcode common colors for styling
-//                     style={{
-//                       backgroundColor: colorMap[color] || color,
-//                       cursor: product.colors[color] ? "pointer" : "not-allowed",
-//                     }}
-//                     title={color}
-//                   />
-//                 ))}
+//                       }`}
+//                       style={{
+//                         backgroundColor: colorMap[color] || color,
+//                       }}
+//                       title={color}
+//                     />
+//                   );
+//                 })}
 //               </div>
 //             </div>
 //             <div>
@@ -563,7 +624,7 @@
 // };
 
 // export default Product;
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Heart,
@@ -588,12 +649,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 const Product = () => {
   const navigate = useNavigate();
@@ -607,13 +662,22 @@ const Product = () => {
   const [error, setError] = useState(null);
 
   const [selectedSize, setSelectedSize] = useState("");
-  const [selectedVariety, setSelectedVariety] = useState("Regular");
-  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedVariety, setSelectedVariety] = useState("");
+  const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 
   const [isSizeChartModalOpen, setIsSizeChartModalOpen] = useState(false);
-  const [isProductInTheCart, setIsProductInTheCart] = useState(false);
+  const [userCart, setUserCart] = useState([]);
+  const isInitialRender = useRef(true);
+
+  const isCurrentVariantInCart = userCart.some(
+    (item) =>
+      item.productId?._id === id &&
+      item.size === selectedSize &&
+      item.variety === selectedVariety &&
+      item.color?.name === selectedColor?.name
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -630,38 +694,42 @@ const Product = () => {
           { params: { id } }
         );
         const fetchedProduct = productResponse.data.product;
+
+        if (fetchedProduct.images && fetchedProduct.images.length > 0) {
+          const mainImage = fetchedProduct.images[0];
+          const newColors = fetchedProduct.colors.map((color) => ({
+            ...color,
+            images: [mainImage, ...color.images],
+          }));
+          fetchedProduct.colors = newColors;
+        }
+
         setProduct(fetchedProduct);
 
-        setSelectedSize(
+        const initialSize =
           Object.keys(fetchedProduct.sizes).find(
             (s) => fetchedProduct.sizes[s]
-          ) || ""
-        );
-        setSelectedVariety(
+          ) || "";
+        setSelectedSize(initialSize);
+
+        const initialVariety =
           Object.keys(fetchedProduct.varietyOfProduct).find(
             (v) => fetchedProduct.varietyOfProduct[v]
-          ) || ""
-        );
-        setSelectedColor(
-          Object.keys(fetchedProduct.colors).find(
-            (c) => fetchedProduct.colors[c]
-          ) || ""
-        );
+          ) || "";
+        setSelectedVariety(initialVariety);
+
+        if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
+          setSelectedColor(fetchedProduct.colors[0]);
+        } else {
+          setSelectedColor(null);
+        }
 
         if (userId) {
           const cartResponse = await axios.get(
             `${API_BASE_URL}/user/getCartDetails`,
             { params: { userId } }
           );
-          const cartItems = cartResponse.data.cart;
-          const existingItem = cartItems.find(
-            (item) => item.productId?._id === id
-          );
-          if (existingItem) {
-            setIsProductInTheCart(true);
-            setSelectedSize(existingItem.size);
-            setQuantity(existingItem.quantity);
-          }
+          setUserCart(cartResponse.data.cart);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -675,7 +743,53 @@ const Product = () => {
     fetchData();
   }, [API_BASE_URL, id, userId]);
 
-  // --- CORRECTED: handleAddToCart function ---
+  useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+
+    if (isCurrentVariantInCart && userId) {
+      const updateCartQuantity = async () => {
+        try {
+          await axios.put(`${API_BASE_URL}/user/updateCartDetails`, {
+            userId,
+            productId: product._id,
+            quantity: quantity,
+            size: selectedSize,
+            variety: selectedVariety,
+            color: selectedColor,
+          });
+          toast({
+            title: "Cart Updated",
+            description: "Product quantity updated successfully.",
+            variant: "success",
+          });
+        } catch (error) {
+          console.error("Error updating cart quantity:", error);
+          toast({
+            title: "Failed to Update Cart",
+            description: "An error occurred while updating the quantity.",
+            variant: "destructive",
+          });
+        }
+      };
+      updateCartQuantity();
+    }
+  }, [
+    quantity,
+    isCurrentVariantInCart,
+    userId,
+    product,
+    selectedSize,
+    selectedVariety,
+    selectedColor,
+    API_BASE_URL,
+    toast,
+  ]);
+
+  const displayedImages = selectedColor ? selectedColor.images : [];
+
   const handleAddToCart = async () => {
     if (!selectedSize || !selectedVariety || !selectedColor) {
       toast({
@@ -695,15 +809,16 @@ const Product = () => {
         productId: product._id,
         quantity: quantity,
         size: selectedSize,
-        variety: selectedVariety, // <-- NEW: Send variety
-        color: selectedColor, // <-- NEW: Send color
+        variety: selectedVariety,
+        color: selectedColor,
       });
       if (response.status === 200) {
         toast({
           title: "Added to cart!",
-          description: `${product.name} (${selectedSize}, ${selectedVariety}, ${selectedColor}) has been added.`,
+          description: `${product.name} (${selectedSize}, ${selectedVariety}, ${selectedColor.name}) has been added.`,
           variant: "success",
         });
+        // Redirect the user to the cart page immediately after a successful add
         navigate("/cart");
       }
     } catch (error) {
@@ -716,23 +831,16 @@ const Product = () => {
     }
   };
 
-  const handleBuyNow = () => {
-    if (!selectedSize || !selectedVariety || !selectedColor) {
-      toast({
-        title: "Please select all options",
-        description: "Choose a size, variety, and color before purchasing.",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (!userId) {
-      navigate("/login");
-      return;
-    }
-    toast({
-      title: "Redirecting to checkout",
-      description: "Taking you to secure checkout...",
-    });
+  const handleGoToCart = () => {
+    navigate("/cart");
+  };
+
+  const handleColorSelect = (color) => {
+    setSelectedColor(color);
+    setSelectedImage(0);
+    setSelectedSize("");
+    setSelectedVariety("");
+    setQuantity(1);
   };
 
   if (loading) {
@@ -744,14 +852,6 @@ const Product = () => {
   if (!product) {
     return <div>No product found.</div>;
   }
-
-  // --- Map of common color names to CSS values for display
-  const colorMap = {
-    Black: "#000000",
-    White: "#FFFFFF",
-    Gray: "#808080",
-    // Add other colors here as needed
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -768,14 +868,21 @@ const Product = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg bg-card/50 border border-border/50">
-              <img
-                src={product.images[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+              {displayedImages && displayedImages.length > 0 ? (
+                <img
+                  src={displayedImages[selectedImage]}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                  <ImageIcon className="h-10 w-10 mr-2" />
+                  No Images Available
+                </div>
+              )}
             </div>
-            <div className="grid grid-cols-3 gap-4">
-              {product.images.map((image, index) => (
+            <div className="grid grid-cols-4 gap-4">
+              {displayedImages?.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -797,19 +904,14 @@ const Product = () => {
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                {/* <Badge variant="secondary" className="text-xs">
-                  {product.category}
-                </Badge> */}
                 {product.isNew && (
                   <Badge className="bg-accent text-accent-foreground text-xs">
-                    {" "}
-                    NEW{" "}
+                    NEW
                   </Badge>
                 )}
                 {product.onSale && (
                   <Badge variant="destructive" className="text-xs">
-                    {" "}
-                    SALE{" "}
+                    SALE
                   </Badge>
                 )}
               </div>
@@ -827,23 +929,6 @@ const Product = () => {
                     </span>
                   )}
                 </div>
-                {/* <div className="flex items-center gap-1">
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < Math.floor(product.rating)
-                            ? "fill-accent text-accent"
-                            : "text-muted-foreground"
-                        }`}
-                      />
-                    ))}
-                  </div> */}
-                {/* <span className="text-sm text-muted-foreground">
-                    ({product.reviews} reviews)
-                  </span> */}
-                {/* </div> */}
               </div>
               <p className="text-foreground/70 leading-relaxed">
                 {product.description}
@@ -855,7 +940,6 @@ const Product = () => {
                 {Object.keys(product.varietyOfProduct).map((variety) => {
                   const isAvailable = product.varietyOfProduct[variety];
                   const isSelected = selectedVariety === variety;
-
                   if (!isAvailable) {
                     return (
                       <div
@@ -875,7 +959,6 @@ const Product = () => {
                       </div>
                     );
                   }
-
                   return (
                     <Button
                       key={variety}
@@ -910,7 +993,6 @@ const Product = () => {
                 {Object.keys(product.sizes).map((size) => {
                   const isAvailable = product.sizes[size];
                   const isSelected = selectedSize === size;
-
                   if (!isAvailable) {
                     return (
                       <div
@@ -930,7 +1012,6 @@ const Product = () => {
                       </div>
                     );
                   }
-
                   return (
                     <Button
                       key={size}
@@ -949,42 +1030,33 @@ const Product = () => {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold mb-3">Color: {selectedColor}</h3>
+              <h3 className="font-semibold mb-3">
+                Color: {selectedColor?.name || "None"}
+              </h3>
               <div className="flex flex-wrap gap-3">
-                {Object.keys(product.colors).map((color) => {
-                  const isAvailable = product.colors[color];
-                  const isSelected = selectedColor === color;
-
-                  if (!isAvailable) {
-                    return (
-                      <div key={color} className="relative group">
-                        <button
-                          disabled={true}
-                          className="w-8 h-8 rounded-full border-2 transition-all opacity-50 cursor-not-allowed"
-                          style={{ backgroundColor: colorMap[color] || color }}
-                          title={color}
-                        />
-                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                          This color is not currently available.
-                        </span>
-                      </div>
-                    );
-                  }
-
+                {product.colors?.map((color, index) => {
+                  const isSelected = selectedColor?.name === color.name;
                   return (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`w-8 h-8 rounded-full border-2 transition-all ${
-                        isSelected
-                          ? "border-accent scale-110"
-                          : "border-border hover:border-accent/50"
-                      }`}
-                      style={{
-                        backgroundColor: colorMap[color] || color,
-                      }}
-                      title={color}
-                    />
+                    <div key={index} className="relative group cursor-pointer">
+                      <button
+                        onClick={() => handleColorSelect(color)}
+                        className={`w-10 h-10 rounded-full border-2 transition-all ${
+                          isSelected
+                            ? "border-accent scale-110"
+                            : "border-border hover:border-accent/50"
+                        }`}
+                      >
+                        <img
+                          src={color.images?.[1]}
+                          alt={color.name}
+                          title={color.name}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      </button>
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                        {color.name}
+                      </span>
+                    </div>
                   );
                 })}
               </div>
@@ -1011,47 +1083,27 @@ const Product = () => {
               </div>
             </div>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {!isProductInTheCart && (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={handleAddToCart}
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart
-                    </Button>
-                    {/* <Button
-                      variant="cta"
-                      size="lg"
-                      onClick={() => navigate("/cart")}
-                    >
-                      Buy Now
-                    </Button> */}
-                  </>
-                )}
-                {isProductInTheCart && (
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => navigate("/cart")}
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Go to Cart
-                  </Button>
-                )}
-              </div>
-              {/* <div className="flex justify-center gap-4">
-                <Button variant="ghost" size="icon">
-                  {" "}
-                  <Heart className="h-4 w-4" />{" "}
+              {isCurrentVariantInCart ? (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleGoToCart}
+                  className="w-full"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Go to Cart
                 </Button>
-                <Button variant="ghost" size="icon">
-                  {" "}
-                  <Share className="h-4 w-4" />{" "}
+              ) : (
+                <Button
+                  variant="cta"
+                  size="lg"
+                  onClick={handleAddToCart}
+                  className="w-full"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Cart
                 </Button>
-              </div> */}
+              )}
             </div>
             <Card className="bg-card/50 border-border/50">
               <CardContent className="p-4">
@@ -1060,9 +1112,6 @@ const Product = () => {
                     <Truck className="h-5 w-5 text-accent" />
                     <div>
                       <p className="font-medium text-sm">Free Shipping</p>
-                      {/* <p className="text-xs text-muted-foreground">
-                        On orders over $75
-                      </p> */}
                     </div>
                   </div>
                   <div className="flex flex-col items-center space-y-2">
@@ -1093,7 +1142,6 @@ const Product = () => {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="specs">Specifications</TabsTrigger>
-              {/* <TabsTrigger value="reviews">Reviews</TabsTrigger> */}
             </TabsList>
             <TabsContent value="details" className="mt-6">
               <Card className="bg-card/50 border-border/50">
@@ -1135,22 +1183,6 @@ const Product = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-            {/* <TabsContent value="reviews" className="mt-6"> */}
-            {/* <Card className="bg-card/50 border-border/50"> */}
-            {/* <CardContent className="p-6"> */}
-            {/* <div className="text-center py-8"> */}
-            {/* <h3 className="font-semibold text-lg mb-2">
-                      Customer Reviews
-                    </h3>
-                    <p className="text-foreground/70 mb-4">
-                      {product.rating} out of 5 stars ({product.reviews}{" "}
-                      reviews)
-                    </p> */}
-            {/* <Button variant="outline">Write a Review</Button> */}
-            {/* </div> */}
-            {/* </CardContent> */}
-            {/* </Card> */}
-            {/* </TabsContent> */}
           </Tabs>
         </div>
       </div>
@@ -1162,12 +1194,6 @@ const Product = () => {
           onOpenChange={setIsSizeChartModalOpen}
         >
           <DialogContent className="sm:max-w-[80vw] max-h-[90vh] overflow-y-auto bg-card border-border">
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 text-foreground/70 hover:text-accent"
-              onClick={() => setIsSizeChartModalOpen(false)}
-            ></Button> */}
             <div className="flex flex-col items-center justify-center p-4">
               <h3 className="text-2xl font-bold mb-4">
                 Size Chart for {product.name}

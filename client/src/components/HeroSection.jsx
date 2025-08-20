@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 import FinalBg from "../assets/FinalBG.mp4";
 import React from "react";
+import DropCountdown from "./DropCountdown";
 
 const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
   // Add opacity prop
@@ -40,7 +41,7 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
         {/* The background gradient will also fade with the section opacity */}
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/50" />
       </div>
-
+      <DropCountdown blurAmount={blurAmount} opacity={opacity} />
       {/* Content - place above the blur layer */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div

@@ -8,6 +8,7 @@ import {
   LogOut,
   X,
   ListOrdered, // Import X icon for the close button
+  CalendarClock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
@@ -28,6 +29,7 @@ const AdminSidebar = ({
     { name: "Add Product", icon: PlusCircle, tab: "addProduct" },
     { name: "Order History", icon: ListOrdered, tab: "orderHistory" },
     { name: "Departments", icon: ListOrdered, tab: "departments" }, // New Departments tab
+    { name: "Drop Manager", icon: CalendarClock, tab: "dropManager" }, // NEW: Add the drop manager tab
   ];
 
   return (
