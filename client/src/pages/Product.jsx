@@ -979,54 +979,61 @@ const Product = () => {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Size</h3>
-                {product.sizeChart && product.sizeChart.length > 0 && (
-                  <Button
-                    variant="link"
-                    className="text-sm text-accent p-0 h-auto"
-                    onClick={() => setIsSizeChartModalOpen(true)}
-                  >
-                    Size Chart
-                  </Button>
-                )}
               </div>
-              <div className="flex flex-wrap gap-2">
-                {Object.keys(product.sizes).map((size) => {
-                  const isAvailable = product.sizes[size];
-                  const isSelected = selectedSize === size;
-                  if (!isAvailable) {
-                    return (
-                      <div
-                        key={size}
-                        className="relative group cursor-not-allowed"
-                      >
-                        <Button
-                          variant="outline"
-                          className="aspect-square border rounded-md text-sm font-medium transition-all opacity-50 cursor-not-allowed"
-                          disabled={true}
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-wrap gap-2">
+                  {Object.keys(product.sizes).map((size) => {
+                    const isAvailable = product.sizes[size];
+                    const isSelected = selectedSize === size;
+                    if (!isAvailable) {
+                      return (
+                        <div
+                          key={size}
+                          className="relative group cursor-not-allowed"
                         >
-                          {size}
-                        </Button>
-                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                          This size is not currently available.
-                        </span>
-                      </div>
+                          <Button
+                            variant="outline"
+                            className="aspect-square border rounded-md text-sm font-medium transition-all opacity-50 cursor-not-allowed"
+                            disabled={true}
+                          >
+                            {size}
+                          </Button>
+                          <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                            This size is not currently available.
+                          </span>
+                        </div>
+                      );
+                    }
+                    return (
+                      <Button
+                        key={size}
+                        variant="outline"
+                        className={`aspect-square border rounded-md text-sm font-medium transition-all ${
+                          isSelected
+                            ? "border-accent bg-accent text-accent-foreground"
+                            : "border-border hover:border-accent/50 hover:bg-accent/10"
+                        }`}
+                        onClick={() => setSelectedSize(size)}
+                      >
+                        {size}
+                      </Button>
                     );
-                  }
-                  return (
-                    <Button
-                      key={size}
-                      variant="outline"
-                      className={`aspect-square border rounded-md text-sm font-medium transition-all ${
-                        isSelected
-                          ? "border-accent bg-accent text-accent-foreground"
-                          : "border-border hover:border-accent/50 hover:bg-accent/10"
-                      }`}
-                      onClick={() => setSelectedSize(size)}
-                    >
-                      {size}
-                    </Button>
-                  );
-                })}
+                  })}
+                </div>
+                <div className="items-center">
+                  <span>Unsure about your size? Check our </span>
+                  {product.sizeChart && product.sizeChart.length > 0 && (
+                    <>
+                      <Button
+                        variant="link"
+                        onClick={() => setIsSizeChartModalOpen(true)}
+                        className="text-sm text-accent p-0 h-auto underline"
+                      >
+                        Size Chart
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             <div>

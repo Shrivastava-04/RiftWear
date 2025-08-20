@@ -77,12 +77,12 @@ const DropCountdown = ({ blurAmount = 0, opacity = 1 }) => {
 
   return (
     <div
-      className="fixed top-[5rem] left-0 w-full h-screen z-40 pointer-events-none"
+      className="fixed top-[4rem] left-0 w-full h-screen z-40 pointer-events-none"
       style={{ filter: `blur(${blurAmount}px)` }} // Apply dynamic blur
       opacity={opacity} // Apply dynamic opacity
     >
       {/* Clock on top left of hero section */}
-      <div className="absolute top-0 left-8 bg-card/70 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3 pointer-events-auto">
+      <div className="absolute top-12 left-6 bg-card/70 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3 pointer-events-auto">
         <Clock className="h-6 w-6 text-accent animate-pulse" />
         <div className="text-foreground">
           <p className="text-xs font-semibold uppercase">Drop Ends In</p>
@@ -95,8 +95,11 @@ const DropCountdown = ({ blurAmount = 0, opacity = 1 }) => {
         </div>
       </div>
       {/* Ribbon-like structure */}
-      <div className="absolute top-20 w-full h-12 overflow-hidden flex items-center justify-center pointer-events-auto">
-        <div className="ribbon-animation bg-red-600/70 whitespace-nowrap px-2 text-white text-lg font-bold">
+      <div className="absolute top-0 w-full h-12  overflow-hidden flex items-center justify-center pointer-events-auto">
+        <div
+          className="ribbon-animation whitespace-nowrap px-2 rounded-md text-black text-lg font-bold"
+          style={{ backgroundColor: "#e89846" }}
+        >
           Products are available for purchase! Hurry, before they are gone!
           &nbsp;&nbsp;&nbsp; Products are available for purchase! Hurry, before
           they are gone! &nbsp;&nbsp;&nbsp; Products are available for purchase!

@@ -43,10 +43,13 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
       </div>
       <DropCountdown blurAmount={blurAmount} opacity={opacity} />
       {/* Content - place above the blur layer */}
-      <div className="relative z-10 container mx-auto px-4 text-center">
+      <div
+        className="relative z-10 container mx-auto px-4 text-center"
+        style={{ filter: `blur(${blurAmount}px)` }}
+      >
         <div
           className="max-w-4xl mx-auto space-y-8"
-          style={{ filter: `blur(${blurAmount}px)` }}
+          // style={{ filter: `blur(${blurAmount}px)` }}
         >
           <div className="space-y-1 md:space-y-4">
             <h1 className="text-2xl md:text-4xl lg:text-6xl font-black gradient-text animate-fade-in-up">
@@ -74,11 +77,11 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
           </div> */}
 
           {/* Floating Elements */}
-          <div className="absolute top-20 left-10 w-20 h-20 bg-accent/20 rounded-full blur-xl animate-float" />
+          {/* <div className="absolute top-20 left-10 w-20 h-20 bg-accent/20 rounded-full blur-xl animate-float" />
           <div
             className="absolute bottom-20 right-10 w-32 h-32 bg-accent/10 rounded-full blur-2xl animate-float"
             // style={{ animationDelay: "1s" }}
-          />
+          /> */}
         </div>
       </div>
 
