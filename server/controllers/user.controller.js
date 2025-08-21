@@ -692,24 +692,119 @@ export const signup = async (req, res) => {
     });
     await newUser.save();
 
-    const subject = "Welcome to Rift.";
+    const subject = `${name}, your Rift account is ready.`;
     const htmlContent = `
-      <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
-        <p>Hi ${name},</p>
-        <p>Welcome to Rift. We're thrilled to have you join our community.</p>
-        <p>Your account has been successfully created. You can now explore our collections, save your favorite items to your wishlist, and enjoy a faster, smoother checkout experience on all future orders.</p>
-        <p>You can get started by exploring our latest collection.</p>
-        <p><a href="${frontendUrl}" style="color: #e89846; text-decoration: none;">Explore Our Latest Collection</a></p>
-        <p>Connect with Rift on Instagram to stay updated on new releases, behind-the-scenes, and exclusive offers.</p>
-        <p><a href="[YOUR_INSTAGRAM_LINK_HERE]" style="color: #e89846; text-decoration: none;">Follow us on Instagram</a></p>
-        <p>Best regards,</p>
-        <p><strong>Team Rift.</strong></p>
-        <p style="font-size: 0.9em; color: #777;">
-          <a href="${frontendUrl}/contact" style="color: #777; text-decoration: none;">Contact Us</a> | <a href="${frontendUrl}/unsubscribe" style="color: #777; text-decoration: none;">Unsubscribe</a>
-        </p>
-      </div>
-    `;
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Rift</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #0f0e0e;
+      color: #e5e7eb;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #1a1a1a;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    .header {
+      padding: 24px;
+      text-align: center;
+      background-color: #1a1a1a;
+      border-bottom: 1px solid #2e2e2e;
+    }
+    .brand {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(to right, #f7d498, #e89846);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .content {
+      padding: 24px;
+    }
+    .content h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+    .content p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #b0b0b0;
+      margin-bottom: 16px;
+    }
+    .button {
+      display: inline-block;
+      background-color: #e89846;
+      color: #0f0e0e;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-align: center;
+      margin-top: 16px;
+    }
+    .ps-note {
+      font-size: 14px;
+      font-style: italic;
+      color: #e89846;
+      margin-top: 20px;
+      padding: 16px;
+      background-color: #2e2e2e;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="background-color: #0f0e0e; padding: 20px 0;">
+    <table class="container" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td class="header">
+          <div class="brand">Rift</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="content">
+          <h1>Hi ${name},</h1>
+          <p>This is to confirm your account with Rift is active. We're glad to have you with us.</p>
+          <p>You're all set to manage your orders and enjoy a streamlined checkout on future purchases.</p>
+          <div style="text-align: center;">
+            <a href="${frontendUrl}" class="button">See the current collection here</a>
+          </div>
+          <p style="margin-top: 20px;">Best,</p>
+          <p><strong>Team Rift</strong></p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 0 24px;">
+          <p class="ps-note">
+            P.S. To ensure you receive our order confirmation emails, please drag this message to your <strong>"Primary"</strong> inbox, if it landed in any other tab (promotion).
+          </p>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+</body>
+</html>`;
+
     try {
+      console.log(htmlContent);
       await sendEmail(email, subject, htmlContent);
     } catch (emailError) {
       console.error("Failed to send welcome email:", emailError);

@@ -52,25 +52,34 @@ export const googleAuth = async (req, res) => {
     // 4. Send email conditionally based on whether it's a new user
     const subject = "Welcome to Rift.";
     const htmlContent = `
-      <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
-        <p>Hi ${name},</p>
-        <p>Welcome to Rift. We're thrilled to have you join our community.</p>
-        <p>Your account has been successfully created. You can now explore our collections, save your favorite items to your wishlist, and enjoy a faster, smoother checkout experience on all future orders.</p>
-        <p>You can get started by exploring our latest collection.</p>
-        <p><a href="${frontendUrl}" style="color: #e89846; text-decoration: none;">Explore Our Latest Collection</a></p>
-        <p>Connect with Rift on Instagram to stay updated on new releases, behind-the-scenes, and exclusive offers.</p>
-        <p><a href="[YOUR_INSTAGRAM_LINK_HERE]" style="color: #e89846; text-decoration: none;">Follow us on Instagram</a></p>
-        <p>Best regards,</p>
-        <p><strong>Team Rift.</strong></p>
-        <p style="font-size: 0.9em; color: #777;">
-          <a href="${frontendUrl}/contact" style="color: #777; text-decoration: none;">Contact Us</a> | <a href="${frontendUrl}/unsubscribe" style="color: #777; text-decoration: none;">Unsubscribe</a>
+      <div style="font-family: sans-serif; line-height: 1.6; color: #e5e7eb; max-width: 600px; margin: 0 auto; background-color: #1a1a1a; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);">
+    <div style="padding: 24px; text-align: center; background-color: #1a1a1a; border-bottom: 1px solid #2e2e2e;">
+        <div style="font-size: 28px; font-weight: 800; color: #ffffff;">Rift</div>
+    </div>
+    <div style="padding: 24px;">
+        <p style="font-size: 16px; color: #b0b0b0;">Hi ${name},</p>
+        <p style="font-size: 16px; color: #b0b0b0;">This is to confirm your account with Rift is active. We're glad to have you with us.</p>
+        <p style="font-size: 16px; color: #b0b0b0;">You're all set to manage your orders and enjoy a streamlined checkout on future purchases.</p>
+        <p style="font-size: 16px; color: #b0b0b0;">You can see the current collection here:</p>
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="${frontendUrl}" style="display: inline-block; background-color: #e89846; color: #0f0e0e; text-decoration: none; font-weight: 700; font-size: 16px; padding: 12px 24px; border-radius: 6px;">Explore Our Collection</a>
+        </div>
+        <p style="font-size: 16px; color: #b0b0b0;">Best,</p>
+        <p style="margin: 0; font-size: 16px; color: #ffffff;"><strong>Team Rift</strong></p>
+    </div>
+    <div style="padding: 0 24px 24px;">
+        <p style="font-size: 14px; font-style: italic; color: #e89846; margin-top: 20px; padding: 16px; background-color: #2e2e2e; border-radius: 4px;">
+            P.S. To ensure you receive our order confirmation emails, please drag this message to your <strong>"Primary"</strong> inbox, if it landed in any other tab (promotion).
         </p>
-      </div>
+    </div>
+</div>
     `;
-    try {
-      await sendEmail(email, subject, htmlContent);
-    } catch (emailError) {
-      console.error("Failed to send welcome email:", emailError);
+    if (isNewUser) {
+      try {
+        await sendEmail(email, subject, htmlContent);
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+      }
     }
 
     // if (!isNewUser) {
