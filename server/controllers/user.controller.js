@@ -829,6 +829,7 @@ export const getUserProfileUsingId = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    // console.log(user);
     res.status(200).json({
       message: "User profile fetched successfully",
       user: {
@@ -893,102 +894,188 @@ export const addToCart = async (req, res) => {
 };
 
 // --- UPDATED: Delete from Cart ---
+// export const deleteFromCart = async (req, res) => {
+//   try {
+//     const { productId, userId, size, variety, color } = req.body;
+
+//     if (!productId || !userId || !size || !variety || !color) {
+//       return res.status(400).json({ message: "Missing required cart fields." });
+//     }
+//     if (
+//       !mongoose.Types.ObjectId.isValid(productId) ||
+//       !mongoose.Types.ObjectId.isValid(userId)
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ message: "Invalid product or user id format" });
+//     }
+
+//     const updatedUser = await User.findByIdAndUpdate(
+//       userId,
+//       {
+//         $pull: {
+//           cartItem: {
+//             productId: productId,
+//             size: size,
+//             variety: variety,
+//             "color.name": color.name, // Match by the color name
+//           },
+//         },
+//       },
+//       { new: true }
+//     ).populate("cartItem.productId");
+
+//     if (!updatedUser) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     res.status(200).json({
+//       message: "Item deleted successfully",
+//       cartItem: updatedUser.cartItem,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
+// --- UPDATED: Update Cart Details ---
+// export const updateCartDetails = async (req, res) => {
+//   try {
+//     const { userId, productId, quantity, size, variety, color } = req.body;
+
+//     if (
+//       !userId ||
+//       !productId ||
+//       typeof quantity !== "number" ||
+//       quantity < 1 ||
+//       !size ||
+//       !variety ||
+//       !color
+//     ) {
+//       return res.status(400).json({ message: "Invalid input provided" });
+//     }
+//     if (
+//       !mongoose.Types.ObjectId.isValid(userId) ||
+//       !mongoose.Types.ObjectId.isValid(productId)
+//     ) {
+//       return res.status(400).json({ message: "Invalid ID format" });
+//     }
+
+//     const updatedUser = await User.findOneAndUpdate(
+//       {
+//         _id: userId,
+//         "cartItem.productId": productId,
+//         "cartItem.size": size,
+//         "cartItem.variety": variety,
+//         "cartItem.color.name": color.name, // Find item by color name
+//       },
+//       {
+//         $set: { "cartItem.$.quantity": quantity },
+//       },
+//       {
+//         new: true,
+//       }
+//     ).populate("cartItem.productId");
+
+//     if (!updatedUser) {
+//       return res
+//         .status(404)
+//         .json({ message: "User or product in cart not found" });
+//     }
+
+//     res.status(200).json({
+//       message: "Cart item quantity updated successfully",
+//       cartItem: updatedUser.cartItem,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
+// server/controllers/user.controller.js
+
+export const updateCartDetails = async (req, res) => {
+  try {
+    const { userId, cartItemId, quantity } = req.body;
+
+    if (
+      !userId ||
+      !cartItemId ||
+      typeof quantity !== "number" ||
+      quantity < 1
+    ) {
+      return res.status(400).json({ message: "Invalid input provided." });
+    }
+
+    if (
+      !mongoose.Types.ObjectId.isValid(userId) ||
+      !mongoose.Types.ObjectId.isValid(cartItemId)
+    ) {
+      return res.status(400).json({ message: "Invalid ID format." });
+    }
+
+    // Find the user and update the specific cart item by its subdocument _id
+    const updatedUser = await User.findOneAndUpdate(
+      {
+        _id: userId,
+        "cartItem._id": cartItemId, // <-- Match by the subdocument's unique _id
+      },
+      {
+        $set: { "cartItem.$.quantity": quantity }, // <-- Use positional operator to update the matched item
+      },
+      {
+        new: true, // Return the modified document
+      }
+    ).populate("cartItem.productId");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User or cart item not found." });
+    }
+
+    res.status(200).json({
+      message: "Cart item quantity updated successfully.",
+      cartItem: updatedUser.cartItem, // Return the full updated cart
+    });
+  } catch (error) {
+    console.error("Error updating cart quantity:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// Also update deleteFromCart to use the same logic
 export const deleteFromCart = async (req, res) => {
   try {
-    const { productId, userId, size, variety, color } = req.body;
+    const { userId, cartItemId } = req.body;
 
-    if (!productId || !userId || !size || !variety || !color) {
-      return res.status(400).json({ message: "Missing required cart fields." });
-    }
     if (
-      !mongoose.Types.ObjectId.isValid(productId) ||
-      !mongoose.Types.ObjectId.isValid(userId)
+      !mongoose.Types.ObjectId.isValid(userId) ||
+      !mongoose.Types.ObjectId.isValid(cartItemId)
     ) {
       return res
         .status(400)
-        .json({ message: "Invalid product or user id format" });
+        .json({ message: "Invalid user or cart item ID format." });
     }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        $pull: {
-          cartItem: {
-            productId: productId,
-            size: size,
-            variety: variety,
-            "color.name": color.name, // Match by the color name
-          },
-        },
+        $pull: { cartItem: { _id: cartItemId } }, // <-- Use the unique _id to pull the item
       },
       { new: true }
     ).populate("cartItem.productId");
 
     if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found." });
     }
 
     res.status(200).json({
-      message: "Item deleted successfully",
+      message: "Item deleted successfully.",
       cartItem: updatedUser.cartItem,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-// --- UPDATED: Update Cart Details ---
-export const updateCartDetails = async (req, res) => {
-  try {
-    const { userId, productId, quantity, size, variety, color } = req.body;
-
-    if (
-      !userId ||
-      !productId ||
-      typeof quantity !== "number" ||
-      quantity < 1 ||
-      !size ||
-      !variety ||
-      !color
-    ) {
-      return res.status(400).json({ message: "Invalid input provided" });
-    }
-    if (
-      !mongoose.Types.ObjectId.isValid(userId) ||
-      !mongoose.Types.ObjectId.isValid(productId)
-    ) {
-      return res.status(400).json({ message: "Invalid ID format" });
-    }
-
-    const updatedUser = await User.findOneAndUpdate(
-      {
-        _id: userId,
-        "cartItem.productId": productId,
-        "cartItem.size": size,
-        "cartItem.variety": variety,
-        "cartItem.color.name": color.name, // Find item by color name
-      },
-      {
-        $set: { "cartItem.$.quantity": quantity },
-      },
-      {
-        new: true,
-      }
-    ).populate("cartItem.productId");
-
-    if (!updatedUser) {
-      return res
-        .status(404)
-        .json({ message: "User or product in cart not found" });
-    }
-
-    res.status(200).json({
-      message: "Cart item quantity updated successfully",
-      cartItem: updatedUser.cartItem,
-    });
-  } catch (error) {
-    console.error(error);
+    console.error("Error deleting cart item:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

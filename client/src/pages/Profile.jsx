@@ -75,6 +75,7 @@ const Profile = () => {
 
       if (response.data && response.data.user) {
         setUser(response.data.user);
+        console.log(response.data.user);
         setIsUserAuthenticated(true);
         // Set initial form data when user data is fetched
         setEditFormData({

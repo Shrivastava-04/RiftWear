@@ -93,7 +93,7 @@
 //               <p className="text-sm">
 //                 Current drop ends on:{" "}
 //                 <strong>
-//                   {new Date(currentDropDate).toLocaleDateString()}
+//                   {new Date(currentDropDate).toLocaleDateString("en-GB")}
 //                 </strong>
 //               </p>
 //             ) : (
@@ -139,6 +139,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const DropManager = () => {
   const [dropDate, setDropDate] = useState("");
+  const [dropTime, setDropTime] = useState(""); // NEW: State for time input
   const [currentDropDate, setCurrentDropDate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -170,10 +171,10 @@ const DropManager = () => {
   }, []);
 
   const handleSaveDropDate = async () => {
-    if (!dropDate) {
+    if (!dropDate || !dropTime) {
       toast({
         title: "Validation Error",
-        description: "Please select an end date.",
+        description: "Please select both a date and time.",
         variant: "destructive",
       });
       return;
@@ -181,8 +182,9 @@ const DropManager = () => {
 
     setIsSaving(true);
     try {
+      // Combine date and time into a single string for the backend
       await axios.put(`${API_BASE_URL}/drops/admin/drop-date`, {
-        endDate: dropDate,
+        endDate: `${dropDate}T${dropTime}:00`, // Format as ISO 8601 string
       });
       toast({
         title: "Success",
@@ -200,6 +202,21 @@ const DropManager = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Helper function to format date to DD-MM-YYYY HH:mm:ss in IST
+  const formatIST = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleString("en-GB", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   };
 
   return (
@@ -220,24 +237,34 @@ const DropManager = () => {
             {currentDropDate ? (
               <p className="text-sm">
                 Current drop ends on:{" "}
-                <strong>
-                  {new Date(currentDropDate).toLocaleDateString("en-GB")}
-                </strong>
+                <strong>{formatIST(currentDropDate)}</strong>
               </p>
             ) : (
               <p className="text-sm text-muted-foreground">
                 No drop date is currently set.
               </p>
             )}
-            <div>
-              <Label htmlFor="drop-date">Set New Drop End Date</Label>
-              <Input
-                id="drop-date"
-                type="date"
-                value={dropDate}
-                onChange={(e) => setDropDate(e.target.value)}
-                className="mt-2"
-              />
+            <div className="flex space-x-2">
+              <div className="flex-1">
+                <Label htmlFor="drop-date">Date</Label>
+                <Input
+                  id="drop-date"
+                  type="date"
+                  value={dropDate}
+                  onChange={(e) => setDropDate(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="drop-time">Time (IST)</Label>
+                <Input
+                  id="drop-time"
+                  type="time"
+                  value={dropTime}
+                  onChange={(e) => setDropTime(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
             </div>
             <Button onClick={handleSaveDropDate} disabled={isSaving}>
               {isSaving ? (
