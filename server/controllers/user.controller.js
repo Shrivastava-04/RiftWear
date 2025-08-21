@@ -694,114 +694,27 @@ export const signup = async (req, res) => {
 
     const subject = `${name}, your Rift account is ready.`;
     const htmlContent = `
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Rift</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      background-color: #0f0e0e;
-      color: #e5e7eb;
-    }
-    .container {
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #1a1a1a;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    }
-    .header {
-      padding: 24px;
-      text-align: center;
-      background-color: #1a1a1a;
-      border-bottom: 1px solid #2e2e2e;
-    }
-    .brand {
-      font-size: 28px;
-      font-weight: 800;
-      background: linear-gradient(to right, #f7d498, #e89846);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .content {
-      padding: 24px;
-    }
-    .content h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-top: 0;
-      margin-bottom: 16px;
-    }
-    .content p {
-      font-size: 16px;
-      line-height: 1.6;
-      color: #b0b0b0;
-      margin-bottom: 16px;
-    }
-    .button {
-      display: inline-block;
-      background-color: #e89846;
-      color: #0f0e0e;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 16px;
-      padding: 12px 24px;
-      border-radius: 6px;
-      text-align: center;
-      margin-top: 16px;
-    }
-    .ps-note {
-      font-size: 14px;
-      font-style: italic;
-      color: #e89846;
-      margin-top: 20px;
-      padding: 16px;
-      background-color: #2e2e2e;
-      border-radius: 4px;
-    }
-  </style>
-</head>
-<body>
-
-  <div style="background-color: #0f0e0e; padding: 20px 0;">
-    <table class="container" cellpadding="0" cellspacing="0" border="0">
-      <tr>
-        <td class="header">
-          <div class="brand">Rift</div>
-        </td>
-      </tr>
-      <tr>
-        <td class="content">
-          <h1>Hi ${name},</h1>
-          <p>This is to confirm your account with Rift is active. We're glad to have you with us.</p>
-          <p>You're all set to manage your orders and enjoy a streamlined checkout on future purchases.</p>
-          <div style="text-align: center;">
-            <a href="${frontendUrl}" class="button">See the current collection here</a>
-          </div>
-          <p style="margin-top: 20px;">Best,</p>
-          <p><strong>Team Rift</strong></p>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding: 0 24px;">
-          <p class="ps-note">
+    <div style="font-family: sans-serif; line-height: 1.6; color: #e5e7eb; max-width: 600px; margin: 0 auto; background-color: #1a1a1a; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);">
+    <div style="padding: 24px; text-align: center; background-color: #1a1a1a; border-bottom: 1px solid #2e2e2e;">
+        <div style="font-size: 28px; font-weight: 800; color: #ffffff;">Rift</div>
+    </div>
+    <div style="padding: 24px;">
+        <p style="font-size: 16px; color: #b0b0b0;">Hi ${name},</p>
+        <p style="font-size: 16px; color: #b0b0b0;">This is to confirm your account with Rift is active. We're glad to have you with us.</p>
+        <p style="font-size: 16px; color: #b0b0b0;">You're all set to manage your orders and enjoy a streamlined checkout on future purchases.</p>
+        <p style="font-size: 16px; color: #b0b0b0;">You can see the current collection here:</p>
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="${frontendUrl}" style="display: inline-block; background-color: #e89846; color: #0f0e0e; text-decoration: none; font-weight: 700; font-size: 16px; padding: 12px 24px; border-radius: 6px;">Explore Our Collection</a>
+        </div>
+        <p style="font-size: 16px; color: #b0b0b0;">Best,</p>
+        <p style="margin: 0; font-size: 16px; color: #ffffff;"><strong>Team Rift</strong></p>
+    </div>
+    <div style="padding: 0 24px 24px;">
+        <p style="font-size: 14px; font-style: italic; color: #e89846; margin-top: 20px; padding: 16px; background-color: #2e2e2e; border-radius: 4px;">
             P.S. To ensure you receive our order confirmation emails, please drag this message to your <strong>"Primary"</strong> inbox, if it landed in any other tab (promotion).
-          </p>
-        </td>
-      </tr>
-    </table>
-  </div>
-
-</body>
-</html>`;
+        </p>
+    </div>
+</div>`;
 
     try {
       console.log(htmlContent);
