@@ -6,15 +6,32 @@ import { Card, CardContent } from "@/components/ui/card";
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ribbonStyles = `
-@keyframes moveRight {
-  0% { transform: translateX(90%); }
-  50% { transform: translateX(0); }
-  100% { transform: translateX(-90%); }
+@keyframes scrollLeft {
+    0%{
+        transform: translateX(100%);
+    }
+    100%{
+        transform: translateX(-100%); 
+    }
+}
+@keyframes scrollLeft2 {
+    0%{
+        transform: translateX(100%);
+    }
+    100%{
+        transform: translateX(-100%); 
+    }
 }
 .ribbon-animation {
-  animation: moveRight 20s linear infinite;
+    animation: scrollLeft 20s linear infinite;
+    display: flex; 
+    width: fit-content; /* Ensure the container is as wide as its content */
 }
-
+.ribbon-animation2 {
+    animation: scrollLeft2 20s linear infinite;
+    display: flex; 
+    width: fit-content; /* Ensure the container is as wide as its content */
+}
 `;
 
 const DropCountdown = ({ blurAmount = 0, opacity = 1 }) => {
@@ -77,11 +94,16 @@ const DropCountdown = ({ blurAmount = 0, opacity = 1 }) => {
     return null;
   }
 
+  const ribbonText =
+    "Products are available for purchase! Hurry, before they are gone!";
+  // Repeat the text with a separator for the seamless loop
+  const repeatedText = `${ribbonText} \u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0 `;
+
   return (
     <div
       className="fixed top-[4rem] left-0 w-full h-screen z-40 pointer-events-none "
-      style={{ filter: `blur(${blurAmount}px)` }} // Apply dynamic blur
-      opacity={opacity} // Apply dynamic opacity
+      style={{ filter: `blur(${blurAmount}px)` }}
+      opacity={opacity}
     >
       {/* Clock on top left of hero section */}
       <div className="absolute top-12 left-6 bg-card/70 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3 pointer-events-auto ">
@@ -97,16 +119,57 @@ const DropCountdown = ({ blurAmount = 0, opacity = 1 }) => {
         </div>
       </div>
       {/* Ribbon-like structure */}
-      <div className="absolute top-0 w-full h-12  overflow-hidden flex items-center justify-center pointer-events-auto">
+      <div
+        className="absolute top-0 w-full h-8 overflow-hidden mt-2 flex items-center justify-center pointer-events-auto"
+        style={{ backgroundColor: "#e89846" }}
+      >
         <div
-          className="ribbon-animation whitespace-nowrap px-2 rounded-md text-black text-lg font-bold"
-          style={{ backgroundColor: "#e89846" }}
+          className="ribbon-animation whitespace-nowrap px-2  text-black text-lg font-bold"
+          // style={{ backgroundColor: "#ffffff" }}
         >
-          Products are available for purchase! Hurry, before they are gone!
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          Products are available for purchase! Hurry, before they are gone!
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          Products are available for purchase! Hurry, before they are gone!
+          {repeatedText}
+        </div>
+        <div
+          className="ribbon-animation whitespace-nowrap px-2  text-black text-lg font-bold"
+          // style={{ backgroundColor: "#000000" }}
+        >
+          {repeatedText}
+        </div>
+        <div
+          className="ribbon-animation whitespace-nowrap px-2  text-black text-lg font-bold"
+          // style={{ backgroundColor: "#2f3241" }}
+        >
+          {repeatedText}
+        </div>
+        <div
+          className="ribbon-animation whitespace-nowrap px-2  text-black text-lg font-bold"
+          // style={{ backgroundColor: "#ffd7b3" }}
+        >
+          {repeatedText}
+        </div>
+        <div
+          className="ribbon-animation whitespace-nowrap px-2  text-black text-lg font-bold"
+          // style={{ backgroundColor: "#ffffff" }}
+        >
+          {repeatedText}
+        </div>
+        <div
+          className="ribbon-animation whitespace-nowrap px-2  text-black text-lg font-bold"
+          // style={{ backgroundColor: "#000000" }}
+        >
+          {repeatedText}
+        </div>
+        <div
+          className="ribbon-animation whitespace-nowrap px-2  text-black text-lg font-bold"
+          // style={{ backgroundColor: "#2f3241" }}
+        >
+          {repeatedText}
+        </div>
+        <div
+          className="ribbon-animation whitespace-nowrap px-2  text-black text-lg font-bold"
+          // style={{ backgroundColor: "#ffd7b3" }}
+        >
+          {repeatedText}
         </div>
       </div>
     </div>
