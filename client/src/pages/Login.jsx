@@ -582,7 +582,7 @@ const Login = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex w-full items-center justify-center ">
+              <div className="flex w-full items-center justify-center">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={handleGoogleError}

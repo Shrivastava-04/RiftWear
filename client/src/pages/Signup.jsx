@@ -840,7 +840,7 @@ const Signup = () => {
                 </div>
               </div>
 
-              <div className="w-full text-center">
+              <div className="flex w-full justify-center items-center">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={handleGoogleError}
