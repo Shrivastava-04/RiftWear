@@ -62,7 +62,7 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
 
           <p className="text-xs md:text-lg text-foreground/80 max-w-3xl mx-auto animate-fade-in-up-delay">
             Every college has its stories, its landmarks, its legends. <br />{" "}
-            This isn't just merch; it's a piece of your story, <br /> made for
+            This isn't just merch; it's a piece of your story. <br /> Made for
             the crew you call family.
           </p>
 
