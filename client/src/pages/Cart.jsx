@@ -169,10 +169,8 @@ const Cart = () => {
   // ... (In the JSX, ensure you pass item._id to the handlers)
   {
     cartItems.map((item) => (
-      <Card key={item._id} className="...">
-        {/* ... */}
+      <Card key={item._id} className="">
         <Button onClick={() => handleQuantityChange(item._id, -1)}></Button>
-        {/* ... */}
         <Button onClick={() => handleQuantityChange(item._id, 1)}></Button>
         <Button onClick={() => handleRemoveItem(item._id)}></Button>
       </Card>
@@ -466,15 +464,15 @@ const Cart = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between text-foreground/80">
+                <div className="flex justify-between items-center text-foreground/80 text-base">
                   <span>Subtotal ({cartItems.length} items)</span>
                   <span>₹{totalAmount.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-foreground/80">
+                <div className="flex justify-between items-center text-foreground/80 text-base">
                   <span>Shipping</span>
                   <span>Free</span>
                 </div>
-                <div className="border-t border-border/50 pt-4 flex justify-between text-xl font-bold">
+                <div className="border-t border-border/50 pt-4 flex justify-between items-center text-2xl font-bold">
                   <span>Total</span>
                   <span className="text-accent">₹{totalAmount.toFixed(2)}</span>
                 </div>
@@ -489,6 +487,11 @@ const Cart = () => {
                 <Button variant="outline" className="w-full" asChild>
                   <Link to="/">Continue Shopping</Link>
                 </Button>
+                <span className="w-full text-center text-sm text-red-500 mt-2 leading-relaxed">
+                  *We are currently delivering only inside IIT(ISM) Dhanbad
+                  campus. Deliveries for outside addresses will be available
+                  soon. Stay updated through our social media channels.
+                </span>
               </CardContent>
             </Card>
           </div>

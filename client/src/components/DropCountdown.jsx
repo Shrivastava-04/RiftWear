@@ -7,12 +7,14 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ribbonStyles = `
 @keyframes moveRight {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% { transform: translateX(90%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(-90%); }
 }
 .ribbon-animation {
-  animation: moveRight 30s linear infinite;
+  animation: moveRight 20s linear infinite;
 }
+
 `;
 
 const DropCountdown = ({ blurAmount = 0, opacity = 1 }) => {
@@ -101,9 +103,10 @@ const DropCountdown = ({ blurAmount = 0, opacity = 1 }) => {
           style={{ backgroundColor: "#e89846" }}
         >
           Products are available for purchase! Hurry, before they are gone!
-          &nbsp;&nbsp;&nbsp; Products are available for purchase! Hurry, before
-          they are gone! &nbsp;&nbsp;&nbsp; Products are available for purchase!
-          Hurry, before they are gone!
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          Products are available for purchase! Hurry, before they are gone!
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          Products are available for purchase! Hurry, before they are gone!
         </div>
       </div>
     </div>
