@@ -196,33 +196,146 @@ const Cart = () => {
   //   }
   // };
 
+  // const handleMakePayment = async () => {
+  //   console.log(user);
+  //   if (
+  //     user &&
+  //     (!user.address ||
+  //       user.address.street === "" ||
+  //       user.address.city === "" ||
+  //       user.address.postalCode === "" ||
+  //       user.address.state === "" ||
+  //       user.address.country === "")
+  //   ) {
+  //     toast({
+  //       title: "Please Enter your address",
+  //       description: "Please update your profile and Enter the address",
+  //       variant: "destructive",
+  //     });
+  //     navigate("/profile");
+  //     return;
+  //   }
+  //   console.log(user.address);
+  //   if (user && !user.phoneNumber) {
+  //     toast({
+  //       title: "Please Enter Phone Number",
+  //       description: "Please update your profile and Enter your Phone Number",
+  //       variant: "destructive",
+  //     });
+  //     navigate("/profile");
+  //     return;
+  //   }
+  //   const res = await loadScript(
+  //     "https://checkout.razorpay.com/v1/checkout.js"
+  //   );
+
+  //   if (!res) {
+  //     alert("Razorpay SDK failed to load. Are you online?");
+  //     return;
+  //   }
+
+  //   try {
+  //     const orderResponse = await axios.post(
+  //       `${API_BASE_URL}/payment/razorpay/create-order`,
+  //       {
+  //         amount: totalAmount,
+  //         cartItems: cartItems,
+  //         userId: userId,
+  //       }
+  //     );
+
+  //     const { id, currency, amount } = orderResponse.data;
+
+  //     const options = {
+  //       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+  //       amount: amount,
+  //       currency: currency,
+  //       name: "Rift Wear",
+  //       description: "Payment for your order",
+  //       order_id: id,
+  //       handler: async (response) => {
+  //         try {
+  //           const finalOrderResponse = await axios.post(
+  //             `${API_BASE_URL}/orders/create`,
+  //             {
+  //               userId: userId,
+  //               cartItems: cartItems,
+  //               razorpayPaymentId: response.razorpay_payment_id,
+  //               razorpayOrderId: response.razorpay_order_id,
+  //               totalAmount: totalAmount,
+  //             }
+  //           );
+  //           setCartItems([]);
+  //           navigate(
+  //             `/order-confirmation/${finalOrderResponse.data.order._id}`
+  //           );
+  //         } catch (error) {
+  //           console.error("Error saving final order:", error);
+  //           navigate("/order-failure");
+  //         }
+  //       },
+  //       prefill: {
+  //         name: user.name,
+  //         email: user.email,
+  //         contact: user.phoneNumber,
+  //       },
+  //       theme: {
+  //         color: "#3399cc",
+  //       },
+  //     };
+
+  //     const paymentObject = new window.Razorpay(options);
+  //     paymentObject.open();
+
+  //     paymentObject.on("payment.failed", function (response) {
+  //       console.error("Razorpay Payment Failed:", response.error);
+  //       navigate("/order-failure");
+  //     });
+  //   } catch (error) {
+  //     console.error("Error during payment process:", error);
+  //     navigate("/order-failure");
+  //   }
+  // };
   const handleMakePayment = async () => {
-    if (
-      user &&
-      (!user.address ||
-        user.address.street === "" ||
-        user.address.city === "" ||
-        user.address.postalCode === "" ||
-        user.address.state === "" ||
-        user.address.country === "")
-    ) {
+    // Check if user or address is missing/empty
+    if (!user || !user.address) {
       toast({
         title: "Please Enter your address",
-        description: "Please update your profile and Enter the address",
+        description:
+          "Please update your profile and enter your address to proceed.",
         variant: "destructive",
       });
       navigate("/profile");
       return;
     }
-    if (user && !user.phoneNumber) {
+
+    // Check if any of the address fields are empty strings
+    const addressFields = ["street", "city", "postalCode", "state", "country"];
+    const isAddressIncomplete = addressFields.some(
+      (field) => !user.address[field]
+    );
+
+    if (isAddressIncomplete) {
+      toast({
+        title: "Incomplete Address",
+        description: "Please fill in all address fields in your profile.",
+        variant: "destructive",
+      });
+      navigate("/profile");
+      return;
+    }
+
+    // Check for missing phone number
+    if (!user.phoneNumber) {
       toast({
         title: "Please Enter Phone Number",
-        description: "Please update your profile and Enter your Phone Number",
+        description: "Please update your profile and enter your Phone Number",
         variant: "destructive",
       });
       navigate("/profile");
       return;
     }
+
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
