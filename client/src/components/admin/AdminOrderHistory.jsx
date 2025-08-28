@@ -11,7 +11,12 @@
 //   TableRow,
 // } from "@/components/ui/table";
 // import { Button } from "@/components/ui/button";
-// import { Loader2, Package, Eye, FileSpreadsheet } from "lucide-react";
+// import {
+//   Loader2,
+//   Eye,
+//   FileSpreadsheet,
+//   Image as ImageIcon,
+// } from "lucide-react";
 // import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
 // import {
@@ -21,6 +26,7 @@
 //   SelectTrigger,
 //   SelectValue,
 // } from "@/components/ui/select";
+// import { Badge } from "@/components/ui/badge";
 
 // const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -57,13 +63,7 @@
 //     fetchAllOrders();
 //   }, [API_BASE_URL, sortBy, startDate, endDate]);
 
-//   // const handleExport = () => {
-//   //   // Navigate to the export endpoint to trigger the download
-//   //   window.location.href = `${API_BASE_URL}/admin/orders/export`;
-//   // };
-
 //   const handleExport = () => {
-//     // Construct the URL with startDate and endDate query parameters
 //     let exportUrl = `${API_BASE_URL}/admin/orders/export`;
 //     const params = new URLSearchParams();
 //     if (startDate) {
@@ -77,7 +77,7 @@
 //       exportUrl += `?${queryString}`;
 //     }
 
-//     window.location.href = exportUrl; // Navigate to the export endpoint to trigger the download
+//     window.location.href = exportUrl;
 //   };
 
 //   if (loading) {
@@ -157,6 +157,7 @@
 //                 <TableRow>
 //                   <TableHead>Order #</TableHead>
 //                   <TableHead>Customer</TableHead>
+//                   <TableHead>Items</TableHead> {/* NEW table head */}
 //                   <TableHead>Total</TableHead>
 //                   <TableHead>Date</TableHead>
 //                   <TableHead className="text-right">Actions</TableHead>
@@ -165,13 +166,7 @@
 //               <TableBody>
 //                 {orders.map((order) => {
 //                   const orderDate = new Date(order.createdAt);
-//                   const day = String(orderDate.getDate()).padStart(2, "0");
-//                   const month = String(orderDate.getMonth() + 1).padStart(
-//                     2,
-//                     "0"
-//                   );
-//                   const year = orderDate.getFullYear();
-//                   const formattedDate = `${day}-${month}-${year}`;
+//                   const formattedDate = orderDate.toLocaleDateString("en-GB");
 
 //                   return (
 //                     <TableRow key={order._id}>
@@ -185,6 +180,91 @@
 //                           {order.detailsOfCustomer?.email || "N/A"}
 //                         </span>
 //                       </TableCell>
+//                       {/* NEW table cell for products */}
+//                       {/* <TableCell>
+//                         {order.detailsOfProduct &&
+//                         order.detailsOfProduct.length > 0 ? (
+//                           <div className="space-y-2">
+//                             {order.detailsOfProduct.map((item, index) => (
+//                               <div
+//                                 key={index}
+//                                 className="flex items-center gap-2"
+//                               >
+//                                 <img
+//                                   src={
+//                                     item.color?.images[0] ||
+//                                     item.productId?.images[0]
+//                                   }
+//                                   alt={item.productId?.name}
+//                                   className="w-10 h-10 object-cover rounded-md border"
+//                                 />
+//                                 <div className="text-sm">
+//                                   <p className="font-medium">
+//                                     {item.productId?.name}
+//                                   </p>
+//                                   <p className="text-muted-foreground">
+//                                     {item.color?.name
+//                                       ? `Color: ${item.color.name}`
+//                                       : ""}
+//                                     {item.size ? `, Size: ${item.size}` : ""}
+//                                     {item.variety
+//                                       ? `, Variety: ${item.variety}`
+//                                       : ""}
+//                                     {item.quantity ? ` x${item.quantity}` : ""}
+//                                   </p>
+//                                 </div>
+//                               </div>
+//                             ))}
+//                           </div>
+//                         ) : (
+//                           <span className="text-muted-foreground">
+//                             No items
+//                           </span>
+//                         )}
+//                       </TableCell> */}
+//                       <TableCell>
+//                         {order.detailsOfProduct &&
+//                         order.detailsOfProduct.length > 0 ? (
+//                           <div className="space-y-2">
+//                             {order.detailsOfProduct.map((item, index) => (
+//                               <div
+//                                 key={index}
+//                                 className="flex items-center gap-2"
+//                               >
+//                                 {/* CORRECTED LINE */}
+//                                 <img
+//                                   src={
+//                                     item.color?.images?.[0] ||
+//                                     item.productId?.images?.[0]
+//                                   }
+//                                   alt={item.productId?.name}
+//                                   className="w-10 h-10 object-cover rounded-md border"
+//                                 />
+//                                 <div className="text-sm">
+//                                   <p className="font-medium">
+//                                     {item.productId?.name}
+//                                   </p>
+//                                   <p className="text-muted-foreground">
+//                                     {item.color?.name
+//                                       ? `Color: ${item.color.name}`
+//                                       : ""}
+//                                     {item.size ? `, Size: ${item.size}` : ""}
+//                                     {item.variety
+//                                       ? `, Variety: ${item.variety}`
+//                                       : ""}
+//                                     {item.quantity ? ` x${item.quantity}` : ""}
+//                                   </p>
+//                                 </div>
+//                               </div>
+//                             ))}
+//                           </div>
+//                         ) : (
+//                           <span className="text-muted-foreground">
+//                             No items
+//                           </span>
+//                         )}
+//                       </TableCell>
+//                       {/* END of new table cell */}
 //                       <TableCell>₹{order.amount.toFixed(2)}</TableCell>
 //                       <TableCell>{formattedDate}</TableCell>
 //                       <TableCell className="text-right">
@@ -220,12 +300,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  Loader2,
-  Eye,
-  FileSpreadsheet,
-  Image as ImageIcon,
-} from "lucide-react";
+import { Loader2, Eye, FileSpreadsheet } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -235,7 +310,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -273,26 +347,22 @@ const AdminOrderHistory = () => {
   }, [API_BASE_URL, sortBy, startDate, endDate]);
 
   const handleExport = () => {
+    // This function remains correct
     let exportUrl = `${API_BASE_URL}/admin/orders/export`;
     const params = new URLSearchParams();
-    if (startDate) {
-      params.append("startDate", startDate);
-    }
-    if (endDate) {
-      params.append("endDate", endDate);
-    }
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
     const queryString = params.toString();
     if (queryString) {
       exportUrl += `?${queryString}`;
     }
-
     window.location.href = exportUrl;
   };
 
   if (loading) {
     return (
-      <Card className="bg-card/50 border-border/50 p-6 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+      <Card className="p-6 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin mr-2" />{" "}
         <p>Loading orders...</p>
       </Card>
     );
@@ -300,26 +370,21 @@ const AdminOrderHistory = () => {
 
   if (error) {
     return (
-      <Card className="bg-card/50 border-destructive/50 p-6 text-destructive">
+      <Card className="p-6 text-destructive">
         <p>Error: {error}</p>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-card/50 border-border/50">
+    <Card>
       <CardHeader className="flex flex-col md:flex-row md:items-center justify-between p-4 sm:p-6 space-y-4 md:space-y-0">
         <CardTitle className="text-xl sm:text-2xl gradient-text">
           All Orders ({orders.length})
         </CardTitle>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-          <Button
-            onClick={handleExport}
-            size="sm"
-            className="whitespace-nowrap"
-          >
-            <FileSpreadsheet className="h-4 w-4 mr-2" />
-            Export to Excel
+        <div className="flex flex-wrap items-center gap-4">
+          <Button onClick={handleExport} size="sm">
+            <FileSpreadsheet className="h-4 w-4 mr-2" /> Export
           </Button>
           <div className="flex items-center space-x-2">
             <Label htmlFor="startDate">From</Label>
@@ -328,7 +393,6 @@ const AdminOrderHistory = () => {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-auto"
             />
           </div>
           <div className="flex items-center space-x-2">
@@ -338,7 +402,6 @@ const AdminOrderHistory = () => {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-auto"
             />
           </div>
           <Select value={sortBy} onValueChange={setSortBy}>
@@ -348,17 +411,16 @@ const AdminOrderHistory = () => {
             <SelectContent>
               <SelectItem value="-createdAt">Newest First</SelectItem>
               <SelectItem value="createdAt">Oldest First</SelectItem>
-              <SelectItem value="-amount">Highest Total</SelectItem>
-              <SelectItem value="amount">Lowest Total</SelectItem>
+              {/* UPDATED: Changed 'amount' to 'totalAmount' to match schema */}
+              <SelectItem value="-totalAmount">Highest Total</SelectItem>
+              <SelectItem value="totalAmount">Lowest Total</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </CardHeader>
       <CardContent className="p-4 sm:p-6">
         {orders.length === 0 ? (
-          <p className="text-foreground/70 text-center py-4">
-            No orders found matching the criteria.
-          </p>
+          <p className="text-center py-4">No orders found.</p>
         ) : (
           <div className="overflow-x-auto">
             <Table>
@@ -366,126 +428,69 @@ const AdminOrderHistory = () => {
                 <TableRow>
                   <TableHead>Order #</TableHead>
                   <TableHead>Customer</TableHead>
-                  <TableHead>Items</TableHead> {/* NEW table head */}
+                  <TableHead>Items</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orders.map((order) => {
-                  const orderDate = new Date(order.createdAt);
-                  const formattedDate = orderDate.toLocaleDateString("en-GB");
-
-                  return (
-                    <TableRow key={order._id}>
-                      <TableCell className="font-medium">
-                        {order.orderNumber}
-                      </TableCell>
-                      <TableCell>
-                        {order.detailsOfCustomer?.name || "N/A"}
-                        <br />
-                        <span className="text-sm text-muted-foreground">
-                          {order.detailsOfCustomer?.email || "N/A"}
-                        </span>
-                      </TableCell>
-                      {/* NEW table cell for products */}
-                      {/* <TableCell>
-                        {order.detailsOfProduct &&
-                        order.detailsOfProduct.length > 0 ? (
-                          <div className="space-y-2">
-                            {order.detailsOfProduct.map((item, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-2"
-                              >
-                                <img
-                                  src={
-                                    item.color?.images[0] ||
-                                    item.productId?.images[0]
-                                  }
-                                  alt={item.productId?.name}
-                                  className="w-10 h-10 object-cover rounded-md border"
-                                />
-                                <div className="text-sm">
-                                  <p className="font-medium">
-                                    {item.productId?.name}
-                                  </p>
-                                  <p className="text-muted-foreground">
-                                    {item.color?.name
-                                      ? `Color: ${item.color.name}`
-                                      : ""}
-                                    {item.size ? `, Size: ${item.size}` : ""}
-                                    {item.variety
-                                      ? `, Variety: ${item.variety}`
-                                      : ""}
-                                    {item.quantity ? ` x${item.quantity}` : ""}
-                                  </p>
-                                </div>
+                {orders.map((order) => (
+                  <TableRow key={order._id}>
+                    <TableCell className="font-medium">
+                      {order.orderNumber}
+                    </TableCell>
+                    <TableCell>
+                      {/* UPDATED: Changed order.detailsOfCustomer to order.customer */}
+                      {order.customer?.name || "N/A"}
+                      <br />
+                      <span className="text-sm text-muted-foreground">
+                        {order.customer?.email || "N/A"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {/* UPDATED: Changed to use 'items' and snapshot data */}
+                      {order.items && order.items.length > 0 ? (
+                        <div className="space-y-2">
+                          {order.items.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2"
+                            >
+                              <img
+                                src={item.image} // Use snapshot image
+                                alt={item.productName} // Use snapshot name
+                                className="w-10 h-10 object-cover rounded-md border"
+                              />
+                              <div className="text-sm">
+                                <p className="font-medium">
+                                  {item.productName}
+                                </p>
+                                <p className="text-muted-foreground">
+                                  {`${item.variantName}, ${item.size}, ${item.colorName} x${item.quantity}`}
+                                </p>
                               </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">
-                            No items
-                          </span>
-                        )}
-                      </TableCell> */}
-                      <TableCell>
-                        {order.detailsOfProduct &&
-                        order.detailsOfProduct.length > 0 ? (
-                          <div className="space-y-2">
-                            {order.detailsOfProduct.map((item, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-2"
-                              >
-                                {/* CORRECTED LINE */}
-                                <img
-                                  src={
-                                    item.color?.images?.[0] ||
-                                    item.productId?.images?.[0]
-                                  }
-                                  alt={item.productId?.name}
-                                  className="w-10 h-10 object-cover rounded-md border"
-                                />
-                                <div className="text-sm">
-                                  <p className="font-medium">
-                                    {item.productId?.name}
-                                  </p>
-                                  <p className="text-muted-foreground">
-                                    {item.color?.name
-                                      ? `Color: ${item.color.name}`
-                                      : ""}
-                                    {item.size ? `, Size: ${item.size}` : ""}
-                                    {item.variety
-                                      ? `, Variety: ${item.variety}`
-                                      : ""}
-                                    {item.quantity ? ` x${item.quantity}` : ""}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">
-                            No items
-                          </span>
-                        )}
-                      </TableCell>
-                      {/* END of new table cell */}
-                      <TableCell>₹{order.amount.toFixed(2)}</TableCell>
-                      <TableCell>{formattedDate}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link to={`/order-confirmation/${order._id}`}>
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">No items</span>
+                      )}
+                    </TableCell>
+                    {/* UPDATED: Changed order.amount to order.totalAmount */}
+                    <TableCell>₹{order.totalAmount.toFixed(2)}</TableCell>
+                    <TableCell>
+                      {new Date(order.createdAt).toLocaleDateString("en-GB")}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link to={`/order-confirmation/${order._id}`}>
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

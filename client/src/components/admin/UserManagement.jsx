@@ -10,7 +10,8 @@
 //   TableRow,
 // } from "@/components/ui/table";
 // import { Button } from "@/components/ui/button";
-// import { Eye, Loader2, Trash2, Edit } from "lucide-react"; // Ensure Trash2 and Edit are imported
+// import { Eye, Loader2, Trash2, Edit } from "lucide-react";
+// import { useToast } from "@/hooks/use-toast";
 
 // import UserDetailsModal from "./UserDetailsModal";
 
@@ -19,9 +20,11 @@
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
 //   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+//   const { toast } = useToast();
 
 //   const [selectedUser, setSelectedUser] = useState(null);
 //   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [modalLoading, setModalLoading] = useState(false);
 
 //   const fetchUsers = async () => {
 //     try {
@@ -41,9 +44,31 @@
 //     fetchUsers();
 //   }, [API_BASE_URL]);
 
+//   // NEW: Function to fetch a single user's full details
+//   const fetchUserDetails = async (userId) => {
+//     setModalLoading(true);
+//     try {
+//       // Assuming you have a backend route for this, e.g., /user/userById
+//       const response = await axios.get(`${API_BASE_URL}/user/userById`, {
+//         params: { id: userId },
+//       });
+//       setSelectedUser(response.data.user);
+//       setIsModalOpen(true);
+//     } catch (err) {
+//       console.error("Error fetching user details:", err);
+//       toast({
+//         title: "Error",
+//         description:
+//           err.response?.data?.message || "Failed to fetch user details.",
+//         variant: "destructive",
+//       });
+//     } finally {
+//       setModalLoading(false);
+//     }
+//   };
+
 //   const handleViewDetails = (user) => {
-//     setSelectedUser(user);
-//     setIsModalOpen(true);
+//     fetchUserDetails(user._id);
 //   };
 
 //   const handleCloseModal = () => {
@@ -61,17 +86,24 @@
 //     }
 //     try {
 //       await axios.delete(`${API_BASE_URL}/admin/users/${userId}`);
-//       // Optionally, show a toast notification here
-//       fetchUsers(); // Refresh the user list
+//       toast({
+//         title: "User Deleted",
+//         description: "User was removed successfully.",
+//         variant: "success",
+//       });
+//       fetchUsers();
 //     } catch (err) {
 //       console.error("Error deleting user:", err);
-//       // Optionally, show an error toast here
+//       toast({
+//         title: "Failed to Delete",
+//         description: err.response?.data?.message || "Server error.",
+//         variant: "destructive",
+//       });
 //     }
 //   };
 
 //   const handleEditUser = (user) => {
 //     alert(`Implement edit functionality for user: ${user.name}`);
-//     // You would typically navigate to an edit form or open an edit modal here.
 //   };
 
 //   if (loading) {
@@ -94,23 +126,15 @@
 //   return (
 //     <Card className="bg-card/50 border-border/50">
 //       <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
-//         {" "}
-//         {/* Adjusted padding */}
 //         <CardTitle className="text-xl sm:text-2xl gradient-text">
-//           {" "}
-//           {/* Adjusted font size */}
 //           All Users ({users.length})
 //         </CardTitle>
 //       </CardHeader>
 //       <CardContent className="p-4 sm:p-6">
-//         {" "}
-//         {/* Adjusted padding */}
 //         {users.length === 0 ? (
 //           <p className="text-foreground/70 text-center py-4">No users found.</p>
 //         ) : (
 //           <div className="overflow-x-auto">
-//             {" "}
-//             {/* Allows horizontal scrolling for table on small screens */}
 //             <Table>
 //               <TableHeader>
 //                 <TableRow>
@@ -126,29 +150,26 @@
 //                 {users.map((user) => (
 //                   <TableRow key={user._id}>
 //                     <TableCell className="font-medium whitespace-normal">
-//                       {" "}
-//                       {/* Allows name to wrap */}
 //                       {user.name}
 //                     </TableCell>
 //                     <TableCell className="whitespace-normal text-sm">
-//                       {" "}
-//                       {/* Allows email to wrap, smaller font */}
 //                       {user.email}
 //                     </TableCell>
 //                     <TableCell className="capitalize whitespace-nowrap">
-//                       {" "}
-//                       {/* Capitalize and prevent wrap */}
 //                       {user.role}
 //                     </TableCell>
 //                     <TableCell className="text-right flex space-x-1 justify-end">
-//                       {" "}
-//                       {/* Adjusted spacing */}
 //                       <Button
 //                         variant="ghost"
 //                         size="icon"
 //                         onClick={() => handleViewDetails(user)}
+//                         disabled={modalLoading}
 //                       >
-//                         <Eye className="h-4 w-4" />
+//                         {modalLoading && selectedUser?._id === user._id ? (
+//                           <Loader2 className="h-4 w-4 animate-spin" />
+//                         ) : (
+//                           <Eye className="h-4 w-4" />
+//                         )}
 //                       </Button>
 //                       <Button
 //                         variant="ghost"
@@ -174,7 +195,6 @@
 //         )}
 //       </CardContent>
 
-//       {/* User Details Modal Render */}
 //       {selectedUser && (
 //         <UserDetailsModal
 //           user={selectedUser}
@@ -213,7 +233,8 @@ const UserManagement = () => {
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalLoading, setModalLoading] = useState(false);
+  // IMPROVEMENT: State to track which user's details are being loaded
+  const [detailsLoadingFor, setDetailsLoadingFor] = useState(null);
 
   const fetchUsers = async () => {
     try {
@@ -233,14 +254,12 @@ const UserManagement = () => {
     fetchUsers();
   }, [API_BASE_URL]);
 
-  // NEW: Function to fetch a single user's full details
+  // --- CORRECTED: Function to fetch a single user's full details ---
   const fetchUserDetails = async (userId) => {
-    setModalLoading(true);
+    setDetailsLoadingFor(userId); // Start loading for this specific user
     try {
-      // Assuming you have a backend route for this, e.g., /user/userById
-      const response = await axios.get(`${API_BASE_URL}/user/userById`, {
-        params: { id: userId },
-      });
+      // Use the correct admin route: /admin/users/:id
+      const response = await axios.get(`${API_BASE_URL}/admin/users/${userId}`);
       setSelectedUser(response.data.user);
       setIsModalOpen(true);
     } catch (err) {
@@ -252,7 +271,7 @@ const UserManagement = () => {
         variant: "destructive",
       });
     } finally {
-      setModalLoading(false);
+      setDetailsLoadingFor(null); // Stop loading
     }
   };
 
@@ -265,15 +284,13 @@ const UserManagement = () => {
     setSelectedUser(null);
   };
 
+  // Note: Ensure you have a DELETE /admin/users/:id route on your backend
   const handleDeleteUser = async (userId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this user? This action cannot be undone."
-      )
-    ) {
+    if (!window.confirm("Are you sure you want to delete this user?")) {
       return;
     }
     try {
+      // This route might need to be added to your admin.routes.js
       await axios.delete(`${API_BASE_URL}/admin/users/${userId}`);
       toast({
         title: "User Deleted",
@@ -297,7 +314,7 @@ const UserManagement = () => {
 
   if (loading) {
     return (
-      <Card className="bg-card/50 border-border/50 p-6 flex items-center justify-center">
+      <Card className="p-6 flex items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin mr-2" />
         <p>Loading users...</p>
       </Card>
@@ -306,55 +323,46 @@ const UserManagement = () => {
 
   if (error) {
     return (
-      <Card className="bg-card/50 border-destructive/50 p-6 text-destructive">
+      <Card className="p-6 text-destructive">
         <p>Error: {error}</p>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-card/50 border-border/50">
-      <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
-        <CardTitle className="text-xl sm:text-2xl gradient-text">
-          All Users ({users.length})
-        </CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle>All Users ({users.length})</CardTitle>
       </CardHeader>
-      <CardContent className="p-4 sm:p-6">
+      <CardContent>
         {users.length === 0 ? (
-          <p className="text-foreground/70 text-center py-4">No users found.</p>
+          <p className="text-center py-4">No users found.</p>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="whitespace-nowrap">Name</TableHead>
-                  <TableHead className="whitespace-nowrap">Email</TableHead>
-                  <TableHead className="whitespace-nowrap">Role</TableHead>
-                  <TableHead className="text-right whitespace-nowrap">
-                    Actions
-                  </TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users.map((user) => (
                   <TableRow key={user._id}>
-                    <TableCell className="font-medium whitespace-normal">
-                      {user.name}
-                    </TableCell>
-                    <TableCell className="whitespace-normal text-sm">
-                      {user.email}
-                    </TableCell>
-                    <TableCell className="capitalize whitespace-nowrap">
-                      {user.role}
-                    </TableCell>
+                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell className="capitalize">{user.role}</TableCell>
                     <TableCell className="text-right flex space-x-1 justify-end">
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleViewDetails(user)}
-                        disabled={modalLoading}
+                        disabled={!!detailsLoadingFor}
                       >
-                        {modalLoading && selectedUser?._id === user._id ? (
+                        {/* IMPROVEMENT: Show spinner only on the clicked row */}
+                        {detailsLoadingFor === user._id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <Eye className="h-4 w-4" />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Instagram, Share, Twitter } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import Header from "@/components/Header";
@@ -29,6 +29,32 @@ const Index = () => {
   const location = useLocation();
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const { toast } = useToast();
+  const [user, setUser] = useState(null);
+  const userId = (localStorage.getItem("userId") || "").replaceAll(/"/g, "");
+  const navigate = useNavigate();
+
+  const fetchUserProfile = async () => {
+    if (!userId) {
+      // setLoading(false);
+      // navigate("/login");
+      return;
+    }
+    try {
+      // setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/user/userById`, {
+        params: { id: userId },
+      });
+      const userData = response.data.user;
+      setUser(userData);
+      // UPDATED: Initialize form with the single address object
+    } catch (error) {
+      console.error("Profile Page: Error fetching user profile:", error);
+      localStorage.removeItem("userId");
+      navigate("/login");
+    } finally {
+      // setLoading(false);
+    }
+  };
 
   const comingSoonPlaceholder = {
     _id: "mock-coming-soon-" + Math.random(),
@@ -45,14 +71,33 @@ const Index = () => {
   };
 
   useEffect(() => {
+    if (userId) {
+      fetchUserProfile();
+    }
     const loadProducts = async () => {
       try {
         const res = await axios.get(`${API_BASE_URL}/product/getallproduct`);
         const homePageProducts = res.data.filter(
           (item) => !item.forDepartment && item.forHomePage
         );
-        const actualProducts = homePageProducts.slice(0, 4);
-        const placeholdersNeeded = 4 - actualProducts.length;
+
+        // --- THIS IS THE CRUCIAL PART THAT MAKES IT WORK ---
+        // We flatten the product data here before it gets passed to ProductCard
+        const flattenedProducts = homePageProducts.map((product) => {
+          if (product.variants && product.variants.length > 0) {
+            const firstVariant = product.variants[0];
+            return {
+              ...product, // Keep top-level fields like _id, name, images
+              price: firstVariant.price, // Add price from the first variant
+              originalPrice: firstVariant.originalPrice, // Add originalPrice
+            };
+          }
+          return product; // Fallback for products without variants
+        });
+        // ----------------------------------------------------
+
+        const actualProducts = flattenedProducts.slice(0, 4);
+        const placeholdersNeeded = 4 - flattenedProducts.length;
 
         const productsToDisplay = [
           ...actualProducts,
@@ -65,7 +110,7 @@ const Index = () => {
       }
     };
     loadProducts();
-  }, [API_BASE_URL]);
+  }, [API_BASE_URL, userId]);
 
   const [departmentsData, setDepartmentsData] = useState([]);
 
@@ -78,7 +123,8 @@ const Index = () => {
         setDepartmentsData(
           response.data.sort((a, b) => a.name.localeCompare(b.name))
         );
-        console.log("Departments fetched successfully:", response.data);
+        // console.log(response.data);
+        // console.log("Departments fetched successfully:", response.data);
       } catch (error) {
         console.error("Error fetching departments:", error);
       }
@@ -162,8 +208,8 @@ const Index = () => {
   }, [location.pathname, location.hash]);
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: user ? user.name : "",
+    email: user ? user.email : "",
     message: "",
     subject: "",
   });
@@ -462,61 +508,6 @@ const Index = () => {
                   </Card>
                 </div>
               </div>
-              {/* <div className="mt-10 md:mt-20 max-w-4xl mx-auto px-4">
-                <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold gradient-text mb-4">
-                    Frequently Asked Questions
-                  </h2>
-                  <p className="text-foreground/70">
-                    Quick answers to common questions
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="bg-card/50 border-border/50">
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold mb-2">
-                        What's your return policy?
-                      </h3>
-                      <p className="text-foreground/70 text-sm">
-                        We offer 30-day returns on all unworn items with
-                        original tags. Free return shipping included.
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-card/50 border-border/50">
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold mb-2">
-                        How long does shipping take?
-                      </h3>
-                      <p className="text-foreground/70 text-sm">
-                        Standard shipping takes 10-12 business days.
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-card/50 border-border/50">
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold mb-2">
-                        Do you offer size exchanges?
-                      </h3>
-                      <p className="text-foreground/70 text-sm">
-                        Yes! Free size exchanges within 30 days. Check our size
-                        guide or contact us for help.
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-card/50 border-border/50">
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold mb-2">
-                        When do you restock sold-out items?
-                      </h3>
-                      <p className="text-foreground/70 text-sm">
-                        Restocks vary by item. Sign up for notifications on
-                        product pages to be alerted when items return.
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div> */}
             </section>
           </div>
         </section>

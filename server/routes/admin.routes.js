@@ -24,13 +24,13 @@ const router = express.Router();
 router.get("/products", getAllProductsAdmin); // Get all products
 router.get("/products/:id", getProductDetailsAdmin); // Get single product details
 router.post("/products", addProduct); // Add new product
+router.put("/updateProduct", updateProduct);
 router.delete("/products/:id", deleteProduct); // Delete product
 // router.put('/products/:id', updateProduct); // Implement update later if needed
 
 // User Management
 router.get("/users", getAllUsersAdmin); // Get all users
 router.get("/users/:id", getUserDetailsAdmin); // Get single user details
-router.put("/updateProduct", updateProduct);
 router.get("/orders", getAllOrders); // New route to get all orders
 router.get("/orders/export", exportOrders); // New route for exporting orders
 

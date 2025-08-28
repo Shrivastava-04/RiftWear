@@ -1,4 +1,4 @@
-// import mongoose, { Schema } from "mongoose";
+// import mongoose from "mongoose";
 
 // const userSchema = new mongoose.Schema(
 //   {
@@ -20,7 +20,6 @@
 //       sparse: true,
 //       required: false,
 //     },
-//     // The address is now a single object with its own properties
 //     address: {
 //       street: {
 //         type: String,
@@ -48,11 +47,13 @@
 //       enum: ["user", "admin"],
 //       default: "user",
 //     },
+//     // --- UPDATED 'cartItem' FIELD ---
 //     cartItem: [
 //       {
 //         productId: {
 //           type: mongoose.Types.ObjectId,
 //           ref: "Product",
+//           required: true,
 //         },
 //         quantity: {
 //           type: Number,
@@ -65,10 +66,20 @@
 //           type: String,
 //         },
 //         color: {
-//           type: String,
+//           // Changed to an object to store color details
+//           name: {
+//             type: String,
+//             required: true,
+//           },
+//           images: [
+//             {
+//               type: String,
+//             },
+//           ],
 //         },
 //       },
 //     ],
+//     // -------------------------------
 //     order: [
 //       {
 //         type: mongoose.Types.ObjectId,
@@ -109,38 +120,31 @@ const userSchema = new mongoose.Schema(
       required: false,
     },
     address: {
-      street: {
-        type: String,
-        required: false,
-      },
-      city: {
-        type: String,
-        required: false,
-      },
-      state: {
-        type: String,
-        required: false,
-      },
-      postalCode: {
-        type: String,
-        required: false,
-      },
-      country: {
-        type: String,
-        required: false,
-      },
+      // No changes here
+      street: { type: String, required: false },
+      city: { type: String, required: false },
+      state: { type: String, required: false },
+      postalCode: { type: String, required: false },
+      country: { type: String, required: false },
     },
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
     },
-    // --- UPDATED 'cartItem' FIELD ---
+
+    // --- ONLY COMPULSORY CHANGES ARE HERE ---
     cartItem: [
       {
         productId: {
           type: mongoose.Types.ObjectId,
           ref: "Product",
+          required: true,
+        },
+        // ADDED: This is the _id of the chosen object in the product's 'variants' array.
+        // This is the most crucial field.
+        variantId: {
+          type: mongoose.Types.ObjectId,
           required: true,
         },
         quantity: {
@@ -149,25 +153,18 @@ const userSchema = new mongoose.Schema(
         },
         size: {
           type: String,
+          required: true, // Size is still needed
         },
-        variety: {
+        // ADDED: A simple string to identify the chosen color within the variant.
+        colorName: {
           type: String,
+          required: true,
         },
-        color: {
-          // Changed to an object to store color details
-          name: {
-            type: String,
-            required: true,
-          },
-          images: [
-            {
-              type: String,
-            },
-          ],
-        },
+        // REMOVED: The old 'variety' and 'color' object are replaced by variantId and colorName.
       },
     ],
-    // -------------------------------
+    // -----------------------------------------
+
     order: [
       {
         type: mongoose.Types.ObjectId,

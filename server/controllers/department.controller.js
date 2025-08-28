@@ -156,12 +156,10 @@ export const createDepartment = async (req, res) => {
 
     // --- UPDATED: Validate productId as an array ---
     if (productId && !validateProductIds(productId)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Invalid product ID format. Must be an array of valid ObjectIds.",
-        });
+      return res.status(400).json({
+        message:
+          "Invalid product ID format. Must be an array of valid ObjectIds.",
+      });
     }
 
     const newDepartment = new Department({
@@ -185,7 +183,7 @@ export const getDepartments = async (req, res) => {
   try {
     const departments = await Department.find().populate(
       "productId",
-      "name images _id description price originalPrice category onSale newArrival"
+      "name images _id description category variants onSale newArrival"
     );
     res.status(200).json(departments);
   } catch (error) {
@@ -214,12 +212,10 @@ export const updateDepartment = async (req, res) => {
 
     // --- UPDATED: Validate productId as an array ---
     if (productId && !validateProductIds(productId)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Invalid product ID format. Must be an array of valid ObjectIds.",
-        });
+      return res.status(400).json({
+        message:
+          "Invalid product ID format. Must be an array of valid ObjectIds.",
+      });
     }
 
     const updatedDepartment = await Department.findByIdAndUpdate(

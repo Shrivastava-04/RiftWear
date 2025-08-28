@@ -12,6 +12,7 @@
 //       ref: "User",
 //       require: true,
 //     },
+//     // --- UPDATED 'detailsOfProduct' FIELD ---
 //     detailsOfProduct: [
 //       {
 //         productId: {
@@ -23,13 +24,21 @@
 //           type: String,
 //           require: true,
 //         },
-//         color: {
-//           type: String,
-//           require: true,
-//         },
 //         variety: {
 //           type: String,
 //           require: true,
+//         },
+//         // Updated 'color' field to store color details
+//         color: {
+//           name: {
+//             type: String,
+//             required: true,
+//           },
+//           images: [
+//             {
+//               type: String,
+//             },
+//           ],
 //         },
 //         quantity: {
 //           type: Number,
@@ -37,6 +46,7 @@
 //         },
 //       },
 //     ],
+//     // ----------------------------------------
 //     amount: {
 //       type: Number,
 //       require: true,
@@ -57,52 +67,43 @@ const orderSchema = new mongoose.Schema(
   {
     orderNumber: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
     },
-    detailsOfCustomer: {
+    customer: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     },
-    // --- UPDATED 'detailsOfProduct' FIELD ---
-    detailsOfProduct: [
+    // --- This section remains updated to create a snapshot of the order ---
+    items: [
       {
         productId: {
           type: mongoose.Types.ObjectId,
           ref: "Product",
-          require: true,
+          required: true,
         },
-        size: {
-          type: String,
-          require: true,
-        },
-        variety: {
-          type: String,
-          require: true,
-        },
-        // Updated 'color' field to store color details
-        color: {
-          name: {
-            type: String,
-            required: true,
-          },
-          images: [
-            {
-              type: String,
-            },
-          ],
+        variantId: {
+          type: mongoose.Types.ObjectId,
+          required: true,
         },
         quantity: {
           type: Number,
-          require: true,
+          required: true,
         },
+        // --- Snapshot Details ---
+        productName: { type: String, required: true },
+        variantName: { type: String, required: true },
+        size: { type: String, required: true },
+        colorName: { type: String, required: true },
+        price: { type: Number, required: true }, // Price per unit at time of purchase
+        image: { type: String, required: true }, // A representative image URL
       },
     ],
-    // ----------------------------------------
-    amount: {
+    // --------------------------------------------------------------------
+    totalAmount: {
       type: Number,
-      require: true,
+      required: true,
     },
     razorpayId: {
       type: String,

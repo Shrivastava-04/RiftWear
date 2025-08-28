@@ -14,7 +14,6 @@
 //   const [order, setOrder] = useState(null);
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
-//   // const [user, setUser] = useState(null); // This state is not used here, can be removed if not needed elsewhere
 
 //   useEffect(() => {
 //     const fetchOrderDetails = async () => {
@@ -23,7 +22,6 @@
 //         setLoading(false);
 //         return;
 //       }
-//       // console.log(orderId); // Log the orderId to check if it's being passed correctly
 
 //       try {
 //         setLoading(true);
@@ -34,7 +32,6 @@
 //           }
 //         );
 //         setOrder(response.data.order);
-//         // console.log(response.data.order);
 //       } catch (err) {
 //         console.error("Error fetching order details:", err);
 //         setError(
@@ -87,15 +84,13 @@
 //     );
 //   }
 
-//   // Add an early return if order is null after loading, to prevent errors
 //   if (!order) {
-//     return null; // Or a fallback component if you prefer
+//     return null;
 //   }
 
-//   // Format the date
 //   const orderDate = new Date(order.createdAt);
 //   const day = String(orderDate.getDate()).padStart(2, "0");
-//   const month = String(orderDate.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+//   const month = String(orderDate.getMonth() + 1).padStart(2, "0");
 //   const year = orderDate.getFullYear();
 //   const formattedDate = `${day}-${month}-${year}`;
 
@@ -128,8 +123,7 @@
 //                   <strong>Payment ID:</strong> {order.razorpayId || "N/A"}
 //                 </p>
 //                 <p>
-//                   <strong>Order Date:</strong> {formattedDate}{" "}
-//                   {/* Display the formatted date */}
+//                   <strong>Order Date:</strong> {formattedDate}
 //                 </p>
 //               </div>
 //               {order.detailsOfCustomer && (
@@ -162,8 +156,9 @@
 //                   >
 //                     <img
 //                       src={
-//                         item.productId?.images?.[0] ||
-//                         "https://placehold.co/60x60/cccccc/333333?text=No+Image"
+//                         item.color?.images?.[0] || // Use the first image from the color object
+//                         item.productId?.images?.[0] || // Fallback to main product image
+//                         "https://placehold.co/60x60/cccccc/333333?text=No+Image" // Final fallback
 //                       }
 //                       alt={item.productId?.name || "Product"}
 //                       className="w-16 h-16 object-cover rounded-md"
@@ -173,8 +168,8 @@
 //                         {item.productId?.name || "Unknown Product"}
 //                       </p>
 //                       <p className="text-sm text-foreground/70">
-//                         Size: {item.size} | Quantity: {item.quantity} | Color:{" "}
-//                         {item.color}
+//                         Size: {item.size} | Quantity: {item.quantity}
+//                         {item.color?.name && ` | Color: ${item.color.name}`}
 //                         {item.variety && ` | Variety: ${item.variety}`}
 //                       </p>
 //                       <p className="text-sm text-accent">
@@ -229,18 +224,15 @@ const OrderConfirmation = () => {
         setLoading(false);
         return;
       }
-
       try {
         setLoading(true);
+        // NOTE: Ensure your backend has a route like this pointing to getOrderById
         const response = await axios.get(
           `${API_BASE_URL}/orders/current-order-details`,
-          {
-            params: { id: orderId },
-          }
+          { params: { id: orderId } }
         );
         setOrder(response.data.order);
       } catch (err) {
-        console.error("Error fetching order details:", err);
         setError(
           err.response?.data?.message || "Failed to load order details."
         );
@@ -248,83 +240,68 @@ const OrderConfirmation = () => {
         setLoading(false);
       }
     };
-
     fetchOrderDetails();
   }, [orderId, API_BASE_URL]);
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-          <Loader2 className="h-8 w-8 animate-spin mr-3" />
-          <p className="text-lg">Loading order details...</p>
-        </div>
-        <Footer />
-      </>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin mr-3" />
+        <p>Loading order details...</p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
-          <Card className="w-full max-w-md text-center bg-card/50 border-destructive/50 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-destructive text-2xl">
-                Order Not Found
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-foreground/70">{error}</p>
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/">
-                  <Home className="h-4 w-4 mr-2" /> Go to Homepage
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-        <Footer />
-      </>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center border-destructive">
+          <CardHeader>
+            <CardTitle className="text-destructive text-2xl">
+              Order Not Found
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>{error}</p>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/">
+                <Home className="h-4 w-4 mr-2" /> Go to Homepage
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
-  if (!order) {
-    return null;
-  }
+  if (!order) return null;
 
-  const orderDate = new Date(order.createdAt);
-  const day = String(orderDate.getDate()).padStart(2, "0");
-  const month = String(orderDate.getMonth() + 1).padStart(2, "0");
-  const year = orderDate.getFullYear();
-  const formattedDate = `${day}-${month}-${year}`;
+  const formattedDate = new Date(order.createdAt).toLocaleDateString("en-GB");
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <Card className="max-w-3xl mx-auto bg-card/50 border-border/50 shadow-lg">
+        <Card className="max-w-3xl mx-auto shadow-lg">
           <CardHeader className="text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
             <CardTitle className="text-3xl font-bold gradient-text">
               Order Confirmed!
             </CardTitle>
             <p className="text-foreground/70 mt-2">
-              Thank you for your purchase. Your order has been placed
-              successfully.
+              Thank you for your purchase.
             </p>
           </CardHeader>
           <CardContent className="space-y-6 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-semibold text-lg mb-2">Order Details</h3>
                 <p>
                   <strong>Order Number:</strong> {order.orderNumber}
                 </p>
+                {/* UPDATED: Changed 'amount' to 'totalAmount' */}
                 <p>
-                  <strong>Total Amount:</strong> ₹{order.amount.toFixed(2)}
+                  <strong>Total Amount:</strong> ₹{order.totalAmount.toFixed(2)}
                 </p>
                 <p>
                   <strong>Payment ID:</strong> {order.razorpayId || "N/A"}
@@ -333,54 +310,48 @@ const OrderConfirmation = () => {
                   <strong>Order Date:</strong> {formattedDate}
                 </p>
               </div>
-              {order.detailsOfCustomer && (
+              {/* UPDATED: Changed 'detailsOfCustomer' to 'customer' */}
+              {order.customer && (
                 <div>
                   <h3 className="font-semibold text-lg mb-2">
                     Customer Information
                   </h3>
                   <p>
-                    <strong>Name:</strong> {order.detailsOfCustomer.name}
+                    <strong>Name:</strong> {order.customer.name}
                   </p>
                   <p>
-                    <strong>Email:</strong> {order.detailsOfCustomer.email}
+                    <strong>Email:</strong> {order.customer.email}
                   </p>
                   <p>
                     <strong>Phone:</strong>{" "}
-                    {order.detailsOfCustomer.phoneNumber || "N/A"}
+                    {order.customer.phoneNumber || "N/A"}
                   </p>
                 </div>
               )}
             </div>
-            <h3 className="font-semibold text-lg mb-3 border-t border-border/50 pt-4">
+            <h3 className="font-semibold text-lg mb-3 border-t pt-4">
               Items Ordered
             </h3>
-            <div className="space-y-3">
-              {order.detailsOfProduct &&
-                order.detailsOfProduct.map((item, index) => (
+            <div className="space-y-4">
+              {/* UPDATED: Changed 'detailsOfProduct' to 'items' and used snapshot fields */}
+              {order.items &&
+                order.items.map((item, index) => (
                   <div
                     key={index}
-                    className="flex items-center space-x-4 border-b border-border/50 pb-3 last:border-b-0 last:pb-0"
+                    className="flex items-center space-x-4 border-b pb-3 last:border-b-0"
                   >
                     <img
-                      src={
-                        item.color?.images?.[0] || // Use the first image from the color object
-                        item.productId?.images?.[0] || // Fallback to main product image
-                        "https://placehold.co/60x60/cccccc/333333?text=No+Image" // Final fallback
-                      }
-                      alt={item.productId?.name || "Product"}
+                      src={item.image} // Use snapshot image
+                      alt={item.productName} // Use snapshot name
                       className="w-16 h-16 object-cover rounded-md"
                     />
                     <div className="flex-1">
-                      <p className="font-medium">
-                        {item.productId?.name || "Unknown Product"}
-                      </p>
+                      <p className="font-medium">{item.productName}</p>
                       <p className="text-sm text-foreground/70">
-                        Size: {item.size} | Quantity: {item.quantity}
-                        {item.color?.name && ` | Color: ${item.color.name}`}
-                        {item.variety && ` | Variety: ${item.variety}`}
+                        {`Size: ${item.size} | ${item.variantName} | ${item.colorName} | Qty: ${item.quantity}`}
                       </p>
-                      <p className="text-sm text-accent">
-                        ₹{(item.productId?.price * item.quantity).toFixed(2)}
+                      <p className="text-sm text-accent font-semibold">
+                        ₹{(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   </div>

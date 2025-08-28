@@ -64,16 +64,22 @@
 //         default: false,
 //       },
 //     },
-//     colors: {
-//       Black: {
-//         type: Boolean,
-//         default: false,
+//     // Updated 'colors' field to store color variants and their images
+//     colors: [
+//       {
+//         name: {
+//           type: String,
+//           required: true,
+//           trim: true,
+//         },
+//         images: [
+//           {
+//             type: String,
+//             required: true,
+//           },
+//         ],
 //       },
-//       White: {
-//         type: Boolean,
-//         default: false,
-//       },
-//     },
+//     ],
 //     category: {
 //       type: String,
 //       required: true,
@@ -101,7 +107,9 @@
 //       },
 //     ],
 //     specifications: {
-//       // **Remove `required: true` from here to allow defaults to be used**
+//       // **Note: `required: true` on nested fields means the parent object is required if defined,
+//       // but individual nested fields are not required if the parent is not present.
+//       // If you want to enforce these fields, ensure your frontend always sends them.
 //       Material: { type: String, required: true },
 //       Weight: { type: String, required: true },
 //       Fit: { type: String, required: true },
@@ -141,14 +149,6 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    price: {
-      type: Number,
-      required: true,
-    },
-    originalPrice: {
-      type: Number,
-      required: true,
-    },
     description: {
       type: String,
       required: true,
@@ -159,54 +159,56 @@ const productSchema = new mongoose.Schema(
       },
     ],
     sizes: {
-      S: {
-        type: Boolean,
-        default: false,
-      },
-      M: {
-        type: Boolean,
-        default: false,
-      },
-      L: {
-        type: Boolean,
-        default: false,
-      },
-      XL: {
-        type: Boolean,
-        default: false,
-      },
-      XXL: {
-        type: Boolean,
-        default: false,
-      },
+      S: { type: Boolean, default: false },
+      M: { type: Boolean, default: false },
+      L: { type: Boolean, default: false },
+      XL: { type: Boolean, default: false },
+      XXL: { type: Boolean, default: false },
     },
-    varietyOfProduct: {
-      Regular: {
-        type: Boolean,
-        default: false,
-      },
-      Oversized: {
-        type: Boolean,
-        default: false,
-      },
-      Polo: {
-        type: Boolean,
-        default: false,
-      },
-      Hoodie: {
-        type: Boolean,
-        default: false,
-      },
-    },
-    // Updated 'colors' field to store color variants and their images
-    colors: [
+    variants: [
       {
         name: {
           type: String,
           required: true,
-          trim: true,
+          enum: ["Regular", "Oversized", "Polo", "Hoodie"],
         },
-        images: [
+        price: {
+          type: Number,
+          required: true,
+        },
+        originalPrice: {
+          type: Number,
+          required: true,
+        },
+        features: [
+          {
+            type: String,
+            required: true,
+          },
+        ],
+        specifications: {
+          Material: { type: String, required: true },
+          Weight: { type: String, required: true },
+          Fit: { type: String, required: true },
+          Care: { type: String, required: true },
+        },
+        colors: [
+          {
+            name: {
+              type: String,
+              required: true,
+              trim: true,
+            },
+            images: [
+              {
+                type: String,
+                required: true,
+              },
+            ],
+          },
+        ],
+        // MOVED sizeChart INSIDE each variant
+        sizeChart: [
           {
             type: String,
             required: true,
@@ -226,29 +228,6 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    rating: {
-      type: Number,
-      default: 0,
-    },
-    reviews: {
-      type: Number,
-      default: 0,
-    },
-    features: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
-    specifications: {
-      // **Note: `required: true` on nested fields means the parent object is required if defined,
-      // but individual nested fields are not required if the parent is not present.
-      // If you want to enforce these fields, ensure your frontend always sends them.
-      Material: { type: String, required: true },
-      Weight: { type: String, required: true },
-      Fit: { type: String, required: true },
-      Care: { type: String, required: true },
-    },
     forDepartment: {
       type: Boolean,
       default: false,
@@ -257,16 +236,11 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    sizeChart: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
     forHomePage: {
       type: Boolean,
       default: false,
     },
+    // NOTE: Top-level 'sizeChart' field has been removed.
   },
   { timestamps: true }
 );
