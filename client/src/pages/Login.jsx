@@ -168,7 +168,7 @@ const Login = () => {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 gap-0 rounded-lg">
+              <div className="flex items-center justify-center w-full">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={handleGoogleError}
