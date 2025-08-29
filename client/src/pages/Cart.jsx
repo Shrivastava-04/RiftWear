@@ -891,7 +891,7 @@ const Cart = () => {
                   <Link to="/">Continue Shopping</Link>
                 </Button>
                 <span className="w-full text-center text-sm text-red-500 mt-2 block">
-                  *Free Delivey is available only inside IIT(ISM) campus
+                  *Free Shipping is available only inside IIT(ISM) campus
                 </span>
               </CardContent>
             </Card>
