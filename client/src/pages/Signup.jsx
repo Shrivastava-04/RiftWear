@@ -242,7 +242,7 @@ const Signup = () => {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex w-full justify-center items-center">
+              <div className="w-full">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={handleGoogleError}

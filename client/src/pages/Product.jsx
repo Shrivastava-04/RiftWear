@@ -705,6 +705,55 @@ const Product = () => {
 
   const selectedVariant = product?.variants?.[selectedVariantIndex];
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const productResponse = await axios.get(
+  //         `${API_BASE_URL}/product/productbyid`,
+  //         { params: { id } }
+  //       );
+  //       const fetchedProduct = productResponse.data.product;
+
+  //       if (
+  //         !fetchedProduct ||
+  //         !fetchedProduct.variants ||
+  //         fetchedProduct.variants.length === 0
+  //       ) {
+  //         setError("Product or its variants not found.");
+  //         return;
+  //       }
+
+  //       setProduct(fetchedProduct);
+  //       const initialVariant = fetchedProduct.variants[0];
+  //       const initialColor = initialVariant.colors?.[0] || null;
+  //       const initialSize =
+  //         Object.keys(fetchedProduct.sizes).find(
+  //           (s) => fetchedProduct.sizes[s]
+  //         ) || "";
+
+  //       setSelectedVariantIndex(0);
+  //       setSelectedColor(initialColor);
+  //       setSelectedSize(initialSize);
+
+  //       if (userId) {
+  //         const cartResponse = await axios.get(
+  //           `${API_BASE_URL}/user/getCartDetails`,
+  //           { params: { userId } }
+  //         );
+  //         setUserCart(cartResponse.data.cart);
+  //       }
+  //     } catch (err) {
+  //       setError(
+  //         err.response?.data?.message || "Failed to fetch product details."
+  //       );
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchData();
+  // }, [API_BASE_URL, id, userId]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -718,13 +767,32 @@ const Product = () => {
         if (
           !fetchedProduct ||
           !fetchedProduct.variants ||
-          fetchedProduct.variants.length === 0
+          !fetchedProduct.variants.length === 0
         ) {
           setError("Product or its variants not found.");
           return;
         }
 
+        // --- NEW: Sort colors for each variant ---
+        // This modifies the product data before we save it to the state.
+        fetchedProduct.variants.forEach((variant) => {
+          if (variant.colors && variant.colors.length > 0) {
+            variant.colors.sort((a, b) => {
+              const aIsBlack = a.name.toLowerCase() === "black";
+              const bIsBlack = b.name.toLowerCase() === "black";
+
+              if (aIsBlack) return -1; // 'a' (Black) always comes first
+              if (bIsBlack) return 1; // 'b' (Black) always comes first
+
+              // If neither is Black, sort the rest alphabetically
+              return a.name.localeCompare(b.name);
+            });
+          }
+        });
+        // --- END of new sorting logic ---
+
         setProduct(fetchedProduct);
+
         const initialVariant = fetchedProduct.variants[0];
         const initialColor = initialVariant.colors?.[0] || null;
         const initialSize =
