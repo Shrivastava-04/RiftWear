@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
-import FinalBg from "../assets/FinalBG.mp4";
+// import FinalBg from "../assets/FinalBG.mp4";
 import React from "react";
 import DropCountdown from "./DropCountdown";
 
@@ -29,7 +29,10 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
           className="w-full h-full object-cover transition-all duration-300" // Smoother transition, covers the area
           style={{ filter: `blur(${blurAmount}px)` }} // Apply dynamic blur
         >
-          <source src={FinalBg} type="video/mp4" />
+          <source
+            src="https://res.cloudinary.com/dfvxh7p8p/video/upload/v1756673332/FinalBG_evzsir.mp4"
+            type="video/mp4"
+          />
           {/* Add more source tags for different formats for better browser compatibility */}
           {/* <source src={heroVideoWebm} type="video/webm" /> */}
           Your browser does not support the video tag.
