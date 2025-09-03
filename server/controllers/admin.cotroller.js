@@ -600,6 +600,7 @@ export const exportOrders = async (req, res) => {
       { header: "Size", key: "size", width: 10 },
       { header: "Color", key: "colorName", width: 15 },
       { header: "Quantity", key: "quantity", width: 10 },
+      { header: "Name To Print", key: "nameToPrint", width: 20 },
       { header: "Price Per Item", key: "price", width: 15 },
       { header: "Order Total", key: "totalAmount", width: 15 },
       { header: "Date", key: "date", width: 20 },
@@ -628,6 +629,7 @@ export const exportOrders = async (req, res) => {
           size: item.size, // From snapshot
           colorName: item.colorName, // From snapshot
           quantity: item.quantity,
+          nameToPrint: item.nameToPrint ? item.nameToPrint : "N/A",
           price: item.price, // From snapshot
           totalAmount: order.totalAmount,
           date: new Date(order.createdAt).toLocaleDateString("en-GB"),

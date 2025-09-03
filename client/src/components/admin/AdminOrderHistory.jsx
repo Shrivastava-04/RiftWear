@@ -180,6 +180,12 @@ const AdminOrderHistory = () => {
                                 <p className="text-muted-foreground">
                                   {`${item.variantName}, ${item.size}, ${item.colorName} x${item.quantity}`}
                                 </p>
+                                <p>
+                                  Custom Name:{" "}
+                                  {`${
+                                    item.nameToPrint ? item.nameToPrint : ""
+                                  }`}
+                                </p>
                               </div>
                             </div>
                           ))}
