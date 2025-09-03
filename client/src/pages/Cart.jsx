@@ -93,8 +93,6 @@ const Cart = () => {
   // Add this constant near the top of your component
   const PRINTING_CHARGE_PER_ITEM = 30;
 
-  let printingFee = 0;
-
   // Update your subTotal calculation to include the printing charge
   const subTotal = useMemo(() => {
     const itemsTotal = (cartItems ?? []).reduce((total, item) => {
@@ -112,15 +110,13 @@ const Cart = () => {
       return total + (item.nameToPrint ? PRINTING_CHARGE_PER_ITEM : 0);
     }, 0);
 
-    printingFee = printingCharge;
-
-    return itemsTotal;
+    return itemsTotal + printingCharge;
   }, [cartItems]);
 
   // totalAmount remains the same, as it now includes the printing charge in the subTotal
   const totalAmount = useMemo(() => {
-    return subTotal + shippingFee + printingFee;
-  }, [subTotal, shippingFee, printingFee]); // Dependency changed to subTotal
+    return subTotal + shippingFee;
+  }, [subTotal, shippingFee]); // Dependency changed to subTotal
 
   const handleQuantityChange = async (cartItemId, delta) => {
     const currentItem = cartItems.find((item) => item._id === cartItemId);
@@ -463,8 +459,8 @@ const Cart = () => {
                   <span>Items Total</span>
                   <span>₹{subTotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between ">
-                  <span>Name</span>
+                <div className="flex justify-between text-sm text-foreground/70">
+                  <span>Custom Name Printing</span>
                   <span>
                     ₹
                     {cartItems.filter((item) => item.nameToPrint).length *
