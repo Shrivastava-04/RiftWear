@@ -215,56 +215,18 @@ export const getUserProfileUsingId = async (req, res) => {
   }
 };
 
-// --- UPDATED: Add to Cart ---
-// export const addToCart = async (req, res) => {
-//   try {
-//     const { productId, userId, size, quantity, variety, color } = req.body;
-
-//     if (!productId || !userId || !size || !variety || !color || !quantity) {
-//       return res.status(400).json({ message: "Missing required cart fields." });
-//     }
-//     if (
-//       !mongoose.Types.ObjectId.isValid(productId) ||
-//       !mongoose.Types.ObjectId.isValid(userId)
-//     ) {
-//       return res.status(400).json({ message: "Invalid ID format" });
-//     }
-//     const user = await User.findOne({ _id: userId });
-//     if (!user) {
-//       return res.status(400).json({ message: "User not exist" });
-//     }
-
-//     // Check for existing product in cart with the same size, variety, and color
-//     const existingItem = user.cartItem.find(
-//       (item) =>
-//         item.productId.equals(productId) &&
-//         item.size === size &&
-//         item.variety === variety &&
-//         item.color.name === color.name // Compare the color name
-//     );
-
-//     if (existingItem) {
-//       existingItem.quantity += quantity;
-//     } else {
-//       user.cartItem.push({ productId, size, variety, color, quantity });
-//     }
-
-//     await user.save();
-//     res.status(200).json({
-//       message: "Item added to cart Successfully",
-//       cart: user.cartItem,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
-
 export const addToCart = async (req, res) => {
   try {
     // UPDATED: Expect variantId and colorName instead of variety and color object
-    const { productId, userId, variantId, size, colorName, quantity } =
-      req.body;
+    const {
+      productId,
+      userId,
+      variantId,
+      size,
+      colorName,
+      quantity,
+      nameToPrint,
+    } = req.body;
 
     // UPDATED: Validation for new required fields
     if (
@@ -322,6 +284,7 @@ export const addToCart = async (req, res) => {
         size,
         colorName,
         quantity,
+        nameToPrint,
       });
     }
 
@@ -338,17 +301,31 @@ export const addToCart = async (req, res) => {
 
 export const updateCartDetails = async (req, res) => {
   try {
-    const { userId, cartItemId, quantity } = req.body;
+    // UPDATED: Now also destructuring 'nameToPrint' from the request body
+    const { userId, cartItemId, quantity, nameToPrint } = req.body;
 
-    if (
-      !userId ||
-      !cartItemId ||
-      typeof quantity !== "number" ||
-      quantity < 1
-    ) {
-      return res.status(400).json({ message: "Invalid input provided." });
+    // Determine what fields need to be updated
+    const updateFields = {};
+
+    if (quantity !== undefined) {
+      if (typeof quantity !== "number" || quantity < 1) {
+        return res.status(400).json({ message: "Invalid quantity provided." });
+      }
+      updateFields["cartItem.$.quantity"] = quantity;
     }
 
+    if (nameToPrint !== undefined) {
+      updateFields["cartItem.$.nameToPrint"] = nameToPrint;
+    }
+
+    // Check if at least one field is being updated
+    if (Object.keys(updateFields).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "No valid update fields provided." });
+    }
+
+    // UPDATED: Add validation for ID formats
     if (
       !mongoose.Types.ObjectId.isValid(userId) ||
       !mongoose.Types.ObjectId.isValid(cartItemId)
@@ -356,17 +333,17 @@ export const updateCartDetails = async (req, res) => {
       return res.status(400).json({ message: "Invalid ID format." });
     }
 
-    // Find the user and update the specific cart item by its subdocument _id
+    // Find the user and update the specific cart item
     const updatedUser = await User.findOneAndUpdate(
       {
         _id: userId,
-        "cartItem._id": cartItemId, // <-- Match by the subdocument's unique _id
+        "cartItem._id": cartItemId,
       },
       {
-        $set: { "cartItem.$.quantity": quantity }, // <-- Use positional operator to update the matched item
+        $set: updateFields, // Use the dynamically created update object
       },
       {
-        new: true, // Return the modified document
+        new: true,
       }
     ).populate("cartItem.productId");
 
@@ -375,16 +352,15 @@ export const updateCartDetails = async (req, res) => {
     }
 
     res.status(200).json({
-      message: "Cart item quantity updated successfully.",
-      cartItem: updatedUser.cartItem, // Return the full updated cart
+      message: "Cart item updated successfully.",
+      cartItem: updatedUser.cartItem,
     });
   } catch (error) {
-    console.error("Error updating cart quantity:", error);
+    console.error("Error updating cart details:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-// Also update deleteFromCart to use the same logic
 export const deleteFromCart = async (req, res) => {
   try {
     const { userId, cartItemId } = req.body;

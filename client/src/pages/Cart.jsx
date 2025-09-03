@@ -7,6 +7,9 @@ import {
   ShoppingCart,
   ArrowRight,
   UserIcon,
+  Pencil,
+  Check,
+  X,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -29,6 +32,8 @@ const Cart = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState([]);
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [editedName, setEditedName] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -44,13 +49,11 @@ const Cart = () => {
       }
       try {
         setLoading(true);
-        // This fetches the user details (needed for address/phone check)
         const userResponse = await axios.get(`${API_BASE_URL}/user/userById`, {
           params: { id: userId },
         });
         setUser(userResponse.data.user);
 
-        // This fetches the cart with populated product details
         const cartResponse = await axios.get(
           `${API_BASE_URL}/user/getCartDetails`,
           { params: { userId } }
@@ -69,44 +72,55 @@ const Cart = () => {
     fetchUserProfileAndCart();
   }, [API_BASE_URL, userId, navigate]);
 
-  // --- UPDATED: Correctly calculate total amount from variants ---
   const shippingFee = user?.address?.postalCode !== "826004" ? 90 : 0;
 
-  const subTotal = useMemo(() => {
-    return (cartItems ?? []).reduce((total, item) => {
-      if (!item.productId || !item.productId.variants) {
-        return total;
-      }
-      // Find the specific variant in the product that matches the one in the cart
-      const variant = item.productId.variants.find(
-        (v) => v._id.toString() === item.variantId.toString()
-      );
-      // // Use the variant's price for the calculation
-      // return user?.address?.postalCode !== "826004"
-      //   ? total + (variant ? variant.price * item.quantity : 0) + 90
-      return total + (variant ? variant.price * item.quantity : 0);
-    }, 0);
-  }, [cartItems]);
-
-  const totalAmount = useMemo(() => {
-    return subTotal + shippingFee;
-  }, [cartItems]);
-
-  // const totalAmount = useMemo(() => {
+  // const subTotal = useMemo(() => {
   //   return (cartItems ?? []).reduce((total, item) => {
   //     if (!item.productId || !item.productId.variants) {
   //       return total;
   //     }
-  //     // Find the specific variant in the product that matches the one in the cart
   //     const variant = item.productId.variants.find(
   //       (v) => v._id.toString() === item.variantId.toString()
   //     );
-  //     // Use the variant's price for the calculation
-  //     return user?.address?.postalCode !== "826004"
-  //       ? total + (variant ? variant.price * item.quantity : 0) + 90
-  //       : total + (variant ? variant.price * item.quantity : 0);
+  //     return total + (variant ? variant.price * item.quantity : 0);
   //   }, 0);
   // }, [cartItems]);
+
+  // const totalAmount = useMemo(() => {
+  //   return subTotal + shippingFee;
+  // }, [cartItems]);
+
+  // Add this constant near the top of your component
+  const PRINTING_CHARGE_PER_ITEM = 30;
+
+  let printingFee = 0;
+
+  // Update your subTotal calculation to include the printing charge
+  const subTotal = useMemo(() => {
+    const itemsTotal = (cartItems ?? []).reduce((total, item) => {
+      if (!item.productId || !item.productId.variants) {
+        return total;
+      }
+      const variant = item.productId.variants.find(
+        (v) => v._id.toString() === item.variantId.toString()
+      );
+      return total + (variant ? variant.price * item.quantity : 0);
+    }, 0);
+
+    // Calculate printing charge
+    const printingCharge = (cartItems ?? []).reduce((total, item) => {
+      return total + (item.nameToPrint ? PRINTING_CHARGE_PER_ITEM : 0);
+    }, 0);
+
+    printingFee = printingCharge;
+
+    return itemsTotal;
+  }, [cartItems]);
+
+  // totalAmount remains the same, as it now includes the printing charge in the subTotal
+  const totalAmount = useMemo(() => {
+    return subTotal + shippingFee + printingFee;
+  }, [subTotal, shippingFee, printingFee]); // Dependency changed to subTotal
 
   const handleQuantityChange = async (cartItemId, delta) => {
     const currentItem = cartItems.find((item) => item._id === cartItemId);
@@ -140,8 +154,43 @@ const Cart = () => {
     }
   };
 
+  // --- NEW: Edit functionality handlers ---
+  const handleEditClick = (itemId, currentName) => {
+    setEditingItemId(itemId);
+    setEditedName(currentName || "");
+  };
+
+  const handleSaveEdit = async (itemId) => {
+    try {
+      await axios.put(`${API_BASE_URL}/user/updateCartDetails`, {
+        userId,
+        cartItemId: itemId,
+        nameToPrint: editedName.trim(),
+      });
+
+      // Update the local state to reflect the change
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item._id === itemId
+            ? { ...item, nameToPrint: editedName.trim() }
+            : item
+        )
+      );
+
+      setEditingItemId(null); // Exit editing mode
+      setEditedName("");
+      toast({ title: "Name updated successfully!" });
+    } catch (error) {
+      toast({ title: "Failed to update name", variant: "destructive" });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+    setEditedName("");
+  };
+
   const handleMakePayment = async () => {
-    // This logic correctly checks for address and phone number before proceeding.
     if (!user || !user.address) {
       toast({
         title: "Please Enter your address",
@@ -153,7 +202,6 @@ const Cart = () => {
       return;
     }
 
-    // Check if any of the address fields are empty strings
     const addressFields = ["street", "city", "postalCode", "state", "country"];
     const isAddressIncomplete = addressFields.some(
       (field) => !user.address[field]
@@ -169,7 +217,6 @@ const Cart = () => {
       return;
     }
 
-    // Check for missing phone number
     if (!user.phoneNumber) {
       toast({
         title: "Please Enter Phone Number",
@@ -208,6 +255,9 @@ const Cart = () => {
         order_id: id,
         handler: async (response) => {
           try {
+            const printingFee =
+              cartItems.filter((item) => item.nameToPrint).length *
+              PRINTING_CHARGE_PER_ITEM;
             const finalOrderResponse = await axios.post(
               `${API_BASE_URL}/orders/create`,
               {
@@ -217,7 +267,8 @@ const Cart = () => {
                 razorpayOrderId: response.razorpay_order_id,
                 totalAmount: totalAmount,
                 shippingFee: shippingFee,
-                subTotal: subTotal,
+                subTotal: subTotal - printingFee,
+                printingFee: printingFee,
               }
             );
             setCartItems([]);
@@ -277,7 +328,6 @@ const Cart = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map((item) => {
-                // --- UPDATED: Logic to find correct variant and color details ---
                 const variant = item.productId?.variants.find(
                   (v) => v._id.toString() === item.variantId.toString()
                 );
@@ -286,6 +336,8 @@ const Cart = () => {
                 );
                 const imageUrl =
                   color?.images?.[0] || item.productId?.images?.[0] || "";
+
+                const isEditing = editingItemId === item._id;
 
                 return (
                   <Card
@@ -304,13 +356,67 @@ const Cart = () => {
                             {item.productId?.name}
                           </Link>
                         </h3>
-                        {/* UPDATED: Display price and details from the specific variant */}
                         <p className="text-accent font-bold">
                           ₹{variant?.price?.toFixed(2) || "N/A"}
                         </p>
                         <p className="text-foreground/70 text-sm mt-1">
                           {`Size: ${item.size}, ${variant?.name}, ${item.colorName}`}
                         </p>
+                        {/* --- NEW EDITABLE NAME SECTION --- */}
+                        <div className="mt-2 flex items-center">
+                          {isEditing ? (
+                            <>
+                              <input
+                                type="text"
+                                value={editedName}
+                                onChange={(e) => setEditedName(e.target.value)}
+                                placeholder="Enter custom name"
+                                className="border rounded px-2 py-1 text-black text-sm mr-2 w-32"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-green-500 hover:text-green-600"
+                                onClick={() => handleSaveEdit(item._id)}
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-red-600"
+                                onClick={handleCancelEdit}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : item.nameToPrint ? (
+                            <>
+                              <span className="text-primary-600 font-medium text-sm mr-2">
+                                Custom Name: {item.nameToPrint}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-gray-500 hover:text-gray-700"
+                                onClick={() =>
+                                  handleEditClick(item._id, item.nameToPrint)
+                                }
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              className="h-8 w-fit px-2 py-1 text-sm text-primary-600"
+                              onClick={() => handleEditClick(item._id, "")}
+                            >
+                              Add Custom Name
+                            </Button>
+                          )}
+                        </div>
+                        {/* --- END OF EDITABLE NAME SECTION --- */}
                       </div>
                       <div className="flex items-center justify-start md:justify-end gap-3 mt-4 md:mt-0">
                         <div className="flex items-center border rounded-md">
@@ -354,8 +460,17 @@ const Cart = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
+                  <span>Items Total</span>
                   <span>₹{subTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between ">
+                  <span>Name</span>
+                  <span>
+                    ₹
+                    {cartItems.filter((item) => item.nameToPrint).length *
+                      PRINTING_CHARGE_PER_ITEM}
+                    .00
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>

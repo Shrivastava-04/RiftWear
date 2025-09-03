@@ -6,6 +6,10 @@ const dropDateSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    startDate: {
+      type: Date,
+      required: true,
+    },
   },
   { timestamps: true }
 );

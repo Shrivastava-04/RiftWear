@@ -160,6 +160,10 @@ const userSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        //ADDED: A simple string to identify if there is a name with the product.
+        nameToPrint: {
+          type: String,
+        },
         // REMOVED: The old 'variety' and 'color' object are replaced by variantId and colorName.
       },
     ],
