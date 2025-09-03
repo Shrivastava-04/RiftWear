@@ -11,6 +11,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -362,12 +363,13 @@ const Cart = () => {
                         <div className="mt-2 flex items-center">
                           {isEditing ? (
                             <>
-                              <input
+                              <Input
+                                id="customName"
                                 type="text"
                                 value={editedName}
                                 onChange={(e) => setEditedName(e.target.value)}
                                 placeholder="Enter custom name"
-                                className="border rounded px-2 py-1 text-black text-sm mr-2 w-32"
+                                className="bg-secondary/50"
                               />
                               <Button
                                 variant="ghost"
@@ -457,7 +459,14 @@ const Cart = () => {
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span>Items Total</span>
-                  <span>₹{subTotal.toFixed(2)}</span>
+                  <span>
+                    ₹
+                    {(
+                      subTotal -
+                      cartItems.filter((item) => item.nameToPrint).length *
+                        PRINTING_CHARGE_PER_ITEM
+                    ).toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm text-foreground/70">
                   <span>Custom Name Printing</span>

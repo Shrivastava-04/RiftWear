@@ -1786,6 +1786,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -2256,11 +2257,11 @@ const Product = () => {
                   <div className="mt-2 flex items-center">
                     {showNameInput ? (
                       <>
-                        <input
+                        <Input
                           type="text"
                           value={nameToPrint}
                           onChange={(e) => setNameToPrint(e.target.value)}
-                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50 text-foreground bg-input/70"
+                          className="bg-secondary/50"
                           placeholder="Your Name"
                         />
                         <Button
@@ -2305,13 +2306,13 @@ const Product = () => {
                         (Additional Charges)
                       </span>
                     </label>
-                    <input
+                    <Input
                       type="text"
                       id="nameToPrint"
                       name="nameToPrint"
                       placeholder="Your Name"
                       value={nameToPrint}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50 text-foreground bg-input/70 mt-1"
+                      className="bg-secondary/50"
                       onChange={(e) => setNameToPrint(e.target.value)}
                     />
                   </div>
