@@ -482,6 +482,10 @@ const Cart = () => {
                 <span className="w-full text-center text-sm text-red-500 mt-2 block">
                   *Free Shipping is available only inside IIT(ISM) campus
                 </span>
+                <span className="w-full text-center text-sm text-red-500 block">
+                  *To avail this, enter your full address including the <br />{" "}
+                  Postal Code- 826004 (for IIT(ISM) Dhanbad)
+                </span>
               </CardContent>
             </Card>
           </div>
