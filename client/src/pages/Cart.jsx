@@ -75,23 +75,6 @@ const Cart = () => {
 
   const shippingFee = user?.address?.postalCode !== "826004" ? 90 : 0;
 
-  // const subTotal = useMemo(() => {
-  //   return (cartItems ?? []).reduce((total, item) => {
-  //     if (!item.productId || !item.productId.variants) {
-  //       return total;
-  //     }
-  //     const variant = item.productId.variants.find(
-  //       (v) => v._id.toString() === item.variantId.toString()
-  //     );
-  //     return total + (variant ? variant.price * item.quantity : 0);
-  //   }, 0);
-  // }, [cartItems]);
-
-  // const totalAmount = useMemo(() => {
-  //   return subTotal + shippingFee;
-  // }, [cartItems]);
-
-  // Add this constant near the top of your component
   const PRINTING_CHARGE_PER_ITEM = 30;
 
   // Update your subTotal calculation to include the printing charge
@@ -468,7 +451,7 @@ const Cart = () => {
                     ).toFixed(2)}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm text-foreground/70">
+                <div className="flex justify-between">
                   <span>Custom Name Printing</span>
                   <span>
                     ₹

@@ -31,7 +31,6 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
-  // UPDATED: State for a single address object
   const [editFormData, setEditFormData] = useState({
     phoneNumber: "",
     address: { street: "", city: "", state: "", postalCode: "", country: "" },
@@ -55,7 +54,6 @@ const Profile = () => {
       });
       const userData = response.data.user;
       setUser(userData);
-      // UPDATED: Initialize form with the single address object
       setEditFormData({
         phoneNumber: userData.phoneNumber || "",
         address: userData.address || {
@@ -79,7 +77,6 @@ const Profile = () => {
     fetchUserProfile();
   }, [API_BASE_URL, userId]);
 
-  // UPDATED: Simplified form handler for both phone and nested address fields
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     if (name.startsWith("address.")) {
@@ -93,13 +90,37 @@ const Profile = () => {
     }
   };
 
+  // UPDATED: Added validation to this function
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+
+    // Destructure for easier access
+    const { phoneNumber, address } = editFormData;
+
+    // VALIDATION: Check if any field is empty (or just contains whitespace)
+    const isAnyFieldEmpty =
+      !phoneNumber.trim() ||
+      !address.street.trim() ||
+      !address.city.trim() ||
+      !address.state.trim() ||
+      !address.postalCode.trim() ||
+      !address.country.trim();
+
+    if (isAnyFieldEmpty) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill out all fields before saving.",
+        variant: "destructive",
+      });
+      return; // Stop the function from proceeding if validation fails
+    }
+
+    // If validation passes, proceed with the API call
     try {
       await axios.put(`${API_BASE_URL}/user/updateUser`, {
         userId,
         phoneNumber: editFormData.phoneNumber,
-        address: editFormData.address, // Send the single address object
+        address: editFormData.address,
       });
       toast({ title: "Profile Updated", variant: "success" });
       setIsEditModalOpen(false);
@@ -114,12 +135,10 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    // await authContextLogout();
     localStorage.removeItem("userId");
     navigate("/");
   };
 
-  // UPDATED: Helper to display the single address
   const displayAddress = (address) => {
     if (!address || Object.values(address).every((field) => !field)) {
       return "No address on file.";
@@ -223,7 +242,6 @@ const Profile = () => {
       </main>
       <Footer />
 
-      {/* UPDATED: Edit Modal for a single address */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

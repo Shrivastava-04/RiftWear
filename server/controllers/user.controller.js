@@ -5,7 +5,9 @@ import mongoose from "mongoose";
 import Order from "../models/orders.model.js";
 import Product from "../models/product.model.js";
 import { sendEmail } from "../services/emailService.js";
+
 const JWT_SECRET = process.env.JWT_SECRET;
+const frontendUrl = process.env.FRONTEND_URL;
 
 const generateTokenAndSetCookie = (userId, res) => {
   const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
@@ -16,8 +18,6 @@ const generateTokenAndSetCookie = (userId, res) => {
     maxAge: 3600000,
   });
 };
-
-const frontendUrl = process.env.FRONTEND_URL;
 
 export const signup = async (req, res) => {
   try {
@@ -396,30 +396,6 @@ export const deleteFromCart = async (req, res) => {
   }
 };
 
-// export const getOrdersByUserId = async (req, res) => {
-//   try {
-//     const { userId } = req.query;
-
-//     if (!mongoose.Types.ObjectId.isValid(userId)) {
-//       return res.status(400).json({ message: "Invalid user ID" });
-//     }
-
-//     const orders = await Order.find({ detailsOfCustomer: userId })
-//       .sort({ createdAt: -1 })
-//       .populate("detailsOfProduct.productId", "name images price");
-
-//     if (!orders || orders.length === 0) {
-//       return res
-//         .status(404)
-//         .json({ message: "No orders found for this user.", orderLength: 0 });
-//     }
-
-//     res.status(200).json({ orders });
-//   } catch (error) {
-//     console.error("Error fetching orders:", error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
 export const getOrdersByUserId = async (req, res) => {
   try {
     const { userId } = req.query;
@@ -458,7 +434,7 @@ export const updateUser = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "Unable to update user" });
     }
-    console.log(updatedUser);
+    // console.log(updatedUser);
 
     res.status(200).json({
       message: "User updated successfull",
