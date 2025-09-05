@@ -73,7 +73,7 @@ const orderConfirmedHtmlContent = (
           )}</td>
         </tr>
         <tr>
-      <td style="padding: 8px; text-align: right; font-weight: 600; color: #b0b0b0;">Custom Printing Fee:</td>
+      <td style="padding: 8px; text-align: right; font-weight: 600; color: #b0b0b0;">Custom Name Printing:</td>
       <td style="padding: 8px; text-align: right; color: #b0b0b0;">₹${printingFee.toFixed(
         2
       )}</td>

@@ -38,6 +38,7 @@ export const getProductDetailsAdmin = async (req, res) => {
   }
 };
 
+// Add Product
 export const addProduct = async (req, res) => {
   try {
     const {
@@ -225,6 +226,7 @@ export const getAllUsersAdmin = async (req, res) => {
   }
 };
 
+// Get a User Details (Admin)
 export const getUserDetailsAdmin = async (req, res) => {
   try {
     const { id } = req.params;
@@ -300,6 +302,7 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
+// Export All Orders (Admin)
 export const exportOrders = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
