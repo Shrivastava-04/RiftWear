@@ -1046,15 +1046,10 @@ const Product = () => {
               <div className="flex flex-wrap gap-2 ">
                 {product.variants.map((variant, index) => (
                   <Button
-                    key={index}
+                    key={variant._id}
                     variant={
                       selectedVariantIndex === index ? "default" : "outline"
                     }
-                    className={`aspect-square border rounded-md text-sm font-medium transition-all ${
-                      selectedVariantIndex === index
-                        ? "border-accent bg-accent hover:text-white text-accent-foreground"
-                        : "border-border hover:border-accent/50 hover:bg-accent/10"
-                    }`}
                     onClick={() => handleVariantSelect(index)}
                   >
                     {variant.name}
