@@ -38,9 +38,7 @@ const ProductCard = ({ product, comingSoonImage, comingSoonText }) => {
 
   // --- Real Product Card Logic (No changes needed here) ---
   const { _id, name, isNew, onSale, variants } = product;
-  const defaultVariant = variants?.find(
-    (variant) => variant.name === "Regular"
-  );
+  const defaultVariant = variants[0];
   const defaultColor = defaultVariant?.colors?.find(
     (color) => color.name === "Black"
   );

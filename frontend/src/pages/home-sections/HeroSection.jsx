@@ -21,7 +21,7 @@ const HeroSection = ({ blurAmount = 0, opacity = 1 }) => {
     if (slides.length > 1) {
       const timer = setTimeout(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-      }, 5000); // Change slide every 5 seconds
+      }, 2500); // Change slide every 5 seconds
       return () => clearTimeout(timer);
     }
   }, [currentIndex, slides.length]);

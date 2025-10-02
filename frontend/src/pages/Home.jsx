@@ -56,14 +56,16 @@ const Home = () => {
       <HeroSection blurAmount={heroBlur} opacity={heroOpacity} />
 
       {/* This is the main scrollable content area */}
-      <div className="relative z-10 pt-[60vh]">
-        <FeaturedProductsSection comingSoonInfo={comingSoonInfo} />
-        <SpecialCollectionSection comingSoonInfo={comingSoonInfo} />
-        <DepartmentsSection comingSoonInfo={comingSoonInfo} />
-        <ContactAndAboutSection />
-      </div>
+      <div className="relative z-10">
+        <div className="pt-[60vh]">
+          <FeaturedProductsSection comingSoonInfo={comingSoonInfo} />
+          <SpecialCollectionSection comingSoonInfo={comingSoonInfo} />
+          <DepartmentsSection comingSoonInfo={comingSoonInfo} />
+          <ContactAndAboutSection />
+        </div>
 
-      <Footer />
+        <Footer />
+      </div>
     </>
   );
 };
@@ -143,7 +145,7 @@ const SpecialCollectionSection = ({ comingSoonInfo }) => {
   const placeholdersNeeded =
     products.length % columns === 0 ? 0 : columns - (products.length % columns);
   const placeholders = Array.from({ length: placeholdersNeeded });
-
+  console.log(products);
   return (
     <section className="py-20 bg-primary/5">
       <div className="container mx-auto px-4">
