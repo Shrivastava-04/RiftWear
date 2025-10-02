@@ -32,20 +32,17 @@ const orderSchema = new mongoose.Schema(
     // --- Snapshot of Items Ordered ---
     items: [
       {
-        // References for admin panel lookups
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-          required: true,
-        },
-        variantId: { type: mongoose.Schema.Types.ObjectId, required: true },
         // Snapshot data for customer history
-        productName: { type: String, required: true },
-        variantName: { type: String, required: true },
+        product: {
+          productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product",
+            required: true,
+          },
+          variantId: { type: mongoose.Schema.Types.ObjectId, required: true },
+          colorId: { type: mongoose.Schema.Types.ObjectId, required: true },
+        },
         size: { type: String, required: true },
-        colorName: { type: String, required: true },
-        image: { type: String, required: true }, // Representative image URL
-        price: { type: Number, required: true }, // Price per unit at time of purchase
         quantity: { type: Number, required: true },
         nameToPrint: { type: String },
       },

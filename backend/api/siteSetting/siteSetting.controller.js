@@ -37,7 +37,7 @@ export const updateSettings = async (req, res) => {
       currentSettings._id,
       req.body,
       { new: true, runValidators: true } // Return the updated doc
-    ).populate("activeDrop"); // Populate the response with drop details
+    ); // Populate the response with drop details
 
     if (!updatedSettings) {
       return res.status(404).json({ message: "Site settings not found." });

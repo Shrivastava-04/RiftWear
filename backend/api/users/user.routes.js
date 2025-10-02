@@ -36,7 +36,7 @@ router.post("/cart", addToCart);
 router.put("/cart", updateCartItem); // Using PUT for updates
 router.delete("/cart/:cartItemId", deleteCartItem);
 
-// --- Wishlist Routes ---
+// --- Wishlist Routes --- Not implemented right now ---
 router.get("/wishlist", getWishlist);
 router.post("/wishlist", addToWishlist);
 router.delete("/wishlist/:productId", removeFromWishlist);

@@ -230,7 +230,7 @@ const OrderManagement = () => {
         return 0;
       });
   }, [orders, statusFilter, sortBy, dateFilter]);
-
+  console.log(filteredAndSortedOrders);
   const handleSelectAll = (checked) => {
     setSelectedOrders(checked ? filteredAndSortedOrders.map((o) => o._id) : []);
   };

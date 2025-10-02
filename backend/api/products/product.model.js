@@ -26,6 +26,31 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// --- Sub-sub-schema for colors and sizes within a variant ---
+const colorSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  images: [{ type: String, required: true }],
+  price: { type: Number, required: true },
+  originalPrice: { type: Number, required: true },
+  stock: [
+    {
+      size: {
+        type: String,
+        required: true,
+        enum: ["S", "M", "L", "XL", "XXL"],
+      },
+      quantity: { type: Number, required: true, default: 0, min: 0 },
+    },
+  ],
+  features: [{ type: String }], // e.g., "100% Cotton", "Breathable Fabric"
+  specifications: {
+    Material: String,
+    Weight: String,
+    Fit: String,
+    Care: String,
+  },
+});
+
 // --- Sub-schema for Product Variants (e.g., Oversized, Regular) ---
 const variantSchema = new mongoose.Schema({
   name: {
@@ -33,39 +58,47 @@ const variantSchema = new mongoose.Schema({
     required: true,
     enum: ["Regular", "Oversized", "Polo", "Hoodie"], // Your existing variants
   },
-  price: {
-    type: Number,
-    required: true,
-  },
-  originalPrice: {
-    type: Number,
-    required: true,
-  },
   // --- Inventory Management per Color/Size ---
-  colors: [
-    {
-      name: { type: String, required: true, trim: true },
-      images: [{ type: String, required: true }],
-      stock: [
-        {
-          size: {
-            type: String,
-            required: true,
-            enum: ["S", "M", "L", "XL", "XXL"],
-          },
-          quantity: { type: Number, required: true, default: 0, min: 0 },
-        },
-      ],
-    },
-  ],
-  features: [{ type: String }],
-  specifications: {
-    Material: String,
-    Weight: String,
-    Fit: String,
-    Care: String,
-  },
+  colors: [colorSchema],
   sizeChart: [{ type: String, required: true }],
+});
+
+// --- Sub-schema for Product Category ---
+const categorySchema = new mongoose.Schema({
+  type: {
+    type: String,
+    required: true,
+    enum: ["Fashion", "College Store"],
+  },
+  subCollection: {
+    type: String,
+    // Only allow these values if the collection is 'Anime Collection'
+    enum: [null, "Naruto", "Jujutsu Kaisen", "One Piece"],
+    default: null,
+  },
+  college: {
+    type: String,
+    enum: [null, "IIT (ISM) Dhanbad"],
+    default: null,
+  },
+  department: {
+    type: String,
+    enum: [
+      null,
+      "Computer Science",
+      "Mechanical Engineering",
+      "Electrical Engineering",
+      "Civil Engineering",
+      "Mining Engineering",
+      "Chemical Engineering",
+      "Electronics & Communication",
+      "Petroleum Engineering",
+      "Mathematics & Computing",
+      "Physics",
+      "Applied Geophysics",
+    ],
+    default: null,
+  },
 });
 
 // --- Main Product Schema ---
@@ -81,53 +114,14 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     // --- Advanced Categorization ---
-    category: {
-      type: {
-        type: String,
-        required: true,
-        enum: ["Fashion", "College Store"],
-      },
-      collection: {
-        type: String,
-        // Only allow these values if the type is 'Fashion'
-        enum: [null, "Anime Collection", "Casuals", "Minimalist"],
-        default: null,
-      },
-      subCollection: {
-        type: String,
-        // Only allow these values if the collection is 'Anime Collection'
-        enum: [null, "Naruto", "Jujutsu Kaisen", "One Piece"],
-        default: null,
-      },
-      college: {
-        type: String,
-        enum: [null, "IIT (ISM) Dhanbad"],
-        default: null,
-      },
-      department: {
-        type: String,
-        enum: [
-          null,
-          "Computer Science",
-          "Mechanical Engineering",
-          "Electrical Engineering",
-          "Civil Engineering",
-          "Mining Engineering",
-          "Chemical Engineering",
-          "Electronics & Communication",
-          "Petroleum Engineering",
-          "Mathematics & Computing",
-          "Physics",
-        ],
-        default: null,
-      },
-    },
+    category: { type: categorySchema, required: true },
 
     // --- Product Variants ---
     variants: [variantSchema],
 
     // --- Reviews and Ratings ---
     reviews: [reviewSchema],
+
     rating: {
       // Average rating, calculated automatically
       type: Number,
@@ -150,7 +144,7 @@ const productSchema = new mongoose.Schema(
     // --- NEW FIELD FOR MANUAL SORTING ---
     sortPriority: {
       type: Number,
-      default: 99, // A high default means new items go to the end unless specified.
+      default: 999, // A high default means new items go to the end unless specified.
     },
 
     // --- Metadata for Filtering ---
@@ -159,10 +153,6 @@ const productSchema = new mongoose.Schema(
       default: true,
     },
     onSale: {
-      type: Boolean,
-      default: false,
-    },
-    forHomePage: {
       type: Boolean,
       default: false,
     },

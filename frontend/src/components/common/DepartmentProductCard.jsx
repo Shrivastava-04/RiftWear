@@ -44,8 +44,8 @@ const DepartmentProductCard = ({ department, product, comingSoonImage }) => {
   const defaultColor = defaultVariant?.colors?.find(
     (color) => color.name === "Black"
   );
-  const price = defaultVariant?.price;
-  const originalPrice = defaultVariant?.originalPrice;
+  const price = defaultColor?.price;
+  const originalPrice = defaultColor?.originalPrice;
   const imageSrc = defaultColor?.images?.[0];
 
   return (

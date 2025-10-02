@@ -13,12 +13,7 @@ const deactivateOtherDrops = async (excludeId = null) => {
 export const createDrop = async (req, res) => {
   try {
     const dropData = req.body;
-    if (
-      !dropData.name ||
-      !dropData.targetCollection ||
-      !dropData.startDate ||
-      !dropData.endDate
-    ) {
+    if (!dropData.name || !dropData.startDate || !dropData.endDate) {
       return res.status(400).json({
         message: "Name, target, start date, and end date are required.",
       });
@@ -48,13 +43,6 @@ export const getAllDrops = async (req, res) => {
   }
 };
 
-// ADD THIS NEW FUNCTION (can be placed before or after getAllDrops)
-
-/**
- * @desc    Get the single, globally active drop
- * @route   GET /api/v1/drops/active
- * @access  Public
- */
 export const getActiveDrop = async (req, res) => {
   try {
     // This finds the one document in the collection that is currently active.
@@ -107,23 +95,21 @@ export const deleteDrop = async (req, res) => {
 // Public function remains the same
 export const checkDropStatus = async (req, res) => {
   try {
-    const { collectionName } = req.body;
-    if (!collectionName)
-      return res.status(400).json({ message: "Collection name is required." });
+    const { name } = req.body;
     const drop = await Drop.findOne({
-      targetCollection: collectionName,
+      name,
       isActive: true,
     });
     if (!drop)
       return res.json({
         isLive: false,
-        message: "No active drop found for this collection.",
+        message: "No active drop found of this name.",
       });
     const now = new Date();
     const isLive = now >= drop.startDate && now <= drop.endDate;
     const message = isLive
       ? "The drop is currently live."
-      : "This drop is not currently active.";
+      : "This drop is not currently live.";
     res.status(200).json({ isLive, message, drop });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error." });

@@ -65,7 +65,6 @@ const ProductDetail = () => {
     queryFn: () => fetchProductById(productId),
   });
   const product = productData?.data?.product;
-
   // --- Derived State (Calculated from selections and data) ---
   const selectedVariant = product?.variants?.[selectedVariantIndex];
   const selectedColor = selectedVariant?.colors?.find(
@@ -96,11 +95,13 @@ const ProductDetail = () => {
   const currentItemInCart = useMemo(() => {
     if (!user?.cart || !selectedVariant?._id) return null;
     return user.cart.find((item) => {
-      const isProductMatch = String(item.productId._id) === String(productId);
+      const isProductMatch =
+        String(item.product.productId._id) === String(productId);
       const isVariantMatch =
-        String(item.variantId) === String(selectedVariant._id);
+        String(item.product.variantId) === String(selectedVariant._id);
       const isSizeMatch = String(item.size) === String(selectedSize);
-      const isColorMatch = String(item.colorName) === String(selectedColorName);
+      const isColorMatch =
+        String(item.product.colorId) === String(selectedColor._id);
       return isProductMatch && isVariantMatch && isSizeMatch && isColorMatch;
     });
   }, [user, productId, selectedVariant, selectedSize, selectedColorName]);
@@ -183,11 +184,12 @@ const ProductDetail = () => {
       navigate("/login");
       return;
     }
+
     cartMutation.mutate({
       productId,
       variantId: selectedVariant._id,
+      colorId: selectedColor._id,
       size: selectedSize,
-      colorName: selectedColorName,
       quantity,
       nameToPrint: nameToPrint.trim(),
     });
@@ -347,14 +349,14 @@ const ProductDetail = () => {
                   </span>
                 </div>
               )}
-              {selectedVariant && (
+              {selectedColor && (
                 <div className="flex items-center gap-4 mb-4">
                   <span className="text-2xl font-bold text-accent">
-                    ₹{selectedVariant.price.toFixed(2)}
+                    ₹{selectedColor.price.toFixed(2)}
                   </span>
                   {selectedVariant.originalPrice > selectedVariant.price && (
                     <span className="text-lg text-muted-foreground line-through">
-                      ₹{selectedVariant.originalPrice.toFixed(2)}
+                      ₹{selectedColor.originalPrice.toFixed(2)}
                     </span>
                   )}
                 </div>
@@ -612,7 +614,7 @@ const ProductDetail = () => {
                     Product Features
                   </h3>
                   <ul className="space-y-2 list-disc list-inside text-foreground/80">
-                    {(selectedVariant?.features || []).map((feature, index) => (
+                    {(selectedColor?.features || []).map((feature, index) => (
                       <li key={index}>{feature}</li>
                     ))}
                   </ul>
@@ -624,7 +626,7 @@ const ProductDetail = () => {
                 <CardContent className="p-6">
                   <h3 className="font-semibold text-lg mb-4">Specifications</h3>
                   <div className="space-y-3">
-                    {Object.entries(selectedVariant?.specifications || {}).map(
+                    {Object.entries(selectedColor?.specifications || {}).map(
                       ([key, value]) => (
                         <div
                           key={key}

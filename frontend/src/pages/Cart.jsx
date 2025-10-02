@@ -104,12 +104,10 @@ const Cart = () => {
     [cartItems]
   );
   const itemsTotal = useMemo(() => {
-    return cartItems.reduce((total, item) => {
-      const variant = item.productId?.variants.find(
-        (v) => v._id.toString() === item.variantId.toString()
-      );
-      return total + (variant?.price || 0) * item.quantity;
-    }, 0);
+    return cartItems.reduce(
+      (total, item) => total + (item.product.price || 0) * item.quantity,
+      0
+    );
   }, [cartItems]);
   const totalAmount = itemsTotal + printingFee + shippingFee;
 
@@ -154,16 +152,24 @@ const Cart = () => {
         },
         handler: async (response) => {
           try {
+            console.log(cartItems);
             const orderPayload = {
               user: { id: user._id, name: user.name },
               shippingAddress: selectedAddress,
               cartItems: cartItems.map((item) => ({
-                ...item,
-                productId: {
-                  _id: item.productId._id,
-                  name: item.productId.name,
-                  variants: item.productId.variants,
+                product: {
+                  productId: item.product.productId,
+                  variantId: item.product.variantId,
+                  colorId: item.product.colorId,
+                  productName: item.product.productName,
+                  variantName: item.product.variantName,
+                  colorName: item.product.colorName,
+                  price: item.product.price,
+                  image: item.product.images[0] || null,
                 },
+                size: item.size,
+                quantity: item.quantity,
+                nameToPrint: item.nameToPrint || "",
               })),
               pricingInfo: {
                 itemsPrice: itemsTotal,
@@ -182,6 +188,7 @@ const Cart = () => {
               `/order-confirmation/${verificationResponse.data.orderId}`
             );
           } catch (err) {
+            console.log(err);
             navigate("/order-failure");
           }
         },
@@ -375,11 +382,10 @@ const CartItem = ({ item }) => {
     setIsEditing(false);
   };
 
-  const variant = item.productId?.variants.find(
-    (v) => v._id.toString() === item.variantId.toString()
-  );
-  const color = variant?.colors.find((c) => c.name === item.colorName);
-  const imageUrl = color?.images?.[0] || "";
+  const { productName, variantName, colorName, price, images, productId } =
+    item.product;
+  const imageUrl =
+    images?.[0] || "https://placehold.co/100x100/333/white?text=Img";
 
   return (
     <Card className="flex flex-col sm:flex-row items-center p-4">
@@ -391,16 +397,12 @@ const CartItem = ({ item }) => {
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
         <div>
           <h3 className="font-semibold text-lg">
-            <Link to={`/product/${item.productId?._id}`}>
-              {item.productId?.name}
-            </Link>
+            <Link to={`/product/${item.productId?._id}`}>{productName}</Link>
           </h3>
-          <p className="text-accent font-bold">
-            ₹{variant?.price?.toFixed(2) || "N/A"}
-          </p>
+          <p className="text-accent font-bold">₹{price.toFixed(2) || "N/A"}</p>
           <p className="text-foreground/70 text-sm mt-1">{`Size: ${
             item.size
-          }, ${variant?.name || "N/A"}, ${item.colorName}`}</p>
+          }, ${variantName || "N/A"}, ${colorName}`}</p>
           <div className="mt-2 flex items-center">
             {isEditing ? (
               <>

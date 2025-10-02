@@ -61,18 +61,20 @@ const calculateTotalStock = (product) => {
 // Helper function to display a price range
 const getPriceRange = (product) => {
   if (!product.variants || product.variants.length === 0) return "N/A";
-  const prices = product.variants.map((v) => v.price);
+  const prices = product.variants.flatMap((variant) =>
+    variant.colors.map((color) => color.price)
+  );
+  if (prices.length === 0) return "N/A";
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   if (minPrice === maxPrice) return `₹${minPrice.toFixed(2)}`;
   return `₹${minPrice.toFixed(2)} - ₹${maxPrice.toFixed(2)}`;
 };
-
 // Helper function to format the new category object for display
 const formatCategory = (category) => {
   if (!category || !category.type) return "Uncategorized";
   const parts = [category.type];
-  if (category.collection) parts.push(category.collection);
+  // CORRECTED: 'collection' to 'subCollection'
   if (category.subCollection) parts.push(category.subCollection);
   if (category.college) parts.push(category.college);
   if (category.department) parts.push(category.department);

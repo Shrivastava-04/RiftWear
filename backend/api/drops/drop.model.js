@@ -13,13 +13,6 @@ const dropSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    // The collection of products this drop applies to.
-    // This allows you to run multiple drops for different collections.
-    targetCollection: {
-      type: String,
-      required: true,
-      // Example: "IIT (ISM) Dhanbad" or "Anime Collection"
-    },
     startDate: {
       type: Date,
       required: true,

@@ -52,6 +52,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 
 const Profile = () => {
   const { user, isAuthenticated } = useAuth();
@@ -192,12 +193,6 @@ const ProfileInfoTab = () => {
           <CardTitle>Account Actions</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button asChild variant="outline" className="w-full justify-start">
-            <Link to="/order">
-              <Package className="mr-2 h-4 w-4" />
-              Order History
-            </Link>
-          </Button>
           <Button asChild variant="outline" className="w-full justify-start">
             <Link to="/cart">
               <ShoppingCart className="mr-2 h-4 w-4" />
@@ -372,6 +367,7 @@ const AddressForm = ({ isOpen, setIsOpen }) => {
     postalCode: "",
     country: "India",
     addressType: "Home",
+    isDefault: false,
   };
   const [formData, setFormData] = useState(initialFormState);
 
@@ -407,6 +403,10 @@ const AddressForm = ({ isOpen, setIsOpen }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSwitchChange = (checked) => {
+    setFormData({ ...formData, isDefault: checked });
   };
 
   return (
@@ -502,6 +502,28 @@ const AddressForm = ({ isOpen, setIsOpen }) => {
                 onChange={handleChange}
               />
             </div>
+          </div>
+          <div>
+            <Label htmlFor="addressType">Address Type</Label>
+            <select
+              name="addressType"
+              id="addressType"
+              value={formData.addressType}
+              onChange={handleChange}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+            >
+              <option value="Home">Home</option>
+              <option value="Work">Work</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div className="flex items-center space-x-2 pt-2">
+            <Switch
+              id="isDefault"
+              checked={formData.isDefault}
+              onCheckedChange={handleSwitchChange}
+            />
+            <Label htmlFor="isDefault">Set as default address</Label>
           </div>
         </div>
         <DialogFooter>

@@ -72,21 +72,17 @@ const Home = () => {
 const FeaturedProductsSection = ({ comingSoonInfo }) => {
   const { data: response, isLoading } = useQuery({
     queryKey: ["products", "featured"],
-    queryFn: () =>
-      fetchProducts({
-        forHomePage: true,
-        isActive: true,
-        categoryType: "College Store",
-      }),
+    queryFn: () => fetchProducts(),
   });
 
   const products =
     response?.data?.products
       .filter((p) => !p.category.department)
-      .filter((p) => p.forHomePage)
+      .filter((p) => p.category.type === "College Store")
       .sort((a, b) => {
         return a.sortPriority < b.sortPriority ? -1 : 1;
-      }) || [];
+      })
+      .slice(0, 10) || [];
   const windowWidth = useWindowWidth();
   let columns = windowWidth >= 1024 ? 5 : windowWidth >= 640 ? 3 : 2;
   const placeholdersNeeded =
@@ -132,15 +128,16 @@ const FeaturedProductsSection = ({ comingSoonInfo }) => {
 const SpecialCollectionSection = ({ comingSoonInfo }) => {
   const { data: response, isLoading } = useQuery({
     queryKey: ["products", "special"],
-    queryFn: () =>
-      fetchProducts({
-        forHomePage: true,
-        isActive: true,
-        categoryType: "Fashion",
-      }),
+    queryFn: () => fetchProducts(),
   });
 
-  const products = response?.data?.products.filter((p) => p.forHomePage) || [];
+  const products =
+    response?.data?.products
+      .sort((a, b) => {
+        return a.sortPriority < b.sortPriority;
+      })
+      .filter((a) => a.category.type === "Fashion")
+      .slice(0, 10) || [];
   const windowWidth = useWindowWidth();
   let columns = windowWidth >= 1024 ? 5 : windowWidth >= 640 ? 3 : 2;
   const placeholdersNeeded =

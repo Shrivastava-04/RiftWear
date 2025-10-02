@@ -11,7 +11,7 @@ import mongoose from "mongoose";
  */
 export const createDepartment = async (req, res) => {
   try {
-    const { name, college, description, image } = req.body;
+    const { name, college, description } = req.body;
 
     if (!name || !college) {
       return res
@@ -26,7 +26,7 @@ export const createDepartment = async (req, res) => {
       });
     }
 
-    const newDepartment = new Department({ name, college, description, image });
+    const newDepartment = new Department({ name, college, description });
     await newDepartment.save();
     res.status(201).json({
       success: true,
@@ -47,7 +47,7 @@ export const createDepartment = async (req, res) => {
 export const updateDepartment = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, college, description, image, isActive } = req.body;
+    const { name, college, description, isActive } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid department ID format." });
@@ -55,7 +55,7 @@ export const updateDepartment = async (req, res) => {
 
     const updatedDepartment = await Department.findByIdAndUpdate(
       id,
-      { name, college, description, image, isActive },
+      { name, college, description, isActive },
       { new: true, runValidators: true }
     );
 
@@ -70,6 +70,95 @@ export const updateDepartment = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating department:", error);
+    res.status(500).json({ message: "Internal Server Error." });
+  }
+};
+
+export const addProductToDepartment = async (req, res) => {
+  try {
+    const { departmentId } = req.params;
+    const { productsId } = req.body; // Array of product IDs to add
+    console.log(departmentId, productsId);
+    console.log("hello");
+    // --- 1. Validation ---
+    if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+      console.log(departmentId);
+      return res.status(400).json({ message: "Invalid department ID format." });
+    }
+    console.log("step1");
+    if (!Array.isArray(productsId) || productsId.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "productsId must be a non-empty array." });
+    }
+
+    console.log("step 2");
+    // --- 2. Update using $addToSet (Database-level uniqueness) ---
+    const updatedDepartment = await Department.findByIdAndUpdate(
+      departmentId,
+      {
+        $addToSet: {
+          products: { $each: productsId }, // Add each ID from the array if it's not already present
+        },
+      },
+      { new: true } // This option returns the modified document
+    );
+
+    if (!updatedDepartment) {
+      return res.status(404).json({ message: "Department not found." });
+    }
+
+    // --- 3. Respond ---
+    console.log("done");
+    res.status(200).json({
+      success: true,
+      message: "Products added to department successfully.",
+      department: updatedDepartment,
+    });
+  } catch (error) {
+    console.error("Error adding products to department:", error);
+    res.status(500).json({ message: "Internal Server Error." });
+  }
+};
+
+export const removeProductFromDepartment = async (req, res) => {
+  try {
+    const { departmentId } = req.params;
+    const { productsId } = req.body; // Array of product IDs to remove
+
+    // --- 1. Validation ---
+    if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+      return res.status(400).json({ message: "Invalid department ID format." });
+    }
+    if (!Array.isArray(productsId) || productsId.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "productsId must be a non-empty array." });
+    }
+
+    // --- 2. Update using $pullAll to remove specified products ---
+    const updatedDepartment = await Department.findByIdAndUpdate(
+      departmentId,
+      {
+        $pullAll: {
+          products: productsId, // Remove all matching IDs from the array
+        },
+      },
+      { new: true } // This option returns the modified document
+    );
+
+    if (!updatedDepartment) {
+      return res.status(404).json({ message: "Department not found." });
+    }
+
+    // --- 3. Respond ---
+    res.status(200).json({
+      success: true,
+      message: "Products removed from department successfully.",
+      department: updatedDepartment,
+    });
+  } catch (error) {
+    console.error("Error removing products from department:", error);
     res.status(500).json({ message: "Internal Server Error." });
   }
 };
@@ -126,7 +215,7 @@ export const deleteDepartment = async (req, res) => {
 export const getAllDepartments = async (req, res) => {
   try {
     // Only return departments that are marked as active
-    const departments = await Department.find();
+    const departments = await Department.find(); // Exclude internal fields
     res.status(200).json({ success: true, departments });
   } catch (error) {
     console.error("Error fetching departments:", error);
@@ -145,7 +234,9 @@ export const getDepartmentById = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid department ID." });
     }
-    const department = await Department.findOne({ _id: id, isActive: true });
+    const department = await Department.findOne({ _id: id, isActive: true })
+      .populate("products")
+      .select("-__v -createdAt -updatedAt");
     if (!department) {
       return res
         .status(404)

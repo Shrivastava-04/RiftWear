@@ -53,13 +53,23 @@ const addressSchema = new mongoose.Schema({
 
 // Schema for items in the user's shopping cart
 const cartItemSchema = new mongoose.Schema({
-  productId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true,
+  product: {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+    variantId: {
+      type: mongoose.Schema.Types.ObjectId, // Refers to the specific variant within the product
+      required: true,
+    },
+    colorId: {
+      type: mongoose.Schema.Types.ObjectId, // Refers to the specific color within the variant
+      required: true,
+    },
   },
-  variantId: {
-    type: mongoose.Schema.Types.ObjectId, // Refers to the specific variant within the product
+  size: {
+    type: String,
     required: true,
   },
   quantity: {
@@ -67,14 +77,6 @@ const cartItemSchema = new mongoose.Schema({
     required: true,
     min: 1,
     default: 1,
-  },
-  size: {
-    type: String,
-    required: true,
-  },
-  colorName: {
-    type: String,
-    required: true,
   },
   nameToPrint: {
     type: String, // For custom text on products

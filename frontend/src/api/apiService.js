@@ -27,51 +27,22 @@ export const googleLogin = (idToken) => {
   return api.post("/auth/google", { idToken });
 };
 
-// This is the key function for our AuthContext to check if a user is logged in
+// --- USER API CALLS ---
 export const getLoggedInUserProfile = () => {
   return api.get("/users/profile");
 };
 
-export const checkIfUserCanReview = (productId) => {
-  return api.get(`/users/can-review/${productId}`);
+export const updateUserProfile = (profileData) => {
+  return api.put("/users/profile", profileData);
 };
 
-// --- PRODUCT API CALLS ---
-
-export const fetchProducts = (filters = {}) => {
-  // We can pass filters as query parameters
-  return api.get("/products", { params: filters });
+export const addAddress = (addressData) => {
+  return api.post("/users/addresses", addressData);
 };
 
-export const fetchProductById = (id) => {
-  return api.get(`/products/${id}`);
+export const deleteAddress = (addressId) => {
+  return api.delete(`/users/addresses/${addressId}`);
 };
-
-export const addProductReview = (productId, reviewData) => {
-  // reviewData should be an object like { rating, comment }
-  return api.post(`/products/${productId}/reviews`, reviewData);
-};
-
-// --- You can add other API functions here as you build the frontend ---
-// e.g., createOrder, fetchOrders, etc.
-
-// --- DEPARTMENT API CALLS ---
-export const fetchDepartments = () => {
-  return api.get("/departments");
-};
-
-// --- DROP API CALLS ---
-export const checkDropStatus = (collectionName) => {
-  return api.post("/drops/status", { collectionName });
-};
-
-export const getActiveDropDetails = () => {
-  return api.get("/drops/active");
-};
-
-// --- CART API CALLS ---
-// Note: These routes are protected by our 'protectRoute' middleware on the backend.
-// Axios's `withCredentials: true` setting will automatically send the user's auth cookie.
 
 export const getCart = () => {
   return api.get("/users/cart");
@@ -88,17 +59,27 @@ export const updateCartItem = (updateData) => {
   return api.put("/users/cart", updateData);
 };
 
-// --- USER PROFILE API CALLS ---
-export const updateUserProfile = (profileData) => {
-  return api.put("/users/profile", profileData);
+export const getUserOrders = () => {
+  return api.get("/users/orders");
 };
 
-export const addAddress = (addressData) => {
-  return api.post("/users/addresses", addressData);
+export const checkIfUserCanReview = (productId) => {
+  return api.get(`/users/can-review/${productId}`);
 };
 
-export const deleteAddress = (addressId) => {
-  return api.delete(`/users/addresses/${addressId}`);
+// --- PRODUCT API CALLS ---
+
+export const fetchProducts = () => {
+  return api.get("/products");
+};
+
+export const fetchProductById = (id) => {
+  return api.get(`/products/${id}`);
+};
+
+export const addProductReview = (productId, reviewData) => {
+  // reviewData should be an object like { rating, comment }
+  return api.post(`/products/${productId}/reviews`, reviewData);
 };
 
 // --- ORDER API CALLS ---
@@ -111,6 +92,26 @@ export const fetchOrderById = (orderId) => {
   return api.get(`/orders/${orderId}`);
 };
 
+// --- DEPARTMENT API CALLS ---
+export const fetchDepartments = () => {
+  return api.get("/departments");
+};
+
+export const fetchDepartmentById = (id) => {
+  return api.get(`/departments/${id}`);
+};
+
+// --- DROP API CALLS ---
+
+export const checkDropStatus = (name) => {
+  // This is to check if a drop is live based on its name and help in showing/hiding payment options on the frontend.
+  return api.post("/drops/status", { name });
+};
+
+export const getActiveDropDetails = () => {
+  return api.get("/drops/active");
+};
+
 // --- PAYMENT API CALLS ---
 export const createRazorpayOrder = (amount) => {
   return api.post("/payment/create-order", { amount });
@@ -120,92 +121,119 @@ export const verifyPayment = (paymentData) => {
   return api.post("/payment/verify", paymentData);
 };
 
+// --- PUBLIC SITE SETTINGS (NO AUTH REQUIRED) ---
+export const getPublicSiteSettings = () => {
+  return api.get("/settings/public");
+};
+
 // --- ADMIN API CALLS ---
 // These routes are protected by our 'adminOnly' middleware on the backend.
 
+// --- USER MANAGEMENT API CALLS (ADMIN) ---
 export const adminGetAllUsers = (params) => {
   return api.get("/admin/users", { params });
 };
-
-export const adminGetAllProducts = (params) => {
-  return api.get("/products", { params });
+export const adminGetUserById = (userId) => {
+  return api.get(`/admin/users/${userId}`);
 };
+export const adminRemoveCartItem = (userId, cartItemId) => {
+  return api.delete(`/admin/users/${userId}/cart/${cartItemId}`);
+};
+
+export const adminDeleteUser = (userId) => {
+  return api.delete(`/admin/users/${userId}`);
+};
+
+// --- PRODUCT MANAGEMENT API CALLS (ADMIN) ---
+export const adminGetAllProducts = (params) => {
+  return api.get("/admin/products", { params });
+};
+
+export const adminAddProduct = (productData) => {
+  return api.post("/admin/products", productData);
+};
+
+export const adminUpdateProduct = (productId, productData) => {
+  return api.put(`/admin/products/${productId}`, productData);
+};
+
+export const adminDeleteProduct = (productId) => {
+  return api.delete(`/admin/products/${productId}`);
+};
+
+// --- ORDER MANAGEMENT API CALLS (ADMIN) ---
 
 export const adminGetAllOrders = () => {
   return api.get("/admin/orders");
 };
 
+export const adminUpdateOrderStatus = (orderId, statusData) => {
+  // statusData will be an object like { status: 'Packed', details: { batchNumber: '123' } }
+  return api.put(`/admin/orders/${orderId}/status`, statusData);
+};
+
+// --- DASHBOARD STATS API CALL (ADMIN) ---
+
 export const fetchDashboardStats = () => {
   return api.get("/admin/stats");
 };
 
-export const adminGetUserById = (userId) => api.get(`/admin/users/${userId}`); // <-- NEW
-export const adminDeleteUser = (userId) => api.delete(`/admin/users/${userId}`); // <-- NEW
-export const adminRemoveCartItem = (userId, cartItemId) => {
-  return api.delete(`/admin/users/${userId}/cart/${cartItemId}`);
-};
-
-// --- ADD THESE NEW FUNCTIONS ---
-export const adminAddProduct = (productData) => {
-  return api.post("/products", productData);
-};
-
-export const adminUpdateProduct = (productId, productData) => {
-  return api.put(`/products/${productId}`, productData);
-};
-
-export const adminDeleteProduct = (productId) => {
-  return api.delete(`/products/${productId}`);
-};
-
-export const adminUpdateOrderStatus = (orderId, statusData) => {
-  // statusData will be an object like { status: 'Packed', details: { batchNumber: '123' } }
-  return api.put(`/orders/${orderId}/status`, statusData);
-};
+// --- DEPARTMENT MANAGEMENT API CALLS (ADMIN) ---
 
 export const adminGetAllDepartments = () => {
-  return api.get("/departments"); // This now fetches all departments for the admin view
+  return api.get("/admin/departments"); // This now fetches all departments for the admin view
 };
 
 export const adminCreateDepartment = (departmentData) => {
-  return api.post("/departments", departmentData);
+  return api.post("/admin/departments", departmentData);
 };
 
 export const adminUpdateDepartment = (id, departmentData) => {
-  return api.put(`/departments/${id}`, departmentData);
+  return api.put(`/admin/departments/${id}`, departmentData);
 };
 
 export const adminDeleteDepartment = (id) => {
-  return api.delete(`/departments/${id}`);
+  return api.delete(`/admin/departments/${id}`);
+};
+export const adminAddProductsToDepartment = (departmentId, productsId) => {
+  console.log(departmentId, productsId);
+  return api.put(`/admin/departments/${departmentId}/addProductsToDepartment`, {
+    productsId, // The body should contain an array of product IDs
+  });
+};
+
+export const adminRemoveProductsFromDepartment = (departmentId, productsId) => {
+  return api.put(
+    `/admin/departments/${departmentId}/removeProductsFromDepartment`,
+    {
+      productsId, // The body should contain an array of product IDs
+    }
+  );
 };
 // --- SITE SETTINGS API CALLS (ADMIN) ---
 export const adminGetSiteSettings = () => {
-  return api.get("/settings");
+  return api.get("/admin/settings");
 };
 
 export const adminUpdateSiteSettings = (settingsData) => {
-  return api.put("/settings", settingsData);
+  return api.put("/admin/settings", settingsData);
 };
 
 // --- DROP API CALLS (ADMIN) ---
 export const adminGetAllDrops = () => {
-  return api.get("/drops/all");
+  return api.get("/admin/drops/all");
 };
 
 export const adminCreateDrop = (dropData) => {
-  return api.post("/drops", dropData);
+  return api.post("/admin/drops", dropData);
 };
 
 export const adminUpdateDrop = (id, dropData) => {
-  return api.put(`/drops/${id}`, dropData);
+  return api.put(`/admin/drops/${id}`, dropData);
 };
 
 export const adminDeleteDrop = (id) => {
-  return api.delete(`/drops/${id}`);
+  return api.delete(`/admin/drops/${id}`);
 };
 
-// --- PUBLIC SITE SETTINGS (NO AUTH REQUIRED) ---
-export const getPublicSiteSettings = () => {
-  return api.get("/settings/public");
-};
 export default api;

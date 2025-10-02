@@ -19,6 +19,5 @@ router.get("/my-orders", getMyOrders);
 router.get("/:id", getOrderById);
 
 // Update an order's status (e.g., to "Shipped")
-router.put("/:id/status", adminOnly, updateOrderStatus);
 
 export default router;

@@ -11,18 +11,22 @@ const departmentSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      enum: ["IIT (ISM) Dhanbad"],
       // Example: "IIT (ISM) Dhanbad"
     },
     description: {
       type: String,
       trim: true,
     },
-    image: {
-      type: String, // URL for a department-specific banner or logo
-    },
+    products: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
     isActive: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   {

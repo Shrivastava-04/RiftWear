@@ -381,22 +381,19 @@ const UserDetailsModal = ({ userId, isOpen, onClose }) => {
                         <div className="flex items-center gap-3">
                           <img
                             src={
-                              variant?.colors.find(
-                                (c) => c.name === item.colorName
-                              )?.images[0] || ""
+                              item.product.image ||
+                              "https://placehold.co/48x48?text=N/A"
                             }
-                            alt={item.productId?.name}
+                            alt={item.product.productName}
                             className="w-12 h-12 object-cover rounded-md"
                           />
                           <div>
                             <p className="font-semibold">
-                              {item.productId?.name || (
-                                <span className="text-destructive">
-                                  Product Deleted
-                                </span>
-                              )}
+                              {item.product.productName}
                             </p>
-                            <p className="text-xs text-muted-foreground">{`Qty: ${item.quantity} | Size: ${item.size}`}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {`Qty: ${item.quantity} | Size: ${item.size} | ${item.product.variantName} | ${item.product.colorName}`}
+                            </p>
                           </div>
                         </div>
                         <AlertDialog>

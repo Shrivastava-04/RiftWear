@@ -11,7 +11,7 @@ const ProductCard = ({ product, comingSoonImage, comingSoonText }) => {
   if (!product) {
     return (
       <Card className="group product-card overflow-hidden border-border/50 bg-card/50 h-full w-full flex flex-col items-start justify-evenly">
-        <div className="relative aspect-square overflow-hidden ">
+        <div className="relative aspect-square overflow-hidden h-full w-full">
           {/* --- UPDATED: Uses the image URL from props --- */}
           <img
             src={
@@ -41,13 +41,11 @@ const ProductCard = ({ product, comingSoonImage, comingSoonText }) => {
   const defaultVariant = variants?.find(
     (variant) => variant.name === "Regular"
   );
-  console.log(defaultVariant);
   const defaultColor = defaultVariant?.colors?.find(
     (color) => color.name === "Black"
   );
-  console.log(defaultColor);
-  const price = defaultVariant?.price;
-  const originalPrice = defaultVariant?.originalPrice;
+  const price = defaultColor?.price;
+  const originalPrice = defaultColor?.originalPrice;
   const imageSrc = defaultColor?.images?.[0];
 
   return (

@@ -63,7 +63,8 @@ const ProductDetailsModal = ({ isOpen, onClose, product }) => {
   const selectedVariant = product.variants[selectedVariantIndex];
   const selectedColor = selectedVariant?.colors?.[selectedColorIndex];
   const displayedImages = selectedColor?.images || [];
-
+  console.log(selectedVariant);
+  console.log(selectedColor);
   // Handlers for navigation
   const handleVariantSelect = (index) => {
     setSelectedVariantIndex(index);
@@ -219,10 +220,10 @@ const ProductDetailsModal = ({ isOpen, onClose, product }) => {
             </div>
 
             <h3 className="text-2xl font-bold text-accent">
-              ₹{selectedVariant.price?.toFixed(2)}
-              {selectedVariant.originalPrice > selectedVariant.price && (
+              ₹{selectedColor.price?.toFixed(2)}
+              {selectedColor.originalPrice > selectedColor.price && (
                 <span className="text-base text-muted-foreground line-through ml-2">
-                  ₹{selectedVariant.originalPrice?.toFixed(2)}
+                  ₹{selectedColor.originalPrice?.toFixed(2)}
                 </span>
               )}
             </h3>
@@ -231,7 +232,7 @@ const ProductDetailsModal = ({ isOpen, onClose, product }) => {
             <div>
               <h4 className="text-sm font-medium mb-2">
                 Stock for:{" "}
-                <span className="font-bold text-primary">
+                <span className="font-bold text-white">
                   {selectedColor?.name || "N/A"}
                 </span>
               </h4>
@@ -272,8 +273,8 @@ const ProductDetailsModal = ({ isOpen, onClose, product }) => {
               </TabsContent>
               <TabsContent value="specs">
                 <ul className="text-sm space-y-1">
-                  {selectedVariant.specifications &&
-                    Object.entries(selectedVariant.specifications).map(
+                  {selectedColor.specifications &&
+                    Object.entries(selectedColor.specifications).map(
                       ([key, value]) => (
                         <li key={key} className="flex justify-between">
                           <span>{key}:</span>
@@ -287,7 +288,7 @@ const ProductDetailsModal = ({ isOpen, onClose, product }) => {
               </TabsContent>
               <TabsContent value="features">
                 <div className="flex flex-wrap gap-2">
-                  {selectedVariant.features?.map((feature, i) => (
+                  {selectedColor.features?.map((feature, i) => (
                     <Badge key={i} variant="outline">
                       {feature}
                     </Badge>
@@ -327,6 +328,13 @@ const ProductDetailsModal = ({ isOpen, onClose, product }) => {
                 </div>
               </TabsContent>
             </Tabs>
+            <div className="space-y-2">
+              <img
+                src={selectedVariant.sizeChart}
+                alt="Size Chart"
+                className="w-80"
+              />
+            </div>
           </div>
         </div>
       </DialogContent>

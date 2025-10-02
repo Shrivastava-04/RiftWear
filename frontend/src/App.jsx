@@ -24,6 +24,10 @@ import OrderManagement from "./pages/admin/OrderManagement";
 import DepartmentManagement from "./pages/admin/DepartmentManagement";
 import DropManagement from "./pages/admin/DropManagement";
 import SiteSettings from "./pages/admin/SiteSetting";
+import ShippingPolicy from "./pages/Shipping";
+import CancellationRefundPolicy from "./pages/Return";
+import TermsConditions from "./pages/TermsAndCondition";
+import PrivacyPolicy from "./pages/Privacy-Policy";
 // We'll create layout components like the Header next
 // import Header from './components/layout/Header';
 
@@ -50,6 +54,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      <Toaster />
     </AuthProvider>
   );
 }
@@ -70,6 +75,13 @@ const MainLayout = () => (
       />
       <Route path="/order/:orderId" element={<OrderDetail />} />
       <Route path="/order-failure" element={<OrderFailure />} />
+      <Route path="/shipping-policy" element={<ShippingPolicy />} />
+      <Route
+        path="/cancellation-refund-policy"
+        element={<CancellationRefundPolicy />}
+      />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-and-conditions" element={<TermsConditions />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
     {/* <Footer /> */}

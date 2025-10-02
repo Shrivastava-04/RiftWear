@@ -23,7 +23,7 @@
 // } from "@/components/ui/select";
 // import { adminAddProduct } from "../../api/apiService";
 
-// // --- Constants (copied from Edit Modal for consistency) ---
+// // --- Constants remain the same ---
 // const VARIANT_NAMES = ["Regular", "Oversized", "Polo", "Hoodie"];
 // const CATEGORY_TYPES = ["Fashion", "College Store"];
 // const FASHION_COLLECTIONS = ["Anime Collection", "Casuals", "Minimalist"];
@@ -44,7 +44,6 @@
 // const SIZES = ["S", "M", "L", "XL", "XXL"];
 // const ERROR_IMG_PLACEHOLDER = "https://placehold.co/64x64/222/fff?text=Invalid";
 
-// // --- Function to generate a clean, default state for a new product ---
 // const getInitialFormData = () => ({
 //   name: "",
 //   description: "",
@@ -89,14 +88,12 @@
 //   const [formData, setFormData] = useState(getInitialFormData());
 //   const [loading, setLoading] = useState(false);
 
-//   // Reset the form whenever the modal is opened
 //   useEffect(() => {
 //     if (isOpen) {
 //       setFormData(getInitialFormData());
 //     }
 //   }, [isOpen]);
 
-//   // Generic handler for nested state updates
 //   const handleNestedChange = (path, value) => {
 //     setFormData((prev) => {
 //       const newFormData = JSON.parse(JSON.stringify(prev));
@@ -121,7 +118,6 @@
 //     setFormData((prev) => ({ ...prev, category: newCategory }));
 //   };
 
-//   // Handlers for adding/removing dynamic array items
 //   const addItem = (path, defaultValue = "") => {
 //     const array = path.reduce((obj, key) => obj[key], formData) || [];
 //     handleNestedChange(path, [...array, defaultValue]);
@@ -158,12 +154,10 @@
 //     );
 //   };
 
-//   // --- Create Logic ---
 //   const handleCreate = async () => {
 //     setLoading(true);
 //     try {
 //       const payload = JSON.parse(JSON.stringify(formData));
-//       // Clean up data before sending
 //       payload.variants.forEach((variant) => {
 //         variant.features = variant.features.filter((f) => f && f.trim() !== "");
 //         if (variant.sizeChart)
@@ -206,7 +200,6 @@
 //           </DialogDescription>
 //         </DialogHeader>
 //         <div className="py-4 space-y-6">
-//           {/* Basic Info & Status */}
 //           <div className="p-4 border rounded-lg space-y-4">
 //             <h3 className="text-lg font-semibold">Basic Information</h3>
 //             <div className="grid md:grid-cols-2 gap-4">
@@ -249,7 +242,6 @@
 //             </div>
 //           </div>
 
-//           {/* Categorization */}
 //           <div className="p-4 border rounded-lg space-y-4">
 //             <h3 className="text-lg font-semibold">Categorization</h3>
 //             <div className="grid md:grid-cols-2 gap-4">
@@ -358,7 +350,6 @@
 //             </div>
 //           </div>
 
-//           {/* Variants */}
 //           <div className="space-y-4">
 //             <div className="flex justify-between items-center">
 //               <h3 className="text-lg font-semibold">Variants</h3>
@@ -668,6 +659,39 @@
 //               </div>
 //             ))}
 //           </div>
+
+//           {/* --- NEW: Display Settings Section --- */}
+//           <div className="p-4 border rounded-lg space-y-4">
+//             <h3 className="text-lg font-semibold">Display Settings</h3>
+//             <div className="grid sm:grid-cols-3 gap-4">
+//               <div className="flex items-center space-x-2">
+//                 <Switch
+//                   id="isNew"
+//                   checked={formData.isNew}
+//                   onCheckedChange={(c) => handleNestedChange(["isNew"], c)}
+//                 />
+//                 <Label htmlFor="isNew">New Arrival</Label>
+//               </div>
+//               <div className="flex items-center space-x-2">
+//                 <Switch
+//                   id="onSale"
+//                   checked={formData.onSale}
+//                   onCheckedChange={(c) => handleNestedChange(["onSale"], c)}
+//                 />
+//                 <Label htmlFor="onSale">On Sale</Label>
+//               </div>
+//               <div className="flex items-center space-x-2">
+//                 <Switch
+//                   id="forHomePage"
+//                   checked={formData.forHomePage}
+//                   onCheckedChange={(c) =>
+//                     handleNestedChange(["forHomePage"], c)
+//                   }
+//                 />
+//                 <Label htmlFor="forHomePage">Show on Home Page</Label>
+//               </div>
+//             </div>
+//           </div>
 //         </div>
 //         <DialogFooter>
 //           <Button onClick={onClose} variant="outline">
@@ -690,7 +714,6 @@
 // };
 
 // export default AddProductModal;
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -737,12 +760,13 @@ const DEPARTMENTS = [
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 const ERROR_IMG_PLACEHOLDER = "https://placehold.co/64x64/222/fff?text=Invalid";
 
+// --- UPDATED: Initial form data now matches the new schema structure ---
 const getInitialFormData = () => ({
   name: "",
   description: "",
   category: {
     type: "Fashion",
-    collection: null,
+    // 'collection' is removed from the data model
     subCollection: null,
     college: null,
     department: null,
@@ -750,40 +774,47 @@ const getInitialFormData = () => ({
   variants: [
     {
       name: "Regular",
-      price: 0,
-      originalPrice: 0,
-      features: ["100% Cotton"],
-      specifications: {
-        Material: "Cotton",
-        Weight: "180GSM",
-        Fit: "Regular",
-        Care: "Machine Wash",
-      },
       sizeChart: [],
+      // Price, features, specs, etc., are now inside each color
       colors: [
         {
           name: "",
+          price: 0,
+          originalPrice: 0,
           images: [],
           stock: SIZES.map((size) => ({ size, quantity: 0 })),
+          // Default values for the first color
+          features: ["Pure Fabric", "Stylish Design"],
+          specifications: {
+            Material: "100% Cotton",
+            Weight: "180 GSM",
+            Fit: "Round Neck, Regular Fit",
+            Care: "Machine Washed",
+          },
         },
       ],
     },
   ],
   isActive: true,
-  sortPriority: 99,
+  sortPriority: 999,
   isNew: true,
   onSale: false,
-  forHomePage: false,
+  // 'forHomePage' is removed
 });
 
 const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState(getInitialFormData());
   const [loading, setLoading] = useState(false);
+  // --- UPDATED: Local state to manage the UI-only "Fashion Collection" dropdown
+  const [selectedFashionCollection, setSelectedFashionCollection] =
+    useState("Casuals");
 
   useEffect(() => {
+    // Reset form state and UI state when the modal opens
     if (isOpen) {
       setFormData(getInitialFormData());
+      setSelectedFashionCollection("Casuals");
     }
   }, [isOpen]);
 
@@ -802,19 +833,27 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
   const handleCategoryChange = (field, value) => {
     const newCategory = { ...formData.category, [field]: value };
     if (field === "type") {
-      newCategory.collection = null;
+      // Clear all sub-fields when type changes
       newCategory.subCollection = null;
       newCategory.college = null;
       newCategory.department = null;
+      setSelectedFashionCollection(""); // Reset UI dropdown
     }
-    if (field === "collection") newCategory.subCollection = null;
     setFormData((prev) => ({ ...prev, category: newCategory }));
+  };
+
+  // --- UPDATED: New handler for the UI-only collection dropdown
+  const handleFashionCollectionChange = (value) => {
+    setSelectedFashionCollection(value);
+    // When the UI collection changes, reset the actual subCollection data
+    handleCategoryChange("subCollection", null);
   };
 
   const addItem = (path, defaultValue = "") => {
     const array = path.reduce((obj, key) => obj[key], formData) || [];
     handleNestedChange(path, [...array, defaultValue]);
   };
+
   const removeItem = (path, index) => {
     const array = path.reduce((obj, key) => obj[key], formData);
     handleNestedChange(
@@ -824,22 +863,30 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
   };
 
   const addVariant = () => {
+    // --- UPDATED: New variant is simpler; details are in the color
     const newVariant = {
       name: "Regular",
-      price: 0,
-      originalPrice: 0,
-      features: [],
-      specifications: { Material: "", Weight: "", Fit: "", Care: "" },
       sizeChart: [],
       colors: [],
     };
     handleNestedChange(["variants"], [...formData.variants, newVariant]);
   };
+
   const addColor = (vIndex) => {
+    // --- UPDATED: New color now includes all necessary fields with your specified defaults
     const newColor = {
       name: "",
+      price: 0,
+      originalPrice: 0,
       images: [],
       stock: SIZES.map((s) => ({ size: s, quantity: 0 })),
+      features: ["Pure Fabric", "Stylish Design"],
+      specifications: {
+        Material: "100% Cotton",
+        Weight: "180 GSM",
+        Fit: "Round Neck, Regular Fit",
+        Care: "Machine Washed",
+      },
     };
     handleNestedChange(
       ["variants", vIndex, "colors"],
@@ -851,13 +898,14 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
     setLoading(true);
     try {
       const payload = JSON.parse(JSON.stringify(formData));
+      // --- UPDATED: Payload cleaning logic moved to iterate through colors
       payload.variants.forEach((variant) => {
-        variant.features = variant.features.filter((f) => f && f.trim() !== "");
         if (variant.sizeChart)
           variant.sizeChart = variant.sizeChart.filter(
             (url) => url && url.trim() !== ""
           );
         variant.colors.forEach((color) => {
+          color.features = color.features.filter((f) => f && f.trim() !== "");
           color.stock = color.stock.filter((s) => s.quantity > 0);
           color.images = color.images.filter((img) => img && img.trim() !== "");
         });
@@ -910,7 +958,7 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                   type="number"
                   value={formData.sortPriority}
                   onChange={(e) =>
-                    handleNestedChange(["sortPriority"], e.target.value)
+                    handleNestedChange(["sortPriority"], Number(e.target.value))
                   }
                 />
               </div>
@@ -956,12 +1004,13 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                   </SelectContent>
                 </Select>
               </div>
+              {/* --- UPDATED: Fashion Collection dropdown now uses local state --- */}
               {formData.category.type === "Fashion" && (
                 <div>
                   <Label>Collection</Label>
                   <Select
-                    value={formData.category.collection || ""}
-                    onValueChange={(v) => handleCategoryChange("collection", v)}
+                    value={selectedFashionCollection}
+                    onValueChange={handleFashionCollectionChange}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select..." />
@@ -976,7 +1025,8 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                   </Select>
                 </div>
               )}
-              {formData.category.collection === "Anime Collection" && (
+              {/* --- UPDATED: Sub-collection visibility depends on local state --- */}
+              {selectedFashionCollection === "Anime Collection" && (
                 <div>
                   <Label>Sub-Collection</Label>
                   <Select
@@ -1070,7 +1120,7 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                 >
                   <X className="h-4 w-4" />
                 </Button>
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <Label>Variant Name</Label>
                     <Select
@@ -1090,72 +1140,6 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div>
-                    <Label>Price</Label>
-                    <Input
-                      type="number"
-                      value={variant.price}
-                      onChange={(e) =>
-                        handleNestedChange(
-                          ["variants", vIndex, "price"],
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label>Original Price</Label>
-                    <Input
-                      type="number"
-                      value={variant.originalPrice}
-                      onChange={(e) =>
-                        handleNestedChange(
-                          ["variants", vIndex, "originalPrice"],
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="p-3 border rounded-md bg-background space-y-4">
-                  <div>
-                    <Label>Features</Label>
-                    {variant.features.map((feat, fIndex) => (
-                      <div
-                        key={fIndex}
-                        className="flex items-center gap-2 mb-2"
-                      >
-                        <Input
-                          value={feat}
-                          onChange={(e) =>
-                            handleNestedChange(
-                              ["variants", vIndex, "features", fIndex],
-                              e.target.value
-                            )
-                          }
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            removeItem(["variants", vIndex, "features"], fIndex)
-                          }
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => addItem(["variants", vIndex, "features"])}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Feature
-                    </Button>
                   </div>
                   <div>
                     <Label>Size Chart URL</Label>
@@ -1183,26 +1167,8 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                       )}
                     </div>
                   </div>
-                  <div>
-                    <Label>Specifications</Label>
-                    <div className="grid md:grid-cols-2 gap-2">
-                      {Object.keys(variant.specifications).map((key) => (
-                        <div key={key}>
-                          <Label className="text-xs font-normal">{key}</Label>
-                          <Input
-                            value={variant.specifications[key]}
-                            onChange={(e) =>
-                              handleNestedChange(
-                                ["variants", vIndex, "specifications", key],
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
+
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium">Colors & Stock</h4>
@@ -1232,19 +1198,153 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                       >
                         <X className="h-3 w-3" />
                       </Button>
-                      <div>
-                        <Label>Color Name</Label>
-                        <Input
-                          placeholder="e.g., Midnight Black"
-                          value={color.name}
-                          onChange={(e) =>
-                            handleNestedChange(
-                              ["variants", vIndex, "colors", cIndex, "name"],
-                              e.target.value
-                            )
-                          }
-                        />
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div>
+                          <Label>Color Name</Label>
+                          <Input
+                            placeholder="e.g., Midnight Black"
+                            value={color.name}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                ["variants", vIndex, "colors", cIndex, "name"],
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        {/* --- UPDATED: Price inputs moved to the color level --- */}
+                        <div>
+                          <Label>Price</Label>
+                          <Input
+                            type="number"
+                            value={color.price}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                ["variants", vIndex, "colors", cIndex, "price"],
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label>Original Price</Label>
+                          <Input
+                            type="number"
+                            value={color.originalPrice}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                [
+                                  "variants",
+                                  vIndex,
+                                  "colors",
+                                  cIndex,
+                                  "originalPrice",
+                                ],
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </div>
                       </div>
+
+                      {/* --- UPDATED: Features and Specs moved inside the color block --- */}
+                      <div className="p-3 border rounded-md bg-muted/20 space-y-4">
+                        <div>
+                          <Label>Features</Label>
+                          {color.features.map((feat, fIndex) => (
+                            <div
+                              key={fIndex}
+                              className="flex items-center gap-2 mb-2"
+                            >
+                              <Input
+                                value={feat}
+                                onChange={(e) =>
+                                  handleNestedChange(
+                                    [
+                                      "variants",
+                                      vIndex,
+                                      "colors",
+                                      cIndex,
+                                      "features",
+                                      fIndex,
+                                    ],
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() =>
+                                  removeItem(
+                                    [
+                                      "variants",
+                                      vIndex,
+                                      "colors",
+                                      cIndex,
+                                      "features",
+                                    ],
+                                    fIndex
+                                  )
+                                }
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              addItem(
+                                [
+                                  "variants",
+                                  vIndex,
+                                  "colors",
+                                  cIndex,
+                                  "features",
+                                ],
+                                "New Feature"
+                              )
+                            }
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Feature
+                          </Button>
+                        </div>
+
+                        <div>
+                          <Label>Specifications</Label>
+                          <div className="grid md:grid-cols-2 gap-2">
+                            {Object.keys(color.specifications).map((key) => (
+                              <div key={key}>
+                                <Label className="text-xs font-normal">
+                                  {key}
+                                </Label>
+                                <Input
+                                  value={color.specifications[key]}
+                                  onChange={(e) =>
+                                    handleNestedChange(
+                                      [
+                                        "variants",
+                                        vIndex,
+                                        "colors",
+                                        cIndex,
+                                        "specifications",
+                                        key,
+                                      ],
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
                       <div>
                         <Label>Stock Quantities</Label>
                         <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
@@ -1353,10 +1453,9 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
             ))}
           </div>
 
-          {/* --- NEW: Display Settings Section --- */}
           <div className="p-4 border rounded-lg space-y-4">
             <h3 className="text-lg font-semibold">Display Settings</h3>
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
                 <Switch
                   id="isNew"
@@ -1373,16 +1472,7 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
                 />
                 <Label htmlFor="onSale">On Sale</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="forHomePage"
-                  checked={formData.forHomePage}
-                  onCheckedChange={(c) =>
-                    handleNestedChange(["forHomePage"], c)
-                  }
-                />
-                <Label htmlFor="forHomePage">Show on Home Page</Label>
-              </div>
+              {/* --- UPDATED: Removed 'forHomePage' switch --- */}
             </div>
           </div>
         </div>

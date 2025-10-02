@@ -2,6 +2,7 @@ import Product from "./product.model.js";
 import User from "../users/user.model.js"; // Needed for reviews
 import Order from "../orders/order.model.js"; // Needed for safe deletion
 import mongoose from "mongoose";
+import Department from "../departments/department.model.js";
 
 // --- PUBLIC: Functions for any user ---
 
@@ -16,8 +17,8 @@ export const getAllProducts = async (req, res) => {
   try {
     const {
       categoryType,
-      sortBy = "createdAt",
-      sortOrder = "desc",
+      sortBy = "sortPriority", // Default sort by admin-defined priority
+      sortOrder = "asc",
       isActive = "all",
     } = req.query;
     const filter = {};
@@ -39,7 +40,7 @@ export const getAllProducts = async (req, res) => {
       sort[sortBy] = sortOrder === "asc" ? 1 : -1;
     }
 
-    const products = await Product.find(filter).sort(sort).select("-reviews");
+    const products = await Product.find(filter).sort(sort);
 
     res.status(200).json({ success: true, products });
   } catch (error) {
@@ -60,7 +61,7 @@ export const getProductById = async (req, res) => {
       return res.status(400).json({ message: "Invalid product ID format." });
     }
 
-    const product = await Product.findById(id).populate("reviews.user", "name");
+    const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
@@ -131,6 +132,16 @@ export const addProduct = async (req, res) => {
     // The request body should match the structure of the product model
     const newProduct = new Product(req.body);
     const savedProduct = await newProduct.save();
+    if (newProduct.category.type === "College Store") {
+      const department = await Department.findOne({
+        name: newProduct.category.department,
+        college: newProduct.category.college,
+      });
+      if (department) {
+        department.products.push(savedProduct._id);
+        await department.save();
+      }
+    }
     res.status(201).json({
       success: true,
       message: "Product created successfully.",

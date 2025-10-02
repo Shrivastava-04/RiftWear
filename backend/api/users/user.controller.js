@@ -11,7 +11,7 @@ export const getUserProfile = async (req, res) => {
     const user = await User.findById(req.user._id)
       .select("-password -__v ") // Clean up the response
       .populate({
-        path: "cart.productId",
+        path: "cart.product.productId",
         model: "Product",
         select: "name images price", // Populate with only necessary product fields
       })
@@ -58,22 +58,34 @@ export const updateUserProfile = async (req, res) => {
 };
 
 // --- Address Management ---
-
 export const addAddress = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // If this is the first address, make it the default
-    if (user.addresses.length === 0) {
-      req.body.isDefault = true;
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    user.addresses.push(req.body); // Assumes body matches addressSchema
+    const newAddress = req.body;
+
+    // If this is the first address, force it to be the default.
+    if (user.addresses.length === 0) {
+      newAddress.isDefault = true;
+    }
+    // If the new address is set to default, unset any other default address.
+    else if (newAddress.isDefault) {
+      user.addresses.forEach((addr) => {
+        if (addr.isDefault) {
+          addr.isDefault = false;
+        }
+      });
+    }
+
+    user.addresses.push(newAddress);
     await user.save();
+
     res.status(201).json({
       success: true,
-      message: "Address added.",
+      message: "Address added successfully.",
       addresses: user.addresses,
     });
   } catch (error) {
@@ -84,25 +96,72 @@ export const addAddress = async (req, res) => {
   }
 };
 
+// export const addAddress = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user._id);
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     // If this is the first address, make it the default
+//     if (user.addresses.length === 0) {
+//       req.body.isDefault = true;
+//     }
+
+//     user.addresses.push(req.body); // Assumes body matches addressSchema
+//     await user.save();
+//     res.status(201).json({
+//       success: true,
+//       message: "Address added.",
+//       addresses: user.addresses,
+//     });
+//   } catch (error) {
+//     console.error("Add Address Error:", error);
+//     res
+//       .status(400)
+//       .json({ message: "Error adding address.", error: error.message });
+//   }
+// };
+
 export const deleteAddress = async (req, res) => {
   try {
-    const { addressId } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(addressId)) {
-      return res.status(400).json({ message: "Invalid address ID." });
-    }
     const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    user.addresses.pull({ _id: addressId });
+    const { addressId } = req.params;
+
+    // Find the specific subdocument to check its properties before removing
+    const addressToDelete = user.addresses.id(addressId);
+
+    if (!addressToDelete) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    const wasDefault = addressToDelete.isDefault;
+
+    // Use Mongoose's .pull() method to stage the removal of the subdocument.
+    // This is the modern and correct way to do this.
+    user.addresses.pull(addressId);
+
+    // If the deleted address was the default, and there are addresses remaining,
+    // make the first remaining address the new default.
+    if (wasDefault && user.addresses.length > 0) {
+      user.addresses[0].isDefault = true;
+    }
+
+    // Save the parent document. This will commit the .pull() operation to the database.
     await user.save();
+
     res.status(200).json({
       success: true,
-      message: "Address deleted.",
+      message: "Address deleted successfully.",
       addresses: user.addresses,
     });
   } catch (error) {
     console.error("Delete Address Error:", error);
-    res.status(500).json({ message: "Error deleting address." });
+    res
+      .status(500)
+      .json({ message: "Error deleting address.", error: error.message });
   }
 };
 
@@ -110,17 +169,55 @@ export const deleteAddress = async (req, res) => {
 
 export const getCart = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id)
-      .populate({
-        path: "cart.productId",
-        model: "Product",
-      })
-      .select("cart"); // Only send back the cart array
-
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
-    res.status(200).json({ success: true, cart: user.cart });
+    if (user.cart.length === 0) {
+      return res.status(200).json({ success: true, cart: [] });
+    }
+
+    const detailedCart = await Promise.all(
+      user.cart.map(async (item) => {
+        const productDoc = await Product.findById(
+          item.product.productId
+        ).lean();
+        if (!productDoc) return null; // Handle case where product might be deleted
+
+        const variantDoc = productDoc.variants.find((v) =>
+          v._id.equals(item.product.variantId)
+        );
+        if (!variantDoc) return null;
+
+        const colorDoc = variantDoc.colors.find((c) =>
+          c._id.equals(item.product.colorId)
+        );
+        if (!colorDoc) return null;
+
+        // Construct the final, detailed cart item object
+        return {
+          _id: item._id, // The cart item's unique ID
+          product: {
+            productId: productDoc._id,
+            productName: productDoc.name,
+            variantId: variantDoc._id,
+            variantName: variantDoc.name,
+            colorId: colorDoc._id,
+            // --- Populated Color Details ---
+            colorName: colorDoc.name,
+            images: colorDoc.images,
+            price: colorDoc.price,
+          },
+          size: item.size,
+          quantity: item.quantity,
+          nameToPrint: item.nameToPrint,
+        };
+      })
+    );
+
+    const populatedCart = detailedCart.filter(Boolean);
+
+    res.status(200).json({ success: true, cart: populatedCart });
   } catch (error) {
     console.error("Get Cart Error:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -129,11 +226,12 @@ export const getCart = async (req, res) => {
 
 export const addToCart = async (req, res) => {
   try {
-    const { productId, variantId, size, colorName, quantity, nameToPrint } =
+    const { productId, variantId, colorId, size, quantity, nameToPrint } =
       req.body;
     const userId = req.user._id;
 
-    if (!productId || !variantId || !size || !colorName || !quantity) {
+    if (!productId || !variantId || !colorId || !size || !quantity) {
+      console.log("done");
       return res.status(400).json({ message: "Missing required cart fields." });
     }
 
@@ -152,36 +250,68 @@ export const addToCart = async (req, res) => {
 
     const existingItem = user.cart.find(
       (item) =>
-        item.productId.equals(productId) &&
-        item.variantId.equals(variantId) &&
-        item.size === size &&
-        item.colorName === colorName
+        item.product.productId.equals(productId) &&
+        item.product.variantId.equals(variantId) &&
+        item.product.colorId.equals(colorId) &&
+        item.size === size
     );
 
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
       user.cart.push({
-        productId,
-        variantId,
+        product: { productId, variantId, colorId },
         size,
-        colorName,
         quantity,
         nameToPrint,
       });
     }
 
+    user.markModified("cart");
     await user.save();
-    const populatedUser = await user.populate({
-      path: "cart.productId",
-      model: "Product",
-      select: "name images price",
-    });
+    const detailedCart = await Promise.all(
+      user.cart.map(async (item) => {
+        const productDoc = await Product.findById(
+          item.product.productId
+        ).lean();
+        if (!productDoc) return null; // Handle case where product might be deleted
 
+        const variantDoc = productDoc.variants.find((v) =>
+          v._id.equals(item.product.variantId)
+        );
+        if (!variantDoc) return null;
+
+        const colorDoc = variantDoc.colors.find((c) =>
+          c._id.equals(item.product.colorId)
+        );
+        if (!colorDoc) return null;
+
+        // Construct the final, detailed cart item object
+        return {
+          _id: item._id, // The cart item's unique ID
+          product: {
+            productId: productDoc._id,
+            productName: productDoc.name,
+            variantId: variantDoc._id,
+            variantName: variantDoc.name,
+            colorId: colorDoc._id,
+            // --- Populated Color Details ---
+            colorName: colorDoc.name,
+            images: colorDoc.images,
+            price: colorDoc.price,
+          },
+          size: item.size,
+          quantity: item.quantity,
+          nameToPrint: item.nameToPrint,
+        };
+      })
+    );
+
+    const populatedCart = detailedCart.filter(Boolean);
     res.status(200).json({
       success: true,
       message: "Item added to cart.",
-      cart: populatedUser.cart,
+      cart: populatedCart,
     });
   } catch (error) {
     console.error("Add to Cart Error:", error);
@@ -218,16 +348,50 @@ export const updateCartItem = async (req, res) => {
     }
 
     await user.save();
-    const populatedUser = await user.populate({
-      path: "cart.productId",
-      model: "Product",
-      select: "name images price",
-    });
+    const detailedCart = await Promise.all(
+      user.cart.map(async (item) => {
+        const productDoc = await Product.findById(
+          item.product.productId
+        ).lean();
+        if (!productDoc) return null; // Handle case where product might be deleted
+
+        const variantDoc = productDoc.variants.find((v) =>
+          v._id.equals(item.product.variantId)
+        );
+        if (!variantDoc) return null;
+
+        const colorDoc = variantDoc.colors.find((c) =>
+          c._id.equals(item.product.colorId)
+        );
+        if (!colorDoc) return null;
+
+        // Construct the final, detailed cart item object
+        return {
+          _id: item._id, // The cart item's unique ID
+          product: {
+            productId: productDoc._id,
+            productName: productDoc.name,
+            variantId: variantDoc._id,
+            variantName: variantDoc.name,
+            colorId: colorDoc._id,
+            // --- Populated Color Details ---
+            colorName: colorDoc.name,
+            images: colorDoc.images,
+            price: colorDoc.price,
+          },
+          size: item.size,
+          quantity: item.quantity,
+          nameToPrint: item.nameToPrint,
+        };
+      })
+    );
+
+    const populatedCart = detailedCart.filter(Boolean);
 
     res.status(200).json({
       success: true,
       message: "Cart updated.",
-      cart: populatedUser.cart,
+      cart: populatedCart,
     });
   } catch (error) {
     console.error("Update Cart Error:", error);
@@ -246,16 +410,50 @@ export const deleteCartItem = async (req, res) => {
     user.cart.pull({ _id: cartItemId }); // Use Mongoose's .pull() method
 
     await user.save();
-    const populatedUser = await user.populate({
-      path: "cart.productId",
-      model: "Product",
-      select: "name images price",
-    });
+    const detailedCart = await Promise.all(
+      user.cart.map(async (item) => {
+        const productDoc = await Product.findById(
+          item.product.productId
+        ).lean();
+        if (!productDoc) return null; // Handle case where product might be deleted
+
+        const variantDoc = productDoc.variants.find((v) =>
+          v._id.equals(item.product.variantId)
+        );
+        if (!variantDoc) return null;
+
+        const colorDoc = variantDoc.colors.find((c) =>
+          c._id.equals(item.product.colorId)
+        );
+        if (!colorDoc) return null;
+
+        // Construct the final, detailed cart item object
+        return {
+          _id: item._id, // The cart item's unique ID
+          product: {
+            productId: productDoc._id,
+            productName: productDoc.name,
+            variantId: variantDoc._id,
+            variantName: variantDoc.name,
+            colorId: colorDoc._id,
+            // --- Populated Color Details ---
+            colorName: colorDoc.name,
+            images: colorDoc.images,
+            price: colorDoc.price,
+          },
+          size: item.size,
+          quantity: item.quantity,
+          nameToPrint: item.nameToPrint,
+        };
+      })
+    );
+
+    const populatedCart = detailedCart.filter(Boolean);
 
     res.status(200).json({
       success: true,
       message: "Item removed from cart.",
-      cart: populatedUser.cart,
+      cart: populatedCart,
     });
   } catch (error) {
     console.error("Delete Cart Item Error:", error);
@@ -310,10 +508,48 @@ export const removeFromWishlist = async (req, res) => {
 
 export const getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ customer: req.user._id }).sort({
-      createdAt: -1,
-    });
-    res.status(200).json({ success: true, orders });
+    const orders = await Order.find({ customer: req.user._id })
+      .sort({
+        createdAt: -1,
+      })
+      .lean();
+
+    if (!orders || orders.length === 0) {
+      return res.status(200).json({ success: true, orders: [] });
+    }
+
+    const detailedOrders = await Promise.all(
+      orders.map(async (order) => {
+        const detailedItems = await Promise.all(
+          order.items.map(async (item) => {
+            const productDoc = await Product.findById(
+              item.product.productId
+            ).lean();
+            if (!productDoc) {
+              return {
+                ...item,
+                productName: "Product Not Found",
+                image: "",
+              };
+            }
+            const variantDoc = productDoc.variants.find((v) =>
+              v._id.equals(item.product.variantId)
+            );
+            const colorDoc = variantDoc?.colors.find((c) =>
+              c._id.equals(item.product.colorId)
+            );
+            return {
+              ...item,
+              productName: productDoc.name,
+              image: colorDoc?.images[0] || "",
+            };
+          })
+        );
+        return { ...order, items: detailedItems };
+      })
+    );
+
+    res.status(200).json({ success: true, orders: detailedOrders });
   } catch (error) {
     console.error("Get Orders Error:", error);
     res.status(500).json({ message: "Server error fetching orders." });
@@ -334,7 +570,7 @@ export const canUserReviewProduct = async (req, res) => {
     const order = await Order.findOne({
       customer: userId,
       orderStatus: "Delivered",
-      "items.productId": productId,
+      "items.product.productId": productId,
     });
 
     if (!order) {
