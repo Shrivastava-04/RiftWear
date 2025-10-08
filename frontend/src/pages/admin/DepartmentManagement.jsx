@@ -148,6 +148,7 @@ const DepartmentFormModal = ({ isOpen, onClose, department, onSave }) => {
 
 // --- NEW Sub-component for Managing Products in a Department ---
 const ManageProductsModal = ({ isOpen, onClose, department, onUpdate }) => {
+  // console.log(department);
   const { toast } = useToast();
   const [allProducts, setAllProducts] = useState([]);
   const [assignedIds, setAssignedIds] = useState(new Set());
@@ -204,6 +205,8 @@ const ManageProductsModal = ({ isOpen, onClose, department, onUpdate }) => {
         (id) => !currentIds.has(id)
       );
 
+      console.log(productsToAdd, productsToRemove);
+
       const promises = [];
       if (productsToAdd.length > 0) {
         console.log(department._id);
@@ -212,6 +215,7 @@ const ManageProductsModal = ({ isOpen, onClose, department, onUpdate }) => {
         );
       }
       if (productsToRemove.length > 0) {
+        console.log(department);
         promises.push(
           adminRemoveProductsFromDepartment(department._id, productsToRemove)
         );
@@ -222,6 +226,7 @@ const ManageProductsModal = ({ isOpen, onClose, department, onUpdate }) => {
       onUpdate(); // Refresh the main department list
       onClose();
     } catch (err) {
+      console.log(err);
       toast({
         title: "Error",
         description: "Failed to save changes.",

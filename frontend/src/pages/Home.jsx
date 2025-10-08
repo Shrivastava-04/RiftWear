@@ -108,7 +108,7 @@ const FeaturedProductsSection = ({ comingSoonInfo }) => {
           ) : (
             <>
               {products.map((p) => (
-                <ProductCard key={p._id} product={p} />
+                <ProductCard key={p._id} product={p.productCard} id={p._id} />
               ))}
               {/* --- UPDATED: Pass dynamic data to placeholder cards --- */}
               {placeholders.map((_, i) => (
@@ -145,7 +145,6 @@ const SpecialCollectionSection = ({ comingSoonInfo }) => {
   const placeholdersNeeded =
     products.length % columns === 0 ? 0 : columns - (products.length % columns);
   const placeholders = Array.from({ length: placeholdersNeeded });
-  console.log(products);
   return (
     <section className="py-20 bg-primary/5">
       <div className="container mx-auto px-4">
@@ -163,7 +162,7 @@ const SpecialCollectionSection = ({ comingSoonInfo }) => {
           ) : (
             <>
               {products.map((p) => (
-                <ProductCard key={p._id} product={p} />
+                <ProductCard key={p._id} product={p.productCard} id={p._id} />
               ))}
               {/* --- UPDATED: Pass dynamic data to placeholder cards --- */}
               {placeholders.map((_, i) => (
@@ -194,17 +193,22 @@ const DepartmentsSection = ({ comingSoonInfo }) => {
     queryFn: () => fetchProducts({ categoryType: "College Store" }),
   });
 
-  const departments = deptsResponse?.data?.departments || [];
+  const departments =
+    deptsResponse?.data?.departments.filter((a) => a.isActive) || [];
   const products = prodsResponse?.data?.products || [];
 
   const departmentsWithProducts = departments
     .map((dept) => {
-      const firstProduct = products.find(
-        (p) =>
-          p.category.department === dept.name &&
-          p.category.college === dept.college
-      );
-      return { department: dept, product: firstProduct || null };
+      if (dept.products.length === 0) {
+        return { department: dept, product: null };
+      } else {
+        const firstProduct = products.find(
+          (p) =>
+            p.category.college === dept.college &&
+            p.category.department === dept.name
+        );
+        return { department: dept, product: firstProduct || null };
+      }
     })
     .sort((a, b) => {
       if (a.product && !b.product) return -1;
@@ -240,7 +244,8 @@ const DepartmentsSection = ({ comingSoonInfo }) => {
                 <DepartmentProductCard
                   key={department._id}
                   department={department}
-                  product={product}
+                  product={product?.productCard}
+                  id={product?._id}
                   // --- UPDATED: Pass the dynamic image to the department "coming soon" cards ---
                   comingSoonImage={comingSoonInfo?.image}
                 />

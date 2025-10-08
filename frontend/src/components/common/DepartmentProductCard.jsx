@@ -5,7 +5,12 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 // The static import is now removed:
 // import comingSoonImage from "../../assets/coming soon image 2.png";
 
-const DepartmentProductCard = ({ department, product, comingSoonImage }) => {
+const DepartmentProductCard = ({
+  department,
+  product,
+  comingSoonImage,
+  id,
+}) => {
   // --- Case 1: No product for this department, so render "Coming Soon" ---
   if (!product) {
     return (
@@ -37,23 +42,23 @@ const DepartmentProductCard = ({ department, product, comingSoonImage }) => {
   }
 
   // --- Case 2: A product was found, so render the full card (No changes needed here) ---
-  const { _id, name, isNew, onSale, variants } = product;
-  const defaultVariant = variants?.find(
-    (variant) => variant.name === "Regular"
-  );
-  const defaultColor = defaultVariant?.colors?.find(
-    (color) => color.name === "Black"
-  );
-  const price = defaultColor?.price;
-  const originalPrice = defaultColor?.originalPrice;
-  const imageSrc = defaultColor?.images?.[0];
+  const { name, isNew, onSale, price, originalPrice, image } = product;
+  // const defaultVariant = variants?.find(
+  //   (variant) => variant.name === "Regular"
+  // );
+  // const defaultColor = defaultVariant?.colors?.find(
+  //   (color) => color.name === "Black"
+  // );
+  // const price = defaultColor?.price;
+  // const originalPrice = defaultColor?.originalPrice;
+  // const imageSrc = defaultColor?.images?.[0];
 
   return (
-    <Link to={`/product/${_id}`}>
+    <Link to={`/product/${id}`}>
       <Card className="group flex-shrink-0 w-56 bg-card/50 border-border/50 overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 hover:cursor-pointer">
         <div className="relative overflow-hidden">
           <img
-            src={imageSrc}
+            src={image}
             alt={name}
             className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />

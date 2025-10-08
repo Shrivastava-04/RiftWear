@@ -125,6 +125,8 @@ export const removeProductFromDepartment = async (req, res) => {
   try {
     const { departmentId } = req.params;
     const { productsId } = req.body; // Array of product IDs to remove
+    // console.log(productsId);
+    console.log(departmentId);
 
     // --- 1. Validation ---
     if (!mongoose.Types.ObjectId.isValid(departmentId)) {

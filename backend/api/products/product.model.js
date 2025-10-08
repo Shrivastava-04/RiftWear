@@ -26,6 +26,19 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const productCardSchema = new mongoose.Schema(
+  {
+    name: { type: String, require: true, default: "" },
+    image: { type: String, require: true, default: "" },
+    price: { type: Number, require: true, default: 0 },
+    originalPrice: { type: Number, require: true, default: 0 },
+    isNew: { type: Boolean, default: true },
+    onSale: { type: Boolean, default: true },
+    sortPriority: { type: Number, default: 999 },
+  },
+  { timestamps: true }
+);
+
 // --- Sub-sub-schema for colors and sizes within a variant ---
 const colorSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
@@ -156,6 +169,9 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    // --- New object for Product Card Display ----
+    productCard: { type: productCardSchema, require: true },
   },
   { timestamps: true }
 );

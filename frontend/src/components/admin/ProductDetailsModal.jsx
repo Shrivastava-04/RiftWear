@@ -328,13 +328,46 @@ const ProductDetailsModal = ({ isOpen, onClose, product }) => {
                 </div>
               </TabsContent>
             </Tabs>
+
+            {/* Size Chart */}
             <div className="space-y-2">
+              <h3 className="text-2xl font-bold text-accent">Size Chart</h3>
               <img
                 src={selectedVariant.sizeChart}
                 alt="Size Chart"
                 className="w-80"
               />
             </div>
+
+            {product?.productCard && (
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold text-accent">
+                  Product Card Details
+                </h3>
+                <div className="flex items-center justify-evenly w-fit ">
+                  <div className="flex flex-col items-start justify-evenly w-fit ">
+                    <span>Name: {product.productCard.name}</span>
+                    <span>Price: {product.productCard.price}</span>
+                    <span>
+                      Original Price: {product.productCard.originalPrice}
+                    </span>
+                    <span>
+                      Is New: {product.productCard.isNew ? "true" : "false"}
+                    </span>
+                    <span>
+                      For Sale: {product.productCard.forSale ? "true" : "false"}
+                    </span>
+                  </div>
+                  <div>
+                    <img
+                      src={product.productCard.image}
+                      alt="Product Card Image"
+                      className="w-60"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

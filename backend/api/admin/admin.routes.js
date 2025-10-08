@@ -62,7 +62,7 @@ router.put(
   addProductToDepartment
 );
 router.put(
-  "/departments/:depertmentId/removeProductsFromDepartment",
+  "/departments/:departmentId/removeProductsFromDepartment",
   removeProductFromDepartment
 ); // Reusing the same controller for removal
 router.delete("/departments/:id", deleteDepartment);

@@ -354,7 +354,7 @@ const ProductDetail = () => {
                   <span className="text-2xl font-bold text-accent">
                     ₹{selectedColor.price.toFixed(2)}
                   </span>
-                  {selectedVariant.originalPrice > selectedVariant.price && (
+                  {selectedColor.originalPrice > selectedColor.price && (
                     <span className="text-lg text-muted-foreground line-through">
                       ₹{selectedColor.originalPrice.toFixed(2)}
                     </span>
@@ -375,7 +375,13 @@ const ProductDetail = () => {
                     variant={
                       selectedVariantIndex === index ? "default" : "outline"
                     }
-                    className={`border rounded-md text-sm font-medium transition-all`}
+                    className={`border rounded-md text-sm font-medium transition-all
+                      ${
+                        selectedVariantIndex === index
+                          ? "border-accent bg-accent hover:text-white text-accent-foreground"
+                          : "border-border hover:border-accent/50 hover:bg-accent/10"
+                      }
+                      `}
                     onClick={() => handleVariantSelect(index)}
                   >
                     {variant.name}
@@ -402,7 +408,13 @@ const ProductDetail = () => {
                     <Button
                       key={size}
                       variant={selectedSize === size ? "default" : "outline"}
-                      className={`border rounded-md text-sm font-medium transition-all`}
+                      className={`border rounded-md text-sm font-medium transition-all
+                        ${
+                          selectedSize === size
+                            ? "border-accent bg-accent hover:text-white text-accent-foreground"
+                            : "border-border hover:border-accent/50 hover:bg-accent/10"
+                        }
+                        `}
                       onClick={() => setSelectedSize(size)}
                     >
                       {size}

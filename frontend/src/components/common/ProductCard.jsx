@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 // The static import is now removed:
 // import comingSoon from "../../assets/coming soon image 2.png";
 
-const ProductCard = ({ product, comingSoonImage, comingSoonText }) => {
+const ProductCard = ({ product, comingSoonImage, comingSoonText, id }) => {
   // --- "Coming Soon" Card Logic ---
   // This section is now dynamic.
   if (!product) {
@@ -37,22 +37,15 @@ const ProductCard = ({ product, comingSoonImage, comingSoonText }) => {
   }
 
   // --- Real Product Card Logic (No changes needed here) ---
-  const { _id, name, isNew, onSale, variants } = product;
-  const defaultVariant = variants[0];
-  const defaultColor = defaultVariant?.colors?.find(
-    (color) => color.name === "Black"
-  );
-  const price = defaultColor?.price;
-  const originalPrice = defaultColor?.originalPrice;
-  const imageSrc = defaultColor?.images?.[0];
+  const { name, isNew, onSale, price, originalPrice, image } = product;
 
   return (
-    <Link to={`/product/${_id}`}>
+    <Link to={`/product/${id}`}>
       <Card className="group product-card overflow-hidden border-border/50 bg-card/50 hover:cursor-pointer h-full w-full flex flex-col items-start justify-evenly">
         <div className="relative aspect-square overflow-hidden">
-          {imageSrc ? (
+          {image ? (
             <img
-              src={imageSrc}
+              src={image}
               alt={name}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />

@@ -203,6 +203,7 @@ export const adminAddProductsToDepartment = (departmentId, productsId) => {
 };
 
 export const adminRemoveProductsFromDepartment = (departmentId, productsId) => {
+  console.log(departmentId, productsId);
   return api.put(
     `/admin/departments/${departmentId}/removeProductsFromDepartment`,
     {

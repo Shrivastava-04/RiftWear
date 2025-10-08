@@ -30,6 +30,7 @@ const FASHION_COLLECTIONS = ["Anime Collection", "Casuals", "Minimalist"];
 const ANIME_SUB_COLLECTIONS = ["Naruto", "Jujutsu Kaisen", "One Piece"];
 const COLLEGE_NAMES = ["IIT (ISM) Dhanbad"];
 const DEPARTMENTS = [
+  "None",
   "Computer Science",
   "Mechanical Engineering",
   "Electrical Engineering",
@@ -67,23 +68,32 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
           // Ensure these fields exist for each color
           price: color.price || 0,
           originalPrice: color.originalPrice || 0,
-          features: color.features || [],
+          features: color.features || ["Pure Fabric", "Stylish Design"],
           specifications: color.specifications || {
-            Material: "",
-            Weight: "",
-            Fit: "",
-            Care: "",
+            Material: "100% Cotton",
+            Weight: "180 GSM",
+            Fit: "Round Neck, Regular Fit",
+            Care: "Machine Washed",
           },
           // Pad stock array to ensure all sizes are present in the UI
           stock: SIZES.map((size) => {
             const existingStock = color.stock.find((s) => s.size === size);
             return {
               size,
-              quantity: existingStock ? existingStock.quantity : 0,
+              quantity: existingStock ? existingStock.quantity : 100,
             };
           }),
         })),
       }));
+      product.productCard = product.productCard || {
+        name: "",
+        image: "",
+        price: 0,
+        originalPrice: 0,
+        isNew: true,
+        onSale: true,
+        sortPriority: 999,
+      };
       setFormData(productCopy);
 
       // --- UPDATED: Initialize the local state for the fashion collection dropdown
@@ -114,6 +124,11 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
       current[path[path.length - 1]] = value;
       return newFormData;
     });
+  };
+
+  const handleProductCardChange = (field, value) => {
+    const newProductCard = { ...formData.productCard, [field]: value };
+    setFormData((prev) => ({ ...prev, productCard: newProductCard }));
   };
 
   const handleCategoryChange = (field, value) => {
@@ -284,6 +299,90 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
               <Label htmlFor="isActive">Product Active</Label>
             </div>
           </div>
+          <div className="p-4 border rounded-lg space-y-4">
+            <h3 className="text-lg font-semibold">Product Card Information</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Label>Name</Label>
+                <Input
+                  placeholder="e.g., Classic Black Tee"
+                  value={formData.productCard.name}
+                  onChange={(e) =>
+                    handleProductCardChange("name", e.target.value)
+                  }
+                />
+              </div>
+              <div>
+                <Label>Sort Priority</Label>
+                <Input
+                  type="number"
+                  value={formData.productCard.sortPriority}
+                  onChange={(e) =>
+                    handleProductCardChange(
+                      "sortPriority",
+                      Number(e.target.value)
+                    )
+                  }
+                />
+              </div>
+              <div>
+                <Label>Price</Label>
+                <Input
+                  type="number"
+                  value={formData.productCard.price}
+                  onChange={(e) =>
+                    handleProductCardChange("price", Number(e.target.value))
+                  }
+                />
+              </div>
+              <div>
+                <Label>Original Price</Label>
+                <Input
+                  type="number"
+                  value={formData.productCard.originalPrice}
+                  onChange={(e) =>
+                    handleProductCardChange(
+                      "originalPrice",
+                      Number(e.target.value)
+                    )
+                  }
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-center">
+              <Label>Image To display</Label>
+              <Input
+                className="flex-grow"
+                value={formData.productCard.image}
+                placeholder="https://..."
+                onChange={(e) =>
+                  handleProductCardChange("image", e.target.value)
+                }
+              />
+              <img
+                src={formData.productCard.image}
+                alt="preview"
+                className="w-12 h-12 object-cover rounded-md border"
+                onError={(e) => (e.target.src = ERROR_IMG_PLACEHOLDER)}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2 pt-2">
+              <Switch
+                id="productCardOnSale"
+                checked={formData.productCard.onSale}
+                onCheckedChange={(c) => handleProductCardChange("onSale", c)}
+              />
+              <Label>On Sale</Label>
+              <Switch
+                id="productCardIsNew"
+                checked={formData.productCard.isNew}
+                onCheckedChange={(c) => handleProductCardChange("isNew", c)}
+              />
+              <Label>Is New</Label>
+            </div>
+          </div>
+
           <div className="p-4 border rounded-lg space-y-4">
             <h3 className="text-lg font-semibold">Categorization</h3>
             <div className="grid md:grid-cols-2 gap-4">
