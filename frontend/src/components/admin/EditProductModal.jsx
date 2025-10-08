@@ -306,7 +306,7 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
                 <Label>Name</Label>
                 <Input
                   placeholder="e.g., Classic Black Tee"
-                  value={formData.productCard.name}
+                  value={formData.productCard?.name}
                   onChange={(e) =>
                     handleProductCardChange("name", e.target.value)
                   }
@@ -316,7 +316,7 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
                 <Label>Sort Priority</Label>
                 <Input
                   type="number"
-                  value={formData.productCard.sortPriority}
+                  value={formData.productCard?.sortPriority}
                   onChange={(e) =>
                     handleProductCardChange(
                       "sortPriority",
@@ -329,7 +329,7 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
                 <Label>Price</Label>
                 <Input
                   type="number"
-                  value={formData.productCard.price}
+                  value={formData.productCard?.price}
                   onChange={(e) =>
                     handleProductCardChange("price", Number(e.target.value))
                   }
@@ -339,7 +339,7 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
                 <Label>Original Price</Label>
                 <Input
                   type="number"
-                  value={formData.productCard.originalPrice}
+                  value={formData.productCard?.originalPrice}
                   onChange={(e) =>
                     handleProductCardChange(
                       "originalPrice",
@@ -353,14 +353,14 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
               <Label>Image To display</Label>
               <Input
                 className="flex-grow"
-                value={formData.productCard.image}
+                value={formData.productCard?.image}
                 placeholder="https://..."
                 onChange={(e) =>
                   handleProductCardChange("image", e.target.value)
                 }
               />
               <img
-                src={formData.productCard.image}
+                src={formData.productCard?.image}
                 alt="preview"
                 className="w-12 h-12 object-cover rounded-md border"
                 onError={(e) => (e.target.src = ERROR_IMG_PLACEHOLDER)}
@@ -370,13 +370,13 @@ const EditProductModal = ({ isOpen, onClose, product, onProductUpdated }) => {
             <div className="flex items-center space-x-2 pt-2">
               <Switch
                 id="productCardOnSale"
-                checked={formData.productCard.onSale}
+                checked={formData.productCard?.onSale}
                 onCheckedChange={(c) => handleProductCardChange("onSale", c)}
               />
               <Label>On Sale</Label>
               <Switch
                 id="productCardIsNew"
-                checked={formData.productCard.isNew}
+                checked={formData.productCard?.isNew}
                 onCheckedChange={(c) => handleProductCardChange("isNew", c)}
               />
               <Label>Is New</Label>
