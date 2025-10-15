@@ -1,5 +1,12 @@
 import express from "express";
-import { signup, login, logout, googleAuth } from "./auth.controller.js";
+import {
+  signup,
+  login,
+  logout,
+  googleAuth,
+  resetPassword,
+  forgotPassword,
+} from "./auth.controller.js";
 
 const router = express.Router();
 
@@ -14,5 +21,9 @@ router.post("/google", googleAuth);
 
 // Route for logging out
 router.post("/logout", logout);
+
+// Route for password reset
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
 export default router;

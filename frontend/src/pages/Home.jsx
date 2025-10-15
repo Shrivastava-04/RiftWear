@@ -58,8 +58,8 @@ const Home = () => {
       {/* This is the main scrollable content area */}
       <div className="relative z-10">
         <div className="pt-[60vh]">
-          <FeaturedProductsSection comingSoonInfo={comingSoonInfo} />
           <SpecialCollectionSection comingSoonInfo={comingSoonInfo} />
+          <FeaturedProductsSection comingSoonInfo={comingSoonInfo} />
           <DepartmentsSection comingSoonInfo={comingSoonInfo} />
           <ContactAndAboutSection />
         </div>

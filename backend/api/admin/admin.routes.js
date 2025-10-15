@@ -10,6 +10,7 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  exportOrders,
 } from "./admin.controller.js";
 import { updateOrderStatus } from "../orders/order.controller.js";
 import { protectRoute } from "../../middleware/auth.middleware.js";
@@ -82,5 +83,7 @@ router.get("/stats", getDashboardStats);
 
 // --- 2. ADD THE NEW ROUTE FOR CART MANAGEMENT ---
 router.delete("/users/:userId/cart/:cartItemId", adminRemoveCartItem);
+
+router.get("/export-orders", exportOrders);
 
 export default router;

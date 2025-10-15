@@ -563,7 +563,8 @@ const OrdersTab = () => {
                     Order #{order.orderNumber}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Placed on {new Date(order.createdAt).toLocaleDateString()}
+                    Placed on{" "}
+                    {new Date(order.createdAt).toLocaleDateString("en-IN")}
                   </p>
                 </div>
                 <Badge>{order.orderStatus}</Badge>

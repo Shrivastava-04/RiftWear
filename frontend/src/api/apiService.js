@@ -27,6 +27,16 @@ export const googleLogin = (idToken) => {
   return api.post("/auth/google", { idToken });
 };
 
+// Password reset request
+
+export const requestPasswordReset = (email) => {
+  return api.post("/auth/forgot-password", { email });
+};
+
+export const resetPassword = (token, password) => {
+  return api.post(`/auth/reset-password/${token}`, { password });
+};
+
 // --- USER API CALLS ---
 export const getLoggedInUserProfile = () => {
   return api.get("/users/profile");
@@ -170,6 +180,19 @@ export const adminGetAllOrders = () => {
 export const adminUpdateOrderStatus = (orderId, statusData) => {
   // statusData will be an object like { status: 'Packed', details: { batchNumber: '123' } }
   return api.put(`/admin/orders/${orderId}/status`, statusData);
+};
+
+export const exportOrders = (startDate, endDate) => {
+  // Use URLSearchParams to safely build the query string for the API call
+  const params = new URLSearchParams();
+  if (startDate) params.append("startDate", startDate);
+  if (endDate) params.append("endDate", endDate);
+
+  const queryString = params.toString();
+  const url = `/admin/export-orders?${queryString}`;
+
+  // The responseType 'blob' remains crucial
+  return api.get(url, { responseType: "blob" });
 };
 
 // --- DASHBOARD STATS API CALL (ADMIN) ---

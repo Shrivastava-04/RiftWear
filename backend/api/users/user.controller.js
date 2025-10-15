@@ -566,6 +566,14 @@ export const canUserReviewProduct = async (req, res) => {
     const { productId } = req.params;
     const userId = req.user._id;
 
+    console.log("Checking review eligibility for user:", userId);
+    console.log("Product ID:", productId);
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      console.log("Invalid product ID format.");
+      return res.status(400).json({ message: "Invalid product ID." });
+    }
+
     // Find a delivered order using YOUR schema's field names
     const order = await Order.findOne({
       customer: userId,
@@ -573,11 +581,13 @@ export const canUserReviewProduct = async (req, res) => {
       "items.product.productId": productId,
     });
 
-    if (!order) {
-      return res
-        .status(200)
-        .json({ canReview: false, reason: "not_purchased" });
-    }
+    console.log(order);
+
+    // if (!order) {
+    //   return res
+    //     .status(200)
+    //     .json({ canReview: false, reason: "not_purchased" });
+    // }
 
     // If purchased, check if they have already reviewed it
     const existingReview = await Product.findOne({
@@ -586,6 +596,7 @@ export const canUserReviewProduct = async (req, res) => {
     });
 
     if (existingReview) {
+      console.log(existingReview);
       return res
         .status(200)
         .json({ canReview: false, reason: "already_reviewed" });

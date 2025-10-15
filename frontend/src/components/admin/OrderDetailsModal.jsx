@@ -394,28 +394,30 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="p-4 border rounded-lg">
               <h4 className="font-semibold mb-2">Customer Details</h4>
-              <p>{order.customer.name}</p>
+              <p>{order?.customer?.name}</p>
               <p className="text-sm text-muted-foreground">
-                {order.customer.email}
+                {order?.customer?.email}
               </p>
             </div>
             <div className="p-4 border rounded-lg">
               <h4 className="font-semibold mb-2">Shipping Address</h4>
               <p>
-                {order.shippingInfo.firstName} {order.shippingInfo.lastName}
+                {order?.shippingInfo?.firstName} {order?.shippingInfo?.lastName}
               </p>
-              <p className="text-sm">{order.shippingInfo.street}</p>
+              <p className="text-sm">{order?.shippingInfo?.street}</p>
               {/* --- UPDATED: Displaying new fields --- */}
-              {order.shippingInfo.landmark && (
+              {order?.shippingInfo?.landmark && (
                 <p className="text-sm">
-                  Landmark: {order.shippingInfo.landmark}
+                  Landmark: {order?.shippingInfo?.landmark}
                 </p>
               )}
               <p className="text-sm">
-                {order.shippingInfo.city}, {order.shippingInfo.state}{" "}
-                {order.shippingInfo.postalCode}, {order.shippingInfo.country}
+                {order?.shippingInfo?.city}, {order?.shippingInfo?.state}
+                {order?.shippingInfo?.postalCode},{order?.shippingInfo?.country}
               </p>
-              <p className="text-sm">Phone: {order.shippingInfo.phoneNumber}</p>
+              <p className="text-sm">
+                Phone: {order?.shippingInfo?.phoneNumber}
+              </p>
             </div>
           </div>
 

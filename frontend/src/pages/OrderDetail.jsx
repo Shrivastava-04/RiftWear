@@ -60,13 +60,15 @@ const OrderDetail = () => {
   });
 
   const order = response?.data?.order;
+  console.log("INSPECT THIS ITEM:", order?.items[0]); // <-- ADD THIS LINE
 
   const reviewEligibilityQueries = useQueries({
     queries: (order?.items ?? []).map((item) => ({
-      queryKey: ["canReview", item.productId],
-      queryFn: () => checkIfUserCanReview(item.productId),
+      queryKey: ["canReview", item.product.productId],
+      queryFn: () => checkIfUserCanReview(item.product.productId),
       enabled: !!(
-        order?.orderStatus?.toLowerCase() === "delivered" && item.productId
+        order?.orderStatus?.toLowerCase() === "delivered" &&
+        item.product.productId
       ),
     })),
   });
@@ -96,7 +98,7 @@ const OrderDetail = () => {
   // --- FINAL FIX IS HERE ---
   // The 'item' object is passed in. We correctly get its 'productId' and 'productName'.
   const openReviewModal = (item) => {
-    setProductToReview({ id: item.productId, name: item.productName });
+    setProductToReview({ id: item.product.productId, name: item.productName });
     setIsReviewModalOpen(true);
   };
 
@@ -197,6 +199,7 @@ const OrderDetail = () => {
                 {items.map((item, index) => {
                   const eligibilityResult =
                     reviewEligibilityQueries[index]?.data?.data;
+                  console.log(reviewEligibilityQueries[index]);
                   const canReview = eligibilityResult?.canReview;
                   const isAlreadyReviewed =
                     eligibilityResult?.reason === "already_reviewed";

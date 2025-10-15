@@ -1,6 +1,7 @@
 import User from "../users/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 import { sendEmail } from "../../services/email.services.js";
 
@@ -32,6 +33,54 @@ const welcomeEmailTemplate = (name) => `
         </p>
     </div>
 </div>`;
+
+const passwordResetEmailTemplate = (userName, resetURL) => {
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 40px auto; background-color: #121212; border-radius: 12px; color: #e5e7eb; padding: 32px;">
+      <div style="text-align: center; border-bottom: 1px solid #333; padding-bottom: 24px; margin-bottom: 24px;">
+        <h1 style="font-size: 30px; font-weight: 800; color: #ffffff; margin: 0;">Rift</h1>
+      </div>
+      <h2 style="font-size: 24px; font-weight: 700; color: #ffffff; margin: 0 0 16px;">Reset Your Password</h2>
+      <p style="font-size: 16px; line-height: 1.6; color: #a0a0a0;">Hi ${
+        userName.split(" ")[0]
+      },</p>
+      <p style="font-size: 16px; line-height: 1.6; color: #a0a0a0;">We received a request to reset the password for your Rift account. You can reset your password by clicking the button below:</p>
+      
+      <div style="margin: 32px 0; text-align: center;">
+        <a href="${resetURL}" target="_blank" style="background-color: #e89846; color: #121212; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px; display: inline-block;">Reset Password</a>
+      </div>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #a0a0a0;">This link is only valid for <strong>10 minutes</strong>. If you did not request a password reset, please ignore this email.</p>
+      
+      <p style="text-align: center; font-size: 12px; color: #777; margin-top: 32px;">Rift | Student-Run at IIT (ISM) Dhanbad</p>
+    </div>
+  `;
+};
+
+const passwordChangedConfirmationTemplate = (userName) => {
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 40px auto; background-color: #121212; border-radius: 12px; color: #e5e7eb; padding: 32px;">
+      <div style="text-align: center; border-bottom: 1px solid #333; padding-bottom: 24px; margin-bottom: 24px;">
+        <h1 style="font-size: 30px; font-weight: 800; color: #ffffff; margin: 0;">Rift</h1>
+      </div>
+      <h2 style="font-size: 24px; font-weight: 700; color: #ffffff; margin: 0 0 16px;">Security Alert: Your Password Was Changed</h2>
+      <p style="font-size: 16px; line-height: 1.6; color: #a0a0a0;">Hi ${
+        userName.split(" ")[0]
+      },</p>
+      <p style="font-size: 16px; line-height: 1.6; color: #a0a0a0;">This email is a confirmation that the password for your Rift account has been successfully changed. You can now log in with your new credentials.</p>
+      
+      <div style="margin: 32px 0; text-align: center;">
+        <a href="${
+          process.env.FRONTEND_URL
+        }/login" target="_blank" style="background-color: #e89846; color: #121212; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px; display: inline-block;">Login to Your Account</a>
+      </div>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #a0a0a0;">If you did not make this change, please contact our support team immediately to secure your account.</p>
+      
+      <p style="text-align: center; font-size: 12px; color: #777; margin-top: 32px;">Rift | Student-Run at IIT (ISM) Dhanbad</p>
+    </div>
+  `;
+};
 
 // --- Reusable Helper Function ---
 const generateTokenAndSetCookie = (userId, res) => {
@@ -175,5 +224,98 @@ export const googleAuth = async (req, res) => {
   } catch (error) {
     console.error("Google Auth Error:", error);
     res.status(401).json({ message: "Google authentication failed." });
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    // Always send a success-like response to prevent email enumeration attacks
+    if (!user) {
+      return res.status(200).json({
+        message:
+          "If an account with this email exists, a password reset link has been sent.",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    await user.save({ validateBeforeSave: false });
+
+    const resetURL = `${FRONTEND_URL}/reset-password/${resetToken}`;
+
+    const emailHtml = passwordResetEmailTemplate(user.name, resetURL);
+    await sendEmail(user.email, "Your Rift Password Reset Link", emailHtml);
+
+    res.status(200).json({
+      message:
+        "If an account with this email exists, a password reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({ message: "An internal server error occurred." });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    const { token } = req.params;
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Password reset token is invalid or has expired." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    // =======================================================
+    // --- NEW: Send Password Change Confirmation Email ---
+    // =======================================================
+    try {
+      const subject = "Security Alert: Your Rift Password Has Been Changed";
+      const htmlContent = passwordChangedConfirmationTemplate(user.name);
+      await sendEmail(user.email, subject, htmlContent);
+    } catch (emailError) {
+      // Log the error, but don't fail the overall request as the password was changed successfully.
+      console.error(
+        "Failed to send password change confirmation email:",
+        emailError
+      );
+    }
+    // =======================================================
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Password has been reset successfully.",
+      });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(500).json({ message: "An internal server error occurred." });
   }
 };

@@ -3,6 +3,7 @@ import Order from "../orders/order.model.js";
 import Product from "../products/product.model.js";
 import mongoose from "mongoose"; // <-- Make sure mongoose is imported
 import Department from "../departments/department.model.js";
+import ExcelJS from "exceljs";
 
 /**
  * @desc    Get all users with advanced filtering and sorting for the admin panel
@@ -58,7 +59,55 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Server error fetching users." });
   }
 };
+// export const getAllUsers = async (req, res) => {
+//   try {
+//     // 1. Get query parameters with defaults
+//     const {
+//       page = 1,
+//       limit = 20,
+//       sortBy = "createdAt",
+//       sortOrder = "desc",
+//       role = "all",
+//       search = "",
+//     } = req.query;
 
+//     // 2. Build the database query object
+//     const query = {};
+
+//     if (role && role !== "all") {
+//       query.role = role;
+//     }
+
+//     if (search) {
+//       const searchRegex = new RegExp(search, "i"); // 'i' for case-insensitive
+//       query.$or = [{ name: searchRegex }, { email: searchRegex }];
+//     }
+
+//     // 3. Build the sort object
+//     const sort = {};
+//     sort[sortBy] = sortOrder === "asc" ? 1 : -1;
+
+//     // 4. Execute queries: one for the total count, one for the paginated data
+//     const totalUsers = await User.countDocuments(query);
+//     const users = await User.find(query)
+//       .sort(sort)
+//       .skip((page - 1) * limit)
+//       .limit(parseInt(limit))
+//       .lean(); // .lean() for better performance
+
+//     // 5. Send the response with users and pagination info
+//     res.status(200).json({
+//       success: true,
+//       users,
+//       currentPage: parseInt(page),
+//       totalPages: Math.ceil(totalUsers / limit),
+//       totalUsers,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching users for admin:", error);
+//     res.status(500).json({ message: "Server error fetching users." });
+//   }
+// };
 /**
  * @desc    Get a single user by ID (for admin panel)
  * @route   GET /api/v1/admin/users/:id
@@ -504,5 +553,170 @@ export const deleteProduct = async (req, res) => {
   } catch (error) {
     console.error("Delete Product Error:", error);
     res.status(500).json({ message: "Server error during product deletion." });
+  }
+};
+
+// Note: You don't need to import Product or User here, Mongoose handles it via populate
+
+export const exportOrders = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    let query = {};
+
+    // --- Date filtering logic (unchanged) ---
+    if (startDate) {
+      query.createdAt = { ...query.createdAt, $gte: new Date(startDate) };
+    }
+    if (endDate) {
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.createdAt = { ...query.createdAt, $lte: endOfDay };
+    }
+
+    // --- UPDATED: Data Fetching with Nested Population ---
+    // 1. Populate 'customer' to get the user's email.
+    // 2. Populate the 'productId' within the 'items' array to get full product details.
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .populate("customer", "email") // Only fetch email from the User model
+      .populate({
+        path: "items.product.productId",
+        model: "Product", // Explicitly define the model for clarity
+      });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Orders");
+
+    // --- UPDATED: Expanded Columns for Maximum Detail ---
+    worksheet.columns = [
+      // General
+      { header: "Row #", key: "rowNumber", width: 8 },
+      { header: "Order #", key: "orderNumber", width: 20 },
+      { header: "Order Date", key: "orderDate", width: 15 },
+      { header: "Order Status", key: "orderStatus", width: 15 },
+      // Customer & Shipping (from shippingInfo snapshot)
+      { header: "Customer Name", key: "customerName", width: 30 },
+      { header: "Customer Email", key: "customerEmail", width: 35 },
+      { header: "Customer Phone", key: "customerPhone", width: 20 },
+      { header: "Shipping Address", key: "shippingAddress", width: 60 },
+      // Item Details
+      { header: "Product Name", key: "productName", width: 40 },
+      { header: "Variant", key: "variantName", width: 15 },
+      { header: "Color", key: "colorName", width: 15 },
+      { header: "Size", key: "size", width: 10 },
+      { header: "Quantity", key: "quantity", width: 10 },
+      { header: "Name To Print", key: "nameToPrint", width: 20 },
+      { header: "Price Per Item", key: "itemPrice", width: 15 },
+      // Order-level Pricing
+      { header: "Items Subtotal", key: "itemsSubtotal", width: 15 },
+      { header: "Shipping Price", key: "shippingPrice", width: 15 },
+      { header: "Tax", key: "taxPrice", width: 15 },
+      { header: "Discount", key: "discount", width: 15 },
+      { header: "Order Total", key: "totalAmount", width: 15 },
+      // Payment Details
+      { header: "Payment Status", key: "paymentStatus", width: 15 },
+      { header: "Payment Method", key: "paymentMethod", width: 15 },
+      { header: "Payment ID", key: "paymentId", width: 30 },
+      // Shipment Tracking
+      { header: "Shipping Carrier", key: "shippingCarrier", width: 20 },
+      { header: "Tracking #", key: "trackingNumber", width: 30 },
+      { header: "Shipped At", key: "shippedAt", width: 15 },
+    ];
+
+    let rowNum = 1;
+    orders.forEach((order) => {
+      // --- Common data for all items in this order ---
+      const customerName = `${order.shippingInfo?.firstName ?? ""} ${
+        order.shippingInfo?.lastName ?? ""
+      }`.trim();
+
+      const shippingAddress = [
+        order.shippingInfo?.street,
+        order.shippingInfo?.landmark,
+        order.shippingInfo?.city,
+        order.shippingInfo?.state,
+        order.shippingInfo?.postalCode,
+        order.shippingInfo?.country,
+      ]
+        .filter(Boolean)
+        .join(", "); // Filter out empty parts and join
+
+      // --- Loop through each item in the order to create a separate row ---
+      order.items.forEach((item) => {
+        // --- Find the specific product, variant, and color details from populated data ---
+        const productDoc = item.product.productId;
+        let productName = "Product Not Found";
+        let variantName = "N/A";
+        let colorName = "N/A";
+        let itemPrice = 0;
+
+        if (productDoc) {
+          productName = productDoc.name;
+          const variantDoc = productDoc.variants.find((v) =>
+            v._id.equals(item.product.variantId)
+          );
+          if (variantDoc) {
+            variantName = variantDoc.name;
+            const colorDoc = variantDoc.colors.find((c) =>
+              c._id.equals(item.product.colorId)
+            );
+            if (colorDoc) {
+              colorName = colorDoc.name;
+              itemPrice = colorDoc.price; // Get price from the specific color variant
+            }
+          }
+        }
+
+        // --- Add a row to the worksheet with all the details ---
+        worksheet.addRow({
+          rowNumber: rowNum++,
+          orderNumber: order.orderNumber,
+          orderDate: new Date(order.createdAt).toLocaleDateString("en-GB"),
+          orderStatus: order.orderStatus,
+          customerName: customerName,
+          customerEmail: order.customer?.email ?? "N/A",
+          customerPhone: order.shippingInfo?.phoneNumber ?? "N/A",
+          shippingAddress: shippingAddress,
+          productName: productName,
+          variantName: variantName,
+          colorName: colorName,
+          size: item.size,
+          quantity: item.quantity,
+          nameToPrint: item.nameToPrint ?? "N/A",
+          itemPrice: itemPrice,
+          itemsSubtotal: order.pricingInfo?.itemsPrice ?? 0,
+          shippingPrice: order.pricingInfo?.shippingPrice ?? 0,
+          taxPrice: order.pricingInfo?.taxPrice ?? 0,
+          discount: order.pricingInfo?.discount ?? 0,
+          totalAmount: order.pricingInfo?.totalAmount ?? 0,
+          paymentStatus: order.paymentInfo?.status ?? "N/A",
+          paymentMethod: order.paymentInfo?.method ?? "N/A",
+          paymentId: order.paymentInfo?.razorpay?.paymentId ?? "N/A",
+          shippingCarrier: order.shippingDetails?.carrier ?? "N/A",
+          trackingNumber: order.shippingDetails?.trackingNumber ?? "N/A",
+          shippedAt: order.shippingDetails?.shippedAt
+            ? new Date(order.shippingDetails.shippedAt).toLocaleDateString(
+                "en-GB"
+              )
+            : "N/A",
+        });
+      });
+    });
+
+    // --- Set response headers to trigger download ---
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=" + "orders.xlsx"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Error exporting orders:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

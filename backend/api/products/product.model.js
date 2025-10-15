@@ -96,20 +96,6 @@ const categorySchema = new mongoose.Schema({
   },
   department: {
     type: String,
-    enum: [
-      null,
-      "Computer Science",
-      "Mechanical Engineering",
-      "Electrical Engineering",
-      "Civil Engineering",
-      "Mining Engineering",
-      "Chemical Engineering",
-      "Electronics & Communication",
-      "Petroleum Engineering",
-      "Mathematics & Computing",
-      "Physics",
-      "Applied Geophysics",
-    ],
     default: null,
   },
 });
