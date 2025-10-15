@@ -83,13 +83,29 @@ const passwordChangedConfirmationTemplate = (userName) => {
 };
 
 // --- Reusable Helper Function ---
+const getCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const options = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "strict",
+  };
+
+  // For production, you might need to specify the domain for cross-subdomain cookies
+  if (isProduction && process.env.COOKIE_DOMAIN) {
+    options.domain = process.env.COOKIE_DOMAIN;
+  }
+
+  return options;
+};
+
 const generateTokenAndSetCookie = (userId, res) => {
   const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: "15d" });
+  const cookieOptions = getCookieOptions();
+
   res.cookie("jwtToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-    maxAge: 15 * 24 * 60 * 60 * 1000,
+    ...cookieOptions,
+    maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
   });
 };
 
@@ -170,9 +186,14 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("jwtToken", {
-    /* ... cookie options ... */
+  const cookieOptions = getCookieOptions();
+
+  // Instruct the browser to clear the cookie by setting an empty value and past expiration date
+  res.cookie("jwtToken", "", {
+    ...cookieOptions,
+    expires: new Date(0),
   });
+
   res.status(200).json({ success: true, message: "Logout successful." });
 };
 
@@ -308,12 +329,10 @@ export const resetPassword = async (req, res) => {
     }
     // =======================================================
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Password has been reset successfully.",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Password has been reset successfully.",
+    });
   } catch (error) {
     console.error("Reset Password Error:", error);
     res.status(500).json({ message: "An internal server error occurred." });
