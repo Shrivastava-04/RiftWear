@@ -19,8 +19,12 @@ export const AuthProvider = ({ children }) => {
   });
 
   const login = async () => {
-    //  queryClient.setQueryData(["user"], { data: { user: userData } });
-    await queryClient.invalidateQueries({ queryKey: ["user"] });
+    try {
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.setQueryData(["user"], { data: { user: userData } });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const logout = async () => {

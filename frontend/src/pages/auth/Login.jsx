@@ -48,6 +48,8 @@ const Login = () => {
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "An error occurred.";
+      // console.log(errorMessage);
+      console.log(error);
       toast({
         title: "Login Failed",
         description: errorMessage,
